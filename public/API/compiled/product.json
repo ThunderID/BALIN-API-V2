@@ -1,0 +1,601 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Product API",
+        "description": "Move your app forward with the Product API",
+        "version": "1.0.0"
+    },
+    "host": "localhost:8800",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/v1",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/products": {
+            "get": {
+                "summary": "Product Lists",
+                "description": "The Products endpoint returns information about the *BALIN* products\noffered at a given location. The response includes the display name\nand other details about each product, and lists the products in the\nproper display order.\n",
+                "parameters": [
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "description": "Access token given by apps.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "search parameter.",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/search"
+                        }
+                    },
+                    {
+                        "name": "skip",
+                        "in": "query",
+                        "description": "How many records are going to be skipped",
+                        "required": false,
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    {
+                        "name": "take",
+                        "in": "query",
+                        "description": "How many records are going to be taken from resource",
+                        "required": false,
+                        "type": "number",
+                        "format": "integer"
+                    }
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of products' data",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/products"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/products/store": {
+            "post": {
+                "summary": "Store a Product",
+                "description": "Store a product with details those are varians, prices, categories, tags, labels, images\n",
+                "parameters": [
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "description": "Access token given by apps.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "Let it null for new product.",
+                        "required": true,
+                        "type": "number",
+                        "format": "double"
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "description": "Product name.",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    {
+                        "name": "upc",
+                        "in": "query",
+                        "description": "Must be unique.",
+                        "required": true,
+                        "type": "string",
+                        "format": "string"
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "description": "Must be json of array = description and fit.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "varians",
+                        "in": "query",
+                        "description": "Must be array of products' varian.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/varians"
+                        }
+                    },
+                    {
+                        "name": "prices",
+                        "in": "query",
+                        "description": "Must be array of products' price.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/prices"
+                        }
+                    },
+                    {
+                        "name": "categories",
+                        "in": "query",
+                        "description": "Must be array of products' category.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/categories"
+                        }
+                    },
+                    {
+                        "name": "tags",
+                        "in": "query",
+                        "description": "Must be array of products' tag.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/tags"
+                        }
+                    },
+                    {
+                        "name": "labels",
+                        "in": "query",
+                        "description": "Must be array of products' label.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/labels"
+                        }
+                    },
+                    {
+                        "name": "images",
+                        "in": "query",
+                        "description": "Must be array of products' image.",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/definitions/images"
+                        }
+                    }
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "An array of product",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/product"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/{id}": {
+            "get": {
+                "summary": "Product Detail",
+                "description": "Get product detail information.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "product id.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "description": "Access token given by apps.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    }
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "product rich data",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/product"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/product/delete/{id}": {
+            "delete": {
+                "summary": "Delete a product",
+                "description": "Get product detail information.",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "query",
+                        "description": "product id.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    },
+                    {
+                        "name": "access_token",
+                        "in": "query",
+                        "description": "Access token given by apps.",
+                        "required": true,
+                        "type": "number",
+                        "format": "integer"
+                    }
+                ],
+                "tags": [
+                    "Products"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "product rich data",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/product"
+                            }
+                        }
+                    },
+                    "default": {
+                        "description": "Unexpected error",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "search": {
+            "type": "array",
+            "properties": {
+                "labelname": {
+                    "type": "string",
+                    "description": "Search product that hath certain label"
+                }
+            }
+        },
+        "products": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "type": "number",
+                    "description": "Total products."
+                },
+                "data": {
+                    "type": "array",
+                    "properties": {
+                        "id": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "upc": {
+                            "type": "string"
+                        },
+                        "slug": {
+                            "type": "string"
+                        },
+                        "description": {
+                            "type": "array"
+                        },
+                        "current_stock": {
+                            "type": "number"
+                        },
+                        "on_hold_stock": {
+                            "type": "number"
+                        },
+                        "inventory_stock": {
+                            "type": "number"
+                        },
+                        "reserved_stock": {
+                            "type": "number"
+                        },
+                        "packed_stock": {
+                            "type": "number"
+                        },
+                        "price": {
+                            "type": "number"
+                        },
+                        "promo_price": {
+                            "type": "number"
+                        },
+                        "thumbnail": {
+                            "type": "string"
+                        },
+                        "image_xs": {
+                            "type": "string"
+                        },
+                        "image_sm": {
+                            "type": "string"
+                        },
+                        "image_md": {
+                            "type": "string"
+                        },
+                        "image_lg": {
+                            "type": "string"
+                        },
+                        "varians": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/varians"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "product": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "upc": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "array"
+                },
+                "current_stock": {
+                    "type": "number"
+                },
+                "on_hold_stock": {
+                    "type": "number"
+                },
+                "inventory_stock": {
+                    "type": "number"
+                },
+                "reserved_stock": {
+                    "type": "number"
+                },
+                "packed_stock": {
+                    "type": "number"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "promo_price": {
+                    "type": "number"
+                },
+                "thumbnail": {
+                    "type": "string"
+                },
+                "image_xs": {
+                    "type": "string"
+                },
+                "image_sm": {
+                    "type": "string"
+                },
+                "image_md": {
+                    "type": "string"
+                },
+                "image_lg": {
+                    "type": "string"
+                },
+                "varians": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/varians"
+                    }
+                }
+            }
+        },
+        "varians": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "sku": {
+                    "type": "string"
+                },
+                "size": {
+                    "type": "string"
+                },
+                "current_stock": {
+                    "type": "number"
+                },
+                "on_hold_stock": {
+                    "type": "number"
+                },
+                "inventory_stock": {
+                    "type": "number"
+                },
+                "reserved_stock": {
+                    "type": "number"
+                },
+                "packed_stock": {
+                    "type": "number"
+                }
+            }
+        },
+        "prices": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "promo_price": {
+                    "type": "number"
+                },
+                "started_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "categories": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "tags": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "slug": {
+                    "type": "string"
+                }
+            }
+        },
+        "labels": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "lable": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                },
+                "started_at": {
+                    "type": "string"
+                },
+                "ended_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "images": {
+            "type": "array",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "product_id": {
+                    "type": "string"
+                },
+                "thumbnail": {
+                    "type": "string"
+                },
+                "image_xs": {
+                    "type": "string"
+                },
+                "image_sm": {
+                    "type": "string"
+                },
+                "image_md": {
+                    "type": "string"
+                },
+                "image_lg": {
+                    "type": "string"
+                },
+                "is_default": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "data": {
+                    "type": "array"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        }
+    }
+}

@@ -35,7 +35,7 @@ interface ValidatingTransactionInterface
 	public function validatevoucher(Voucher $voucher);
 	public function calculatevoucherdiscount(Voucher $voucher);
 
-	public function calculatepointdiscount(User $user);
+	public function calculatepointdiscount(User $user, Sale $sale);
 	public function calculatebills();
 	
 	public function getsalenumber(Sale $sale);

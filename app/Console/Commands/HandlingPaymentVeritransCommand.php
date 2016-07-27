@@ -71,7 +71,7 @@ class HandlingPaymentVeritransCommand extends Command {
 		// Uncomment for production environment
 		Veritrans_Config::$isProduction	= env('VERITRANS_PRODUCTION', false);
 
-		$waiting_transaction			= Sale::status('payment_process')->get();
+		$waiting_transaction			= Sale::status('veritrans_payment_process')->get();
 
 		foreach ($waiting_transaction as $key => $value) 
 		{

@@ -151,11 +151,11 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	
 	public function validateshippingaddress(array $shipment)
 	{
-		$courier 			= Courier::id($shipment['courier_id'])->first();
+		$courier 				= Courier::id($shipment['courier_id'])->first();
 
 		$this->validatecourier($courier);
 
-		$postal_code	= ShippingCost::courierid($courier->id)->postalcode($shipment['address']['zipcode'])->first();
+		$postal_code			= ShippingCost::courierid($courier->id)->postalcode($shipment['address']['zipcode'])->first();
 	
 		$this->validatepostalcode($postal_code);
 
@@ -217,10 +217,18 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		}
 	}
 
-	public function calculatepointdiscount(User $user)
+	public function calculatepointdiscount(User $user, Sale $sale)
 	{
+		if($sale->count())
+		{
+			$bills		= $sale->bills;
+		}
+		else
+		{
+			$bills 		= $this->getbills();
+		}
+	
 		$point 			= $user->total_point;
-		$bills 			= $this->getbills();
 
 		if($point >= $bills)
 		{

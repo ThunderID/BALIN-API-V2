@@ -111,7 +111,7 @@ class Payment extends BaseModel
 	{
         parent::boot();
  
-        Payment::observe(new PaymentObserver());
+        // Payment::observe(new PaymentObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

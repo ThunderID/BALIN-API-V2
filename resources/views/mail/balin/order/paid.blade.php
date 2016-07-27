@@ -179,10 +179,10 @@
 							<td colspan="2">&nbsp;</td>
 							<td colspan="2" style="text-align:left;">Total</td>
 							<td style="text-align:right;">IDR</td>
-							@if($data['invoice']['bills'] < 0)
+							@if($data['paid']['bills'] < 0)
 								<td style="text-align:right;padding:5px;">@thunder_mail_money_indo_without_IDR(0)</td>
 							@else
-								<td style="text-align:right;padding:5px;">@thunder_mail_money_indo_without_IDR($data['invoice']['bills'])</td>
+								<td style="text-align:right;padding:5px;">@thunder_mail_money_indo_without_IDR($data['paid']['bills'])</td>
 							@endif
 						</tr>
 					</tbody>

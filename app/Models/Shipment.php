@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Observers\ShipmentObserver;
+// use App\Models\Observers\ShipmentObserver;
 use App\Models\Traits\Calculations\HasShipCostTrait;
 use App\Models\Traits\Changes\HasStatusLogTrait;
 
@@ -103,7 +103,7 @@ class Shipment extends BaseModel
 	{
         parent::boot();
  
-        Shipment::observe(new ShipmentObserver());
+        // Shipment::observe(new ShipmentObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

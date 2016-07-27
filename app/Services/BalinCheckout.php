@@ -102,7 +102,10 @@ class BalinCheckout implements CheckoutInterface
 		//7. Validate Checkout Status
 		$this->pre->validatecheckoutstatus($sale); 
 
-		//8. Generate unique number
+		//8. Calculatepoint discount
+		$this->pre->calculatepointdiscount($customer); 
+
+		//9. Generate unique number
 		$this->sale['unique_number']	= $this->pre->getuniquenumber($sale); 
 
 		if($this->pre->errors->count())
@@ -112,44 +115,44 @@ class BalinCheckout implements CheckoutInterface
 			return false;
 		}
 
-		//9. set transact_at
+		//10. set transact_at
 		$this->sale['transact_at'] 		= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
 
-		//10. set shipping cost 
+		//11. set shipping cost 
 		$this->sale['shipping_cost']	= $this->pre->getshippingcost();
 
-		//11. set voucher discount 
+		//12. set voucher discount 
 		$this->sale['voucher_discount']	= $this->pre->getvoucherdiscount();
 
 		\DB::BeginTransaction();
 
 		/** PROCESS */
 
-		//12. Store Data Transaksi
+		//13. Store Data Transaksi
 		$this->pro->store($this->sale); 
 		
-		//13. Store sale item
+		//14. Store sale item
 		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
 
-		//14. Store packing ornament
+		//15. Store packing ornament
 		$this->pro->storepackingornament($this->pro->sale, $this->sale['transactionextensions']); 
 
-		//15. Store Shipping Address
+		//16. Store Shipping Address
 		$this->pro->shippingaddress($this->pro->sale, $this->sale['shipment']); 
 
-		//16. Reduce Quota Voucher
+		//17. Reduce Quota Voucher
 		if($this->pro->sale->voucher()->count())
 		{
 			$this->pro->creditquotavoucher($this->pro->sale->voucher, 1, 'Belanja #'.$this->sale['ref_number']); 
 		}
 
-		//17. Reduce Balin Point
+		//18. Reduce Balin Point
 		$this->pro->creditbalinpoint($customer, $this->pro->sale, $this->pre->getpointdiscount()); 
 
-		//18. Store Log Transaksi
+		//19. Store Log Transaksi
 		$this->pro->updatestatus($this->pro->sale, 'wait');
 
-		//19. Check bills
+		//20. Check bills
 		if($this->pre->getbills() == 0)
 		{
 			$this->pro->updatestatus($this->pro->sale, 'paid');
@@ -168,16 +171,16 @@ class BalinCheckout implements CheckoutInterface
 
 		/** POST PROCESS */
 
-		//20. Send Mail
+		//21. Send Mail
 		$this->post->sendmailinvoice($this->pro->sale, $this->sale['client_id']);
 
-		//21. Send Mail for bills
+		//22. Send Mail for bills
 		if($this->pre->getbills() == 0)
 		{
 			$this->post->sendmailpaymentacceptance($this->pro->sale, $this->sale['client_id']);
 		}
 
-		//22. Return Sale Model Object
+		//23. Return Sale Model Object
 		$this->saved_data	= $this->pro->sale;
 
 		return true;

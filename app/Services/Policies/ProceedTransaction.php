@@ -154,9 +154,9 @@ class ProceedTransaction implements ProceedTransactionInterface
 
 		$idx								= 0;
 		$currentamount						= 0;
-		$paidamount							= 0;
+		$paidamount							= $pointdiscount;
 
-		while($paidamount < $pointdiscount && $points && isset($points[$idx]) && $sumpoints > 0)
+		while($paidamount <= $pointdiscount && $points && isset($points[$idx]) && $sumpoints > 0)
 		{
 			$sumpoints						= PointLog::userid($user->id)->onactive('now')->sum('amount');
 	
@@ -196,10 +196,35 @@ class ProceedTransaction implements ProceedTransactionInterface
 					$this->errors->add('Sale', $point->getError());
 				}
 
-				$paidamount					= $paidamount + $camount;
+				$paidamount					= $paidamount - $camount;
 			}
 
 			$idx++;
+		}
+	}
+
+	public function revertbalinpoint(Sale $sale)
+	{
+		foreach ($sale->paidpointlogs as $key => $value) 
+		{
+			if($value->amount < 0)
+			{
+				$point                      = new PointLog;
+				$point->fill([
+						'user_id'           => $value->user_id,
+						'point_log_id'      => $value->id,
+						'reference_id'     	=> $sale->id,
+						'reference_type'    => get_class($sale),
+						'amount'            => 0 - $value->amount,
+						'expired_at'        => $value->expired_at,
+						'notes'             => 'Revert Belanja #'.$sale->ref_number,
+					]);
+		
+				if(!$point->save())
+				{
+					$this->errors->add('Canceled', $point->getError());
+				}
+			}
 		}
 	}
 

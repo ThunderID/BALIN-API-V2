@@ -10,7 +10,7 @@ use App\Models\Traits\HasReferralOfTrait;
 use App\Models\Traits\HasTotalPointTrait;
 use App\Models\Traits\HasSelectAllTrait;
 
-use App\Models\Observers\UserObserver;
+// use App\Models\Observers\UserObserver;
 
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -109,7 +109,7 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
 	{
 		parent::boot();
  
-		User::observe(new UserObserver());
+		// User::observe(new UserObserver());
 	}
 
 	/**

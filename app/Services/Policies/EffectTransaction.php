@@ -64,4 +64,17 @@ class EffectTransaction implements EffectTransactionInterface
 			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - PAYMENT VALIDATION');
 		}); 
 	}
+
+	public function sendmailcancelorder(Sale $sale, $client_id)
+	{
+		$template 			= ClientTemplate::clientid($client_id)->first();
+
+		$data				= ['canceled' => $sale, 'balin' => $store];
+
+		//send mail
+		Mail::send('mail.'.$template->located.'.order.paid', ['data' => $data], function($message) use($sale, $template)
+		{
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - CANCEL ORDER');
+		}); 
+	}
 }

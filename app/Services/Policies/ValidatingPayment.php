@@ -36,5 +36,13 @@ class ValidatingPayment implements ValidatingPaymentInterface
 			$this->errors->add('Sale', 'Tidak dapat memproses pembayaran untuk pembelian yang belum di checkout');
 		}
 	}
+
+	public function validatepaymentamount(Sale $sale, array $payment)
+	{
+		if($sale['bills'] != $payment['amount'])
+		{
+			$this->errors->add('Sale', 'Jumlah pembayaran tidak sesuai dengan tagihan');
+		}
+	}
 }
 

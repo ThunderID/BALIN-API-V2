@@ -69,12 +69,25 @@ class EffectTransaction implements EffectTransactionInterface
 	{
 		$template 			= ClientTemplate::clientid($client_id)->first();
 
-		$data				= ['canceled' => $sale, 'balin' => $store];
+		$data				= ['canceled' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.paid', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.'.$template->located.'.order.canceled', ['data' => $data], function($message) use($sale, $template)
 		{
 			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - CANCEL ORDER');
+		}); 
+	}
+
+	public function sendmaildeliveredorder(Sale $sale, $client_id)
+	{
+		$template 			= ClientTemplate::clientid($client_id)->first();
+
+		$data				= ['delivered' => $sale, 'balin' => $this->storeinfo];
+
+		//send mail
+		Mail::send('mail.'.$template->located.'.order.delivered', ['data' => $data], function($message) use($sale, $template)
+		{
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - DELIVERED ORDER');
 		}); 
 	}
 }

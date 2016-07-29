@@ -56,7 +56,7 @@ class TransactionLog extends BaseModel
 											'transaction_id'				=> 'exists:transactions,id',
 											'status'						=> 'in:cart,wait,veritrans_processing_payment,paid,packed,shipping,delivered,canceled,abandoned',
 											'changed_at'					=> 'date_format:"Y-m-d H:i:s"',
-											'notes'							=> 'required_if:status,delivered',
+											// 'notes'							=> 'required_if:status,delivered',
 										];
 
 	/* ---------------------------------------------------------------------------- RELATIONSHIP ----------------------------------------------------------------------------*/

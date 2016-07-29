@@ -43,7 +43,7 @@ class EffectShipment implements EffectShipmentInterface
 	{
 		$template 			= ClientTemplate::clientid($client_id)->first();
 
-		$data				= ['shipped' => $sale, 'balin' => $store];
+		$data				= ['shipped' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
 		Mail::send('mail.'.$template->located.'.order.shipped', ['data' => $data], function($message) use($sale, $template)

@@ -17,7 +17,7 @@ class ClientTemplate extends BaseModel
 	 * Relationship Traits.
 	 *
 	 */
-	use \App\Models\Traits\belongsTo\HasClientTrait;
+	// use \App\Models\Traits\belongsTo\HasClientTrait;
 
 	/**
 	 * The database table used by the model.

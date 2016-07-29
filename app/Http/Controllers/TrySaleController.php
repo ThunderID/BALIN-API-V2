@@ -12,7 +12,7 @@ use App\Http\Controllers\Veritrans\Veritrans_VtDirect;
 use App\Http\Controllers\Veritrans\Veritrans_VtWeb;
 use App\Http\Controllers\Veritrans\Veritrans_Sanitizer;
 
-use App\Services\BalinShippingOrder as Checkout;
+use App\Services\BalinDeliveredOrder as Checkout;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
@@ -67,10 +67,10 @@ class TrySaleController extends Controller
 		// 	            ];
 		// $jwt 		= new JwtToken;
 
-		$app 				= \App\Entities\Sale::status(['packed'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
+		$app 				= \App\Entities\Sale::status(['delivered'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
 		// $app 				= \App\Models\Sale::id(78)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
 // dd($app);
-// dd($app[0]);
+dd($app[0]);
 // 		$modified = $app[0];
 // 		$modified['id'] = null;
 // 		$modified['transactiondetails'][0]['transaction_id'] = null;
@@ -135,7 +135,8 @@ class TrySaleController extends Controller
 
 // $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
 $app[0]['client_id'] = 'f3d259ddd3ed8ff3843839b';
-$app[0]['shipment']['receipt_number'] = 'f3d259ddd3ed8ff3843839b0';
+$app[0]['notes'] = 'Diterima Oleh Chelsy';
+// $app[0]['shipment']['receipt_number'] = 'f3d259ddd3ed8ff3843839b0';
 // // dd($app);
 // 		$token = $jwt->createToken($payload);
 // dd($token);

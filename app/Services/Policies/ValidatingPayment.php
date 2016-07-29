@@ -2,15 +2,7 @@
 
 namespace App\Services\Policies;
 
-use App\Models\User;
 use App\Entities\Sale;
-use App\Models\TransactionLog;
-use App\Models\Varian;
-use App\Models\ProductExtension;
-use App\Models\Courier;
-use App\Models\ShippingCost;
-use App\Models\Voucher;
-use App\Models\StoreSetting;
 
 use App\Contracts\Policies\ValidatingPaymentInterface;
 
@@ -33,7 +25,7 @@ class ValidatingPayment implements ValidatingPaymentInterface
 	{
 		if($sale['bills'] <= 0)
 		{
-			$this->errors->add('Sale', 'Tidak dapat memproses pembayaran untuk pembelian yang belum di checkout');
+			$this->errors->add('Sale', 'Tidak dapat memproses pembayaran yang belum lunas');
 		}
 	}
 
@@ -42,6 +34,14 @@ class ValidatingPayment implements ValidatingPaymentInterface
 		if($sale['bills'] != $payment['amount'])
 		{
 			$this->errors->add('Sale', 'Jumlah pembayaran tidak sesuai dengan tagihan');
+		}
+	}
+
+	public function validatebillshavepaid(Sale $sale)
+	{
+		if($sale['bills'] > 0)
+		{
+			$this->errors->add('Sale', 'Tidak dapat memproses pembayaran untuk pembelian yang belum di lunas');
 		}
 	}
 }

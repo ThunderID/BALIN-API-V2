@@ -3,15 +3,15 @@
 namespace App\Services\Policies;
 
 use App\Entities\Sale;
-use App\Models\TransactionLog;
-use App\Models\TransactionExtension;
-use App\Models\TransactionDetail;
-use App\Models\Address;
-use App\Models\Shipment;
-use App\Models\Voucher;
-use App\Models\QuotaLog;
-use App\Models\PointLog;
-use App\Models\User;
+use App\Entities\TransactionLog;
+use App\Entities\TransactionExtension;
+use App\Entities\TransactionDetail;
+use App\Entities\Address;
+use App\Entities\Shipment;
+use App\Entities\Voucher;
+use App\Entities\QuotaLog;
+use App\Entities\PointLog;
+use App\Entities\User;
 
 use Illuminate\Support\MessageBag;
 

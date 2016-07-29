@@ -21,7 +21,7 @@ trait BelongsToVoucherTrait
 
 	public function Voucher()
 	{
-		return $this->belongsTo('App\Models\Voucher');
+		return $this->belongsTo('App\Entities\Voucher');
 	}
 
 	public function scopeHasVoucher($query, $variable)

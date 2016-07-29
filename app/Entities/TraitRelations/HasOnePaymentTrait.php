@@ -25,6 +25,6 @@ trait HasOnePaymentTrait
 	 **/
 	public function Payment()
 	{
-		return $this->hasOne('App\Models\Payment', 'transaction_id');
+		return $this->hasOne('App\Entities\Payment', 'transaction_id');
 	}
 }

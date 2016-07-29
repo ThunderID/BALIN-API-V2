@@ -2,7 +2,7 @@
 
 namespace App\Entities;
 
-use App\Models\BaseModel;
+use App\CrossServices\ClosedDoorModelObserver;
 
 /**
  * Used for Sale and Purchase Models
@@ -18,13 +18,7 @@ class Transaction extends BaseModel
 	 */
 	protected $table				= 'transactions';
 
-	/**
-	 * Timestamp field
-	 *
-	 * @var array
-	 */
-	// protected $timestamps			= true;
-	
+
 	/**
 	 * Date will be returned as carbon
 	 *
@@ -50,6 +44,8 @@ class Transaction extends BaseModel
 	public static function boot() 
 	{
 		parent::boot();
+
+        Transaction::observe(new ClosedDoorModelObserver());
 	}
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

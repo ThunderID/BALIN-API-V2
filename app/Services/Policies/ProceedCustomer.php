@@ -2,7 +2,7 @@
 
 namespace App\Services\Policies;
 
-use App\Models\Customer;
+use App\Entities\Customer;
 
 use Illuminate\Support\MessageBag;
 

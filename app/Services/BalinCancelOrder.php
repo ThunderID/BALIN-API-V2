@@ -4,9 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\MessageBag;
 
-use App\Models\User;
+use App\Entities\User;
 use App\Entities\Sale;
-use App\Models\TransactionLog;
+use App\Entities\TransactionLog;
 
 use App\Contracts\CancelOrderInterface;
 
@@ -87,6 +87,13 @@ class BalinCancelOrder implements CancelOrderInterface
 		//1. Validate Buyer
 		$this->pre_pay->validatebillshaventpaid($sale); 
 
+		if($this->pre_pay->errors->count())
+		{
+			$this->errors 		= $this->pre_pay->errors;
+
+			return false;
+		}
+		
 		\DB::BeginTransaction();
 
 		/** PROCESS */

@@ -5,7 +5,7 @@ namespace App\Services;
 use Illuminate\Support\MessageBag;
 
 use App\Entities\Sale;
-use App\Models\User;
+use App\Entities\User;
 
 use App\Contracts\HandlingPaymentInterface;
 

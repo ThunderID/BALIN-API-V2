@@ -12,7 +12,7 @@ use App\Http\Controllers\Veritrans\Veritrans_VtDirect;
 use App\Http\Controllers\Veritrans\Veritrans_VtWeb;
 use App\Http\Controllers\Veritrans\Veritrans_Sanitizer;
 
-use App\Services\BalinCancelOrder as Checkout;
+use App\Services\BalinShippingOrder as Checkout;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
@@ -54,7 +54,9 @@ class TrySaleController extends Controller
 
   //       dd(10);
         
-		// $user 	= \App\Models\User::id(78)->first();
+		// $user 	= \App\Entities\Auditor::first();
+		// $user 	= new \App\Entities\ProductLabel;
+		// dd($user);
 		// dd($user->toArray());
 		// $payload 	= 	[
 		// 					'sub' => $user->id,
@@ -65,36 +67,36 @@ class TrySaleController extends Controller
 		// 	            ];
 		// $jwt 		= new JwtToken;
 
-		$app 				= \App\Models\Sale::WITH(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
+		$app 				= \App\Entities\Sale::status(['packed'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
 		// $app 				= \App\Models\Sale::id(78)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
 // dd($app);
-dd($app);
-		$modified = $app[0];
-		$modified['id'] = null;
-		$modified['transactiondetails'][0]['transaction_id'] = null;
-		$modified['transactiondetails'][0]['id'] = null;
-		$modified['shipment']['address']['id'] = null;
-		$modified['user']['id'] = null;
-		$modified['user']['email'] = 'cmooy@gmail.com';
-		unset($modified['voucher']);
-		unset($modified['paidpointlogs']);
-		unset($modified['transactionextensions']);
-		unset($modified['ref_number']);
-		unset($modified['bills']);
-		unset($modified['extend_cost']);
-		unset($modified['user_id']);
-		unset($modified['transact_at']);
-		unset($modified['unique_number']);
-		unset($modified['shipping_cost']);
-		unset($modified['voucher_discount']);
-		unset($modified['amount']);
-		unset($modified['status']);
-		unset($modified['transactionlogs']);
-		unset($modified['shipment']['address_id']);
-		unset($modified['shipment']['transaction_id']);
-		unset($modified['shipment']['address']['owner_id']);
-		unset($modified['shipment']['address']['owner_type']);
-		unset($modified['shipment']['courier']);
+// dd($app[0]);
+// 		$modified = $app[0];
+// 		$modified['id'] = null;
+// 		$modified['transactiondetails'][0]['transaction_id'] = null;
+// 		$modified['transactiondetails'][0]['id'] = null;
+// 		$modified['shipment']['address']['id'] = null;
+// 		$modified['user']['id'] = null;
+// 		$modified['user']['email'] = 'cmooy@gmail.com';
+// 		unset($modified['voucher']);
+// 		unset($modified['paidpointlogs']);
+// 		unset($modified['transactionextensions']);
+// 		unset($modified['ref_number']);
+// 		unset($modified['bills']);
+// 		unset($modified['extend_cost']);
+// 		unset($modified['user_id']);
+// 		unset($modified['transact_at']);
+// 		unset($modified['unique_number']);
+// 		unset($modified['shipping_cost']);
+// 		unset($modified['voucher_discount']);
+// 		unset($modified['amount']);
+// 		unset($modified['status']);
+// 		unset($modified['transactionlogs']);
+// 		unset($modified['shipment']['address_id']);
+// 		unset($modified['shipment']['transaction_id']);
+// 		unset($modified['shipment']['address']['owner_id']);
+// 		unset($modified['shipment']['address']['owner_type']);
+// 		unset($modified['shipment']['courier']);
 // 		// Set our server key
 // 		Veritrans_Config::$serverKey	= env('VERITRANS_KEY', 'VT_KEY');
 
@@ -116,23 +118,24 @@ dd($app);
 // 			$payment['ondate']			= \Carbon\Carbon::parse($notif->transaction_time)->format('Y-m-d H:i:s');
 // 			$payment['amount']			= $notif->gross_amount;
 // 			$payment['status']			= $transaction;
-			$payment['id']				= null;
+			// $payment['id']				= null;
 			// $payment['transaction_id']	= $app[0]['id'];
-			$payment['destination']		= 'Tokopedia';
-			$payment['account_name']	= 'Agil';
-			$payment['account_number']	= '1234567890';
-			$payment['ondate']			= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+			// $payment['destination']		= 'Tokopedia';
+			// $payment['account_name']	= 'Agil';
+			// $payment['account_number']	= '1234567890';
+			// $payment['ondate']			= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
 			// $payment['amount']			= '642996';
-			$payment['method']			= 'transfer';
+			// $payment['method']			= 'transfer';
 
 		// $app[0]['payment'] 	= $payment;
-		$modified['payment'] 	= $payment;
+		// $modified['payment'] 	= $payment;
 
 // 		$app['payment'] 	= $payment;
 // 		// dd($app);
 
 // $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
-// $app[0]['client_id'] = 'f3d259ddd3ed8ff3843839b';
+$app[0]['client_id'] = 'f3d259ddd3ed8ff3843839b';
+$app[0]['shipment']['receipt_number'] = 'f3d259ddd3ed8ff3843839b0';
 // // dd($app);
 // 		$token = $jwt->createToken($payload);
 // dd($token);

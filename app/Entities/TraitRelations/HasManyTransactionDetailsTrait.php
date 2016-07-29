@@ -26,7 +26,7 @@ trait HasManyTransactionDetailsTrait
 	 **/
 	public function TransactionDetails()
 	{
-		return $this->hasMany('App\Models\TransactionDetail', 'transaction_id');
+		return $this->hasMany('App\Entities\TransactionDetail', 'transaction_id');
 	}
 
 	/**

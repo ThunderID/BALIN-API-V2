@@ -3,7 +3,7 @@
 namespace App\Services\Policies;
 
 use App\Entities\Sale;
-use App\Models\Payment;
+use App\Entities\Payment;
 
 use Illuminate\Support\MessageBag;
 

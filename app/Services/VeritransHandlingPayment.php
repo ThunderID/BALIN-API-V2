@@ -4,9 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\MessageBag;
 
-use App\Models\User;
+use App\Entities\User;
 use App\Entities\Sale;
-use App\Models\TransactionLog;
+use App\Entities\TransactionLog;
 
 use App\Contracts\HandlingPaymentInterface;
 

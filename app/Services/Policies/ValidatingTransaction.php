@@ -2,15 +2,15 @@
 
 namespace App\Services\Policies;
 
-use App\Models\User;
+use App\Entities\User;
 use App\Entities\Sale;
-use App\Models\TransactionLog;
-use App\Models\Varian;
-use App\Models\ProductExtension;
-use App\Models\Courier;
-use App\Models\ShippingCost;
-use App\Models\Voucher;
-use App\Models\StoreSetting;
+use App\Entities\TransactionLog;
+use App\Entities\Varian;
+use App\Entities\ProductExtension;
+use App\Entities\Courier;
+use App\Entities\ShippingCost;
+use App\Entities\Voucher;
+use App\Entities\StoreSetting;
 
 use App\Contracts\Policies\ValidatingTransactionInterface;
 

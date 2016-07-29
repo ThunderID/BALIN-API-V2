@@ -26,6 +26,6 @@ trait HasOneShipmentTrait
 	 **/
 	public function Shipment()
 	{
-		return $this->hasOne('App\Models\Shipment', 'transaction_id');
+		return $this->hasOne('App\Entities\Shipment', 'transaction_id');
 	}
 }

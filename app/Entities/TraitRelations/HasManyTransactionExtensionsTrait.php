@@ -28,6 +28,6 @@ trait HasManyTransactionExtensionsTrait
 	 **/
 	public function TransactionExtensions()
 	{
-		return $this->hasMany('App\Models\TransactionExtension', Pluralizer::singular($this->getTable()).'_id');
+		return $this->hasMany('App\Entities\TransactionExtension', Pluralizer::singular($this->getTable()).'_id');
 	}
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Entities\BaseModel;
+
 // use App\Models\Observers\ClientTemplateObserver;
 
 /**

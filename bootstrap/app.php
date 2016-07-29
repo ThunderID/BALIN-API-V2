@@ -87,6 +87,7 @@ $app->routeMiddleware([
 $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\TransactionServiceProvider::class);
 $app->register(App\Providers\PaymentServiceProvider::class);
+$app->register(App\Providers\ShipmentServiceProvider::class);
 // $app->register(App\Providers\VeritransPaymentServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 

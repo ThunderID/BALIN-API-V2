@@ -3,8 +3,8 @@
 namespace App\Services\Policies;
 
 use App\Entities\Sale;
-use App\Models\Store;
-use App\Models\Policy;
+use App\Entities\Store;
+use App\Entities\Policy;
 use App\Models\ClientTemplate;
 
 use Illuminate\Support\MessageBag;

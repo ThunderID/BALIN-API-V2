@@ -3,8 +3,8 @@
 namespace App\Contracts\Policies;
 
 use App\Entities\Sale;
-use App\Models\Voucher;
-use App\Models\User;
+use App\Entities\Voucher;
+use App\Entities\User;
 
 interface ProceedTransactionInterface
 {

@@ -2,12 +2,12 @@
 
 namespace App\Contracts\Policies;
 
-use App\Models\User;
-use App\Models\Varian;
-use App\Models\ProductExtension;
-use App\Models\Courier;
-use App\Models\ShippingCost;
-use App\Models\Voucher;
+use App\Entities\User;
+use App\Entities\Varian;
+use App\Entities\ProductExtension;
+use App\Entities\Courier;
+use App\Entities\ShippingCost;
+use App\Entities\Voucher;
 use App\Entities\Sale;
 
 interface ValidatingTransactionInterface

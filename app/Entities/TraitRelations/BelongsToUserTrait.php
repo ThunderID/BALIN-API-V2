@@ -26,7 +26,7 @@ trait BelongsToUserTrait
 	 **/
 	public function User()
 	{
-		return $this->belongsTo('App\Models\User');
+		return $this->belongsTo('App\Entities\User');
 	}
 
 	/**
@@ -63,7 +63,7 @@ trait BelongsToUserTrait
 	 **/
 	public function Customer()
 	{
-		return $this->belongsTo('App\Models\Customer', 'user_id');
+		return $this->belongsTo('App\Entities\Customer', 'user_id');
 	}
 
 	/**

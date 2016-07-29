@@ -27,7 +27,7 @@ trait HasManyPointLogsTrait
 	 **/
 	public function PointLogs()
 	{
-		return $this->hasMany('App\Models\PointLog', Pluralizer::singular($this->getTable()).'_id');
+		return $this->hasMany('App\Entities\PointLog', Pluralizer::singular($this->getTable()).'_id');
 	}
 
 	/**
@@ -55,7 +55,7 @@ trait HasManyPointLogsTrait
 	 **/
 	public function MyReferrals()
 	{
-		return $this->hasMany('App\Models\PointLog', 'reference_id')->whereIn('reference_type', ['App\Models\User', 'App\Models\Admin', 'App\Models\Customer']);
+		return $this->hasMany('App\Entities\PointLog', 'reference_id')->whereIn('reference_type', ['App\Entities\User', 'App\Entities\Admin', 'App\Entities\Customer', 'App\Models\User', 'App\Models\Admin', 'App\Models\Customer']);
 	}
 
 	/**
@@ -64,7 +64,7 @@ trait HasManyPointLogsTrait
 	 **/
 	public function PaidPointLogs()
 	{
-		return $this->hasMany('App\Models\PointLog', 'reference_id')->where('reference_type', '=', 'App\Models\Sale')->where('amount', '<', 0);
+		return $this->hasMany('App\Entities\PointLog', 'reference_id')->whereIn('reference_type', ['App\Entities\Sale', 'App\Models\Sale'])->where('amount', '<', 0);
 	}
 
 	/**

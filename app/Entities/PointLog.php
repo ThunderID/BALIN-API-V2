@@ -4,8 +4,18 @@ namespace App\Entities;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\TraitRelations\BelongsToUserTrait;
+use App\Entities\TraitRelations\MorphToReferenceTrait;
+
 class PointLog extends BaseModel
 {
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use BelongsToUserTrait;
+	use MorphToReferenceTrait;
+
 	/**
 	 * The database table used by the model.
 	 *

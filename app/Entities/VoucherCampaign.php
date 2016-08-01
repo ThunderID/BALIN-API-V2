@@ -55,4 +55,18 @@ class VoucherCampaign extends BaseModel
 	}
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	/**
+	 * scope to get condition where code
+	 *
+	 * @param string or array of entity' code
+	 **/
+	public function scopeCode($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return $query->whereIn($query->getModel()->table.'.code', $value);
+		}
+		return 	$query->where($query->getModel()->table.'.code', $variable);
+	}
 }

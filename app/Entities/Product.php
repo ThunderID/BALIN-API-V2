@@ -14,6 +14,10 @@ use App\Entities\TraitLibraries\JoinTransactionTrait;
 use App\Entities\TraitLibraries\FieldNameTrait;
 
 use App\Entities\TraitRelations\HasManyVariansTrait;
+use App\Entities\TraitRelations\HasManyPricesTrait;
+use App\Entities\TraitRelations\HasManyProductLabelsTrait;
+use App\Entities\TraitRelations\MorphManyImagesTrait;
+use App\Entities\TraitRelations\BelongsToManyClustersTrait;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
@@ -50,6 +54,10 @@ class Product extends BaseModel
 	 *
 	 */
 	use HasManyVariansTrait;
+	use HasManyPricesTrait;
+	use HasManyProductLabelsTrait;
+	use MorphManyImagesTrait;
+	use BelongsToManyClustersTrait;
 
 	/**
 	 * The database table used by the model.

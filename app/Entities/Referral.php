@@ -46,8 +46,6 @@ class Referral extends VoucherCampaign
 											'code'							,
 											'type'							,
 											'value'							,
-											'started_at'					,
-											'expired_at'					,
 										];
 
 	/**
@@ -56,12 +54,9 @@ class Referral extends VoucherCampaign
 	 * @var array
 	 */
 	protected $rules				=	[
-											'type'							=> 'in:free_shipping_cost,debit_point,promo_referral',
+											'type'							=> 'in:referral',
 											'code'							=> 'max:255|min:8',
-											'type'							=> 'max:255',
 											'value'							=> 'numeric',
-											'started_at'					=> 'date_format:"Y-m-d H:i:s"'/*|after:now'*/,
-											'expired_at'					=> 'date_format:"Y-m-d H:i:s"|after:now',
 										];
 	
 	/**

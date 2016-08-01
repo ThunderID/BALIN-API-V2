@@ -83,7 +83,7 @@ class Customer extends User
 	protected $rules				=	[
 											'name'							=> 'required|max:255',
 											'email'							=> 'max:255|email',
-											'date_of_birth'					=> 'date_format:"Y-m-d H:i:s"|before:13 years ago'
+											// 'date_of_birth'					=> 'date_format:"Y-m-d H:i:s"|before:13 years ago'
 										];
 	
 	/**
@@ -111,4 +111,18 @@ class Customer extends User
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	/**
+	 * scope to get condition where activation link
+	 *
+	 * @param string or array of entity' activation link
+	 **/
+	public function scopeActivationLink($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return $query->whereIn($query->getModel()->table.'.activation_link', $variable);
+		}
+		return 	$query->where($query->getModel()->table.'.activation_link', $variable);
+	}
 }

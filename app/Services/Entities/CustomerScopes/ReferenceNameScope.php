@@ -29,14 +29,14 @@ class ReferenceNameScope implements ScopeInterface
 				->leftjoin('point_logs', function($join)
 				{
 					$join->on('point_logs.user_id', '=', 'users.id')
-					->whereIn('point_logs.reference_type', ['App\Entities\User', 'App\Entities\Voucher', 'App\Models\User', 'App\Models\Voucher'])
+					->whereIn('point_logs.reference_type', ['App\Entities\User', 'App\Entities\Customer', 'App\Entities\Voucher', 'App\Models\User', 'App\Models\Voucher'])
 					->wherenull('point_logs.deleted_at')
 					;
 				})
 				->leftjoin(DB::raw('(SELECT name, id, deleted_at from users) as users2'), function ($join)
 				{
 					$join->on('users2.id', '=', 'point_logs.reference_id')
-					->whereIn('point_logs.reference_type', ['App\Entities\User', 'App\Models\User'])
+					->whereIn('point_logs.reference_type', ['App\Entities\User', 'App\Models\User', 'App\Entities\Customer', 'App\Models\Customer'])
 					->wherenull('users2.deleted_at')
 					;
 				})

@@ -70,6 +70,16 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
 	}
 
 	/**
+	 * find Active
+	 * 
+	 * @param Active
+	 */	
+	public function scopeActive($query, $variable)
+	{
+		return $query->where('is_active', $variable);
+	}
+
+	/**
 	 * scope search based on role
 	 *
 	 * @param string or array of role

@@ -88,6 +88,10 @@ $app->register(App\Providers\AppServiceProvider::class);
 $app->register(App\Providers\TransactionServiceProvider::class);
 $app->register(App\Providers\PaymentServiceProvider::class);
 $app->register(App\Providers\ShipmentServiceProvider::class);
+$app->register(App\Providers\UserServiceProvider::class);
+$app->register(App\Providers\ReferralServiceProvider::class);
+$app->register(App\Providers\ProductServiceProvider::class);
+
 // $app->register(App\Providers\VeritransPaymentServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 

@@ -87,5 +87,16 @@ class ValidatingProduct implements ValidatingProductInterface
 	public function validateimage(array $image)
 	{
 	}
+
+	public function validatedeleteproduct(Product $product)
+	{
+		foreach ($product['varians'] as $key => $value) 
+		{
+			if($value->transactiondetails()->count())
+			{
+				$this->errors->add('Product', 'Tidak dapat menghapus produk yang dijual');
+			}
+		}
+	}
 }
 

@@ -6,11 +6,12 @@ use App\Contracts\Policies\ValidatingProductInterface;
 use App\Contracts\Policies\ProceedProductInterface;
 use App\Contracts\Policies\EffectProductInterface;
 
-interface StoreProductInterface
+use App\Entities\Product;
+
+interface DeleteProductInterface
 {
 	public function __construct(ValidatingProductInterface $pre, ProceedProductInterface $pro, EffectProductInterface $post);
 	public function getError();
 	public function getData();
-	public function fill(array $product);
-	public function save();
+	public function delete(Product $product);
 }

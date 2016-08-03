@@ -255,5 +255,66 @@ class ProceedProduct implements ProceedProductInterface
 			}
 		}
 	}
+
+
+	public function deleteproduct(Product $product)
+	{
+		if(!$product->delete())
+		{
+			$this->errors->add('Product', $product->getError());
+		}
+	}
+
+	public function deletevarian(Product $product)
+	{
+		foreach ($product->varians as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Product', $value->getError());
+			}
+		}
+	}
+
+	public function deleteprice(Product $product)
+	{
+		foreach ($product->prices as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Product', $value->getError());
+			}
+		}
+	}
+
+	public function deletelabel(Product $product)
+	{
+		foreach ($product->labels as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Product', $value->getError());
+			}
+		}
+	}
+
+	public function deletecluster(Product $product)
+	{
+		if(!$product->clusters()->sync([]))
+		{
+			$this->errors->add('Product', 'Tag/Kategori produk tidak tersimpan.');
+		}
+	}
+
+	public function deleteimage(Product $product)
+	{
+		foreach ($product->images as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Product', $value->getError());
+			}
+		}
+	}
 }
 

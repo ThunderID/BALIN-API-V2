@@ -12,7 +12,7 @@ use App\Http\Controllers\Veritrans\Veritrans_VtDirect;
 use App\Http\Controllers\Veritrans\Veritrans_VtWeb;
 use App\Http\Controllers\Veritrans\Veritrans_Sanitizer;
 
-use App\Services\BalinStoreProduct as Checkout;
+use App\Services\BalinDeleteExpedition as Checkout;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
@@ -67,7 +67,7 @@ class TrySaleController extends Controller
 		// 	            ];
 		// $jwt 		= new JwtToken;
 		// $app 			= \App\Entities\Customer::first()->toArray();
-		$app 			= \App\Entities\Product::id(1)->with(['varians', 'categories', 'tags', 'labels', 'images', 'prices'])->first()->toArray();
+		$app 			= \App\Entities\Courier::with(['shippingcosts', 'images'])->first();
 		// $app 			= \App\Entities\Customer::id(24)->first()->toArray();
 // $app['reference_code'] = 'GIFTTOMMY';
 		// $app['date_of_birth'] 	= '1983-10-18 00:00:00';
@@ -75,8 +75,8 @@ class TrySaleController extends Controller
 		// unset($app['id']);
 		// $app 				= \App\Entities\Sale::status(['delivered'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
 		// $app 				= \App\Models\Sale::id(78)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
+// dd($app->delete());
 // dd($app);
-// dd($app[0]);
 // 		$modified = $app[0];
 		// $app['id'] = null;
 // 		$modified['id'] = null;
@@ -144,7 +144,7 @@ $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
 // $app[0]['client_id'] = 'f3d259ddd3ed8ff3843839b';
 // $app[0]['notes'] = 'Diterima Oleh Chelsy';
 // $app[0]['shipment']['receipt_number'] = 'f3d259ddd3ed8ff3843839b0';
-// // dd($app);
+// dd($app);
 // 		$token = $jwt->createToken($payload);
 // dd($token);
 		// $try 						= new \App\Models\Sale;
@@ -160,12 +160,19 @@ $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
 		// $sale						= Input::get('sale');
 
 		// $this->class 		= new \App\Services\VeritransProcessingPayment;
+		// $this->class->fill($app);
 
-		$this->class->fill($app);
+		// if(!$this->class->save())
+		// {
+		// 	return new JSend('error', (array)Input::all(), $this->class->getError());
+		// }
+
+		// $this->class->fill($app);
 		// $this->class->fill($app[0]);
 		// $this->class->fill($modified);
 
-		if(!$this->class->save())
+		if(!$this->class->delete($app))
+		// if(!$this->class->save())
 		{
 			return new JSend('error', (array)Input::all(), $this->class->getError());
 		}

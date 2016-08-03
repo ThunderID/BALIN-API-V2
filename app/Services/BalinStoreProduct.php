@@ -125,6 +125,8 @@ class BalinStoreProduct implements StoreProductInterface
 
 		if($this->pro->errors->count())
 		{
+			\DB::rollback();
+			
 			$this->errors 		= $this->pro->errors;
 
 			return false;

@@ -11,6 +11,7 @@ use App\Entities\TraitLibraries\JoinProductTrait;
 use App\Entities\TraitLibraries\JoinTransactionTrait;
 
 use App\Entities\TraitRelations\BelongsToProductTrait;
+use App\Entities\TraitRelations\HasManyTransactionDetailsTrait;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
@@ -44,6 +45,7 @@ class Varian extends BaseModel
 	 *
 	 */
 	use BelongsToProductTrait;
+	use HasManyTransactionDetailsTrait;
 
 	/**
 	 * The database table used by the model.

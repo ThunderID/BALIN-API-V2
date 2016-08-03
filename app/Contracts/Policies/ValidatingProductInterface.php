@@ -2,6 +2,8 @@
 
 namespace App\Contracts\Policies;
 
+use App\Entities\Product;
+
 interface ValidatingProductInterface
 {
 	public function validateproduct(array $product);
@@ -15,4 +17,6 @@ interface ValidatingProductInterface
 	public function validatecluster(array $cluster);
 
 	public function validateimage(array $image);
+
+	public function validatedeleteproduct(Product $product);
 }

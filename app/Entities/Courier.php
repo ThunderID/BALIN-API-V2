@@ -12,6 +12,7 @@ use App\Entities\Traits\GetAllTrait;
 use App\Entities\TraitLibraries\FieldNameTrait;
 
 use App\Entities\TraitRelations\HasManyShippingCostsTrait;
+use App\Entities\TraitRelations\MorphManyImagesTrait;
 
 class Courier extends BaseModel
 {
@@ -37,6 +38,7 @@ class Courier extends BaseModel
 	 *
 	 */
 	use HasManyShippingCostsTrait;
+	use MorphManyImagesTrait;
 
 	/**
 	 * The database table used by the model.

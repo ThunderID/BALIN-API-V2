@@ -91,6 +91,11 @@ $app->register(App\Providers\ShipmentServiceProvider::class);
 $app->register(App\Providers\UserServiceProvider::class);
 $app->register(App\Providers\ReferralServiceProvider::class);
 $app->register(App\Providers\ProductServiceProvider::class);
+$app->register(App\Providers\VoucherServiceProvider::class);
+$app->register(App\Providers\OrnamentServiceProvider::class);
+$app->register(App\Providers\StoreSettingServiceProvider::class);
+$app->register(App\Providers\SupplierServiceProvider::class);
+$app->register(App\Providers\ExpeditionServiceProvider::class);
 
 // $app->register(App\Providers\VeritransPaymentServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);

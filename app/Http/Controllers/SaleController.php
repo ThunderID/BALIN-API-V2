@@ -7,7 +7,15 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
+use App\Services\BalinCheckout;
+use App\Services\BankTransferHandlingPayment;
+use App\Services\BalinPackingOrder;
+use App\Services\BalinShippingOrder;
+use App\Services\BalinDeliveredOrder;
+use App\Services\BalinCancelOrder;
+use App\Services\BalinAddToCart;
 /**
  * Handle Protected Resource of Sale
  * 
@@ -15,6 +23,18 @@ use Illuminate\Support\Facades\DB;
  */
 class SaleController extends Controller
 {
+	public function __construct(Request $request, BalinCheckout $balincheckout, BankTransferHandlingPayment $balinpaid, BalinPackingOrder $balinpack, BalinShippingOrder $balinship, BalinDeliveredOrder $balindeliver, BalinCancelOrder $balincancel, BalinAddToCart $balincart)
+	{
+		$this->request 				= $request;
+		$this->balincheckout		= $balincheckout;
+		$this->balinpaid			= $balinpaid;
+		$this->balinpack			= $balinpack;
+		$this->balinship			= $balinship;
+		$this->balindeliver			= $balindeliver;
+		$this->balincancel			= $balincancel;
+		$this->balincart			= $balincart;
+	}
+
 	/**
 	 * Display all sales
 	 *
@@ -23,7 +43,7 @@ class SaleController extends Controller
 	 */
 	public function index()
 	{
-		$result                 = new \App\Models\Sale;
+		$result                 = new \App\Entities\Sale;
 
 		if(Input::has('search'))
 		{
@@ -34,7 +54,7 @@ class SaleController extends Controller
 				switch (strtolower($key)) 
 				{
 					case 'expiredcart':
-						$policy 	= new \App\Models\Policy;
+						$policy 	= new \App\Entities\Policy;
 						$policy 	= $policy->default(true)->type('expired_cart')->first();
 						
 						if($policy)
@@ -47,7 +67,7 @@ class SaleController extends Controller
 						}
 						break;
 					case 'expiredwait':
-						$policy 	= new \App\Models\Policy;
+						$policy 	= new \App\Entities\Policy;
 						$policy 	= $policy->default(true)->type('expired_paid')->first();
 						
 						if($policy)
@@ -98,7 +118,7 @@ class SaleController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.']));
 				}
 				switch (strtolower($key)) 
 				{
@@ -132,9 +152,10 @@ class SaleController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['user'])->get()->toArray();
+		$result                     = $result->with(['user'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -144,14 +165,15 @@ class SaleController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\Sale::id($id)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
+		$result                 = \App\Entities\Sale::id($id)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 	}
 
 	/**
@@ -170,155 +192,47 @@ class SaleController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data sale.');
 		}
 
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
-
 		//1. Validate Sale Parameter
 		$sale                       = Input::get('sale');
 
 		if(is_null($sale['id']))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data sale.');
+			return response()->json( JSend::fail(['Tidak ada data sale.']));
 		}
-		else
+
+		switch ($sale['status']) 
 		{
-			$is_new                 = false;
+			case 'wait':
+				$sale_store			= $this->balincheckout;
+				break;
+			case 'paid':
+				$sale_store			= $this->balinpaid;
+				break;
+			case 'packing':
+				$sale_store			= $this->balinpack;
+				break;
+			case 'shipping':
+				$sale_store			= $this->balinship;
+				break;
+			case 'delivered':
+				$sale_store			= $this->balindeliver;
+				break;
+			case 'canceled':
+				$sale_store			= $this->balincancel;
+				break;
+			default:
+				$sale_store			= $this->balincart;
+				break;
 		}
 
+		$sale_store->fill($sale);
 
-		//1a. Get original data
-		$sale_data              = \App\Models\Sale::findorfail($sale['id']);
-
-		//1b. Check if there were statuses differences
-		if($sale_data['status']==$sale['status'])
+		if(!$sale_store->save())
 		{
-			$errors->add('Sale', 'Tidak ada perubahan status.');
+			return response()->json( JSend::error($sale_store->getError()->toArray())->asArray());
 		}
 
-		//2. Check if status = paid
-		if(!$errors->count() && in_array($sale['status'], ['paid']))
-		{
-			if(!isset($sale['payment']) || is_null($sale['payment']))
-			{
-				$errors->add('Sale', 'Tidak ada data pembayaran.');
-			}
-			else
-			{
-				$paid_data		= \App\Models\Payment::findornew($sale['payment']['id']);
-				
-				$payment_rule   =   [
-										'transaction_id'	=> 'exists:transactions,id|'.(!$paid_data ? '' : 'in:'.$sale_data['id']),
-										'method'			=> 'required|max:255',
-										'destination'		=> 'required|max:255',
-										'account_name'		=> 'required|max:255',
-										'account_number'	=> 'required|max:255',
-										'ondate'			=> 'required|date_format:"Y-m-d H:i:s"',
-										'amount'			=> 'required|numeric|in:'.$sale_data['bills'],
-									];
-
-				$validator   = Validator::make($sale['payment'], $payment_rule);
-
-				//if there was log and validator false
-				if (!$validator->passes())
-				{
-					$errors->add('Log', $validator->errors());
-				}
-				else
-				{
-					$sale['payment']['transaction_id']	= $sale['id'];
-					$paid_data                    		= $paid_data->fill($sale['payment']);
-
-					if(!$paid_data->save())
-					{
-						$errors->add('Log', $paid_data->getError());
-					}
-				}
-			}
-		}
-
-		//2. Check if status = shipping
-		if(!$errors->count() && in_array($sale['status'], ['shipping']))
-		{
-			if(is_null($sale['shipment']['receipt_number']))
-			{
-				$errors->add('Sale', 'Tidak ada nomor resi.');
-			}
-			else
-			{
-				$shipping_data       = \App\Models\Shipment::id($sale['shipment']['id'])->first();
-
-				if($shipping_data)
-				{
-					$shipment_rule   =  [
-											'receipt_number'            => 'required|max:255',
-										];
-
-					$validator		= Validator::make($sale['shipment'], $shipment_rule);
-
-					//if there was log and validator false
-					if (!$validator->passes())
-					{
-						$errors->add('Log', $validator->errors());
-					}
-					else
-					{
-						$sale['shipment']['transaction_id']	= $sale['id'];
-						$shipping_data                    	= $shipping_data->fill($sale['shipment']);
-
-						if(!$shipping_data->save())
-						{
-							$errors->add('Log', $shipping_data->getError());
-						}
-					}
-				}
-				else
-				{
-					$errors->add('Log', 'Shipment tidak valid.');
-				}
-			}
-		}
-
-		//3. Check if status = others
-		if(!$errors->count() && !in_array($sale['status'], ['paid', 'shipping']))
-		{
-			$log_rules   =   [
-									'transaction_id'	=> 'exists:transactions,id|'.($is_new ? '' : 'in:'.$sale_data['id']),
-									'status'			=> 'required|max:255|in:cart,wait,payment_process,paid,packed,shipping,delivered,canceled,abandoned',
-								];
-
-			$validator   = Validator::make($sale, $log_rules);
-
-			//if there was log and validator false
-			if (!$validator->passes())
-			{
-				$errors->add('Log', $validator->errors());
-			}
-			else
-			{
-				$log_data                    = new \App\Models\TransactionLog;
-
-				$log_data                    = $log_data->fill(['status' => $sale['status'], 'transaction_id' => $sale_data['id'], 'notes' => (isset($sale['notes']) ? $sale['notes'] : '')]);
-
-				if(!$log_data->save())
-				{
-					$errors->add('Log', $log_data->getError());
-				}
-			}
-		}
-
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
-		
-		$final_sale                 = \App\Models\Sale::id($sale_data['id'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
-
-		return new JSend('success', (array)$final_sale);
+		return response()->json( JSend::success($sale_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

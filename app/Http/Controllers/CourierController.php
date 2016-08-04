@@ -23,7 +23,7 @@ class CourierController extends Controller
 	 */
 	public function index()
 	{
-		$result                 = new \App\Models\Courier;
+		$result                 = new \App\Entities\Courier;
 
 		if(Input::has('search'))
 		{
@@ -92,14 +92,14 @@ class CourierController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\Courier::id($id)->with(['shippingcosts', 'addresses', 'images', 'shippings', 'shippings.address', 'shippings.sale'])->first();
+		$result                 = \App\Entities\Courier::id($id)->with(['shippingcosts', 'addresses', 'images', 'shippings', 'shippings.address', 'shippings.sale'])->first();
 	   
 		if($result)
 		{
 			return new JSend('success', (array)$result->toArray());
 
 		}
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 
 	}
 
@@ -141,7 +141,7 @@ class CourierController extends Controller
 										];
 
 		//1a. Get original data
-		$courier_data              = \App\Models\Courier::findornew($courier['id']);
+		$courier_data              = \App\Entities\Courier::findornew($courier['id']);
 
 		//1b. Validate Basic Courier Parameter
 		$validator                  = Validator::make($courier, $courier_rules);
@@ -170,7 +170,7 @@ class CourierController extends Controller
 			{
 				if(!$errors->count())
 				{
-					$cost_data		= \App\Models\ShippingCost::findornew($value['id']);
+					$cost_data		= \App\Entities\ShippingCost::findornew($value['id']);
 
 					$cost_rules		=	[
 											'courier_id'			=> 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['courier_id']),
@@ -207,7 +207,7 @@ class CourierController extends Controller
 			//if there was no error, check if there were things need to be delete
 			if(!$errors->count())
 			{
-				$costs                            = \App\Models\ShippingCost::courierid($courier['id'])->get(['id'])->toArray();
+				$costs                            = \App\Entities\ShippingCost::courierid($courier['id'])->get(['id'])->toArray();
 				
 				$cost_should_be_ids               = [];
 				foreach ($costs as $key => $value) 
@@ -221,7 +221,7 @@ class CourierController extends Controller
 				{
 					foreach ($difference_cost_ids as $key => $value) 
 					{
-						$cost_data                = \App\Models\ShippingCost::find($value);
+						$cost_data                = \App\Entities\ShippingCost::find($value);
 
 						if(!$cost_data->delete())
 						{
@@ -240,7 +240,7 @@ class CourierController extends Controller
 			{
 				if(!$errors->count())
 				{
-					$address_data		= \App\Models\Address::findornew($value['id']);
+					$address_data		= \App\Entities\Address::findornew($value['id']);
 
 					$address_rules		=   [
 												'owner_id'		=> 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['id']),
@@ -278,7 +278,7 @@ class CourierController extends Controller
 			//if there was no error, check if there were things need to be delete
 			if(!$errors->count())
 			{
-				$addresses                            = \App\Models\Address::ownerid($courier['id'])->ownertype(get_class($courier_data))->get(['id'])->toArray();
+				$addresses                            = \App\Entities\Address::ownerid($courier['id'])->ownertype(get_class($courier_data))->get(['id'])->toArray();
 				
 				$address_should_be_ids               = [];
 				foreach ($addresses as $key => $value) 
@@ -292,7 +292,7 @@ class CourierController extends Controller
 				{
 					foreach ($difference_address_ids as $key => $value) 
 					{
-						$address_data                = \App\Models\Address::find($value);
+						$address_data                = \App\Entities\Address::find($value);
 
 						if(!$address_data->delete())
 						{
@@ -312,7 +312,7 @@ class CourierController extends Controller
 			{
 				if(!$errors->count())
 				{
-					$image_data		= \App\Models\Image::findornew($value['id']);
+					$image_data		= \App\Entities\Image::findornew($value['id']);
 
 					$image_rules	=   [
 											'imageable_id'              => 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['id']),
@@ -353,7 +353,7 @@ class CourierController extends Controller
 			//if there was no error, check if there were things need to be delete
 			if(!$errors->count())
 			{
-				$images                            = \App\Models\Image::imageableid($courier['id'])->imageabletype(get_class($courier_data))->get(['id'])->toArray();
+				$images                            = \App\Entities\Image::imageableid($courier['id'])->imageabletype(get_class($courier_data))->get(['id'])->toArray();
 				
 				$image_should_be_ids               = [];
 				foreach ($images as $key => $value) 
@@ -367,7 +367,7 @@ class CourierController extends Controller
 				{
 					foreach ($difference_image_ids as $key => $value) 
 					{
-						$image_data                = \App\Models\Image::find($value);
+						$image_data                = \App\Entities\Image::find($value);
 
 						if(!$image_data->delete())
 						{
@@ -388,7 +388,7 @@ class CourierController extends Controller
 
 		DB::commit();
 		
-		$final_courier                 = \App\Models\Courier::id($courier_data['id'])->with(['shippingcosts', 'addresses', 'images'])->first()->toArray();
+		$final_courier                 = \App\Entities\Courier::id($courier_data['id'])->with(['shippingcosts', 'addresses', 'images'])->first()->toArray();
 
 		return new JSend('success', (array)$final_courier);
 	}
@@ -401,7 +401,7 @@ class CourierController extends Controller
 	public function delete($id = null)
 	{
 		//
-		$courier                    = \App\Models\Courier::id($id)->with(['shippingcosts'])->first();
+		$courier                    = \App\Entities\Courier::id($id)->with(['shippingcosts'])->first();
 
 		if(!$courier)
 		{

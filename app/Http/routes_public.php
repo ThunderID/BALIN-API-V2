@@ -106,12 +106,3 @@ $app->group(['middleware' => 'oauth', 'namespace' => 'App\Http\Controllers'], fu
 		]
 	);
 });
-
-// // ------------------------------------------------------------------------------------
-// // VERITRANS
-// // ------------------------------------------------------------------------------------
-// $app->get('/veritrans/validate',
-// 	[
-// 		'uses'				=> 'PaymentController@veritranscc'
-// 	]
-// );

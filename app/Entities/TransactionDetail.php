@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\CrossServices\ClosedDoorModelObserver;
 
 use App\Entities\TraitRelations\BelongsToVarianTrait;
+use App\Entities\TraitRelations\BelongsToTransactionTrait;
 
 class TransactionDetail extends BaseModel
 {
@@ -13,6 +14,7 @@ class TransactionDetail extends BaseModel
 	 *
 	 */
 	use BelongsToVarianTrait;
+	use BelongsToTransactionTrait;
 
 	/**
 	 * The database table used by the model.
@@ -88,4 +90,21 @@ class TransactionDetail extends BaseModel
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	/**
+	 * scope to check critical stock that below margin (current_stock)
+	 *
+	 * @param treshold
+	 */	
+	public function scopeCritical($query, $variable)
+	{
+		return 	$query
+				->selectraw('transaction_details.*')
+				// ->selectcurrentstock(true)
+				->TransactionStockOn(['wait', 'veritrans_processing_payment', 'paid', 'packed', 'shipping', 'delivered'])
+				->HavingCurrentStock($variable)
+				// ->orderby('current_stock', 'asc')
+				->groupBy('varian_id')
+				;
+	}
 }

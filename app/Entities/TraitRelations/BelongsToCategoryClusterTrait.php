@@ -30,6 +30,15 @@ trait BelongsToCategoryClusterTrait
 	}
 	
 	/**
+	 * call belongsto relationship with Cluster
+	 *
+	 **/
+	public function Cluster()
+	{
+		return $this->belongsTo('App\Entities\CategoryCluster', 'category_id');
+	}
+
+	/**
 	 * check if model has CategoryCluster
 	 *
 	 **/

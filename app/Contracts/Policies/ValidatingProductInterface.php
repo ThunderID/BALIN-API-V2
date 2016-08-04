@@ -19,4 +19,6 @@ interface ValidatingProductInterface
 	public function validateimage(array $image);
 
 	public function validatedeleteproduct(Product $product);
+
+	public function getslug();
 }

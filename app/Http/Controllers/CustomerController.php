@@ -22,7 +22,7 @@ class CustomerController extends Controller
 	 */
 	public function index()
 	{
-		$result                     = new \App\Models\Customer;
+		$result                     = new \App\Entities\Customer;
 
 		if(Input::has('search'))
 		{
@@ -99,13 +99,13 @@ class CustomerController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\Customer::id($id)->with(['sales', 'myreferrals', 'myreferrals.user'])->first();
+		$result                 = \App\Entities\Customer::id($id)->with(['sales', 'myreferrals', 'myreferrals.user'])->first();
 
 		if($result)
 		{
 			return new JSend('success', (array)$result->toArray());
 		}
 		
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 	}
 }

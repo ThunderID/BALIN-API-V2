@@ -8,7 +8,7 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 
-use App\Models\StoreSetting;
+use App\Entities\StoreSetting;
 
 use Carbon\Carbon;
 
@@ -21,14 +21,14 @@ class MyController extends Controller
 	 */
 	public function detail($user_id = null)
 	{
-		$result                 = \App\Models\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
+		$result                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
 
 		if($result)
 		{
 			return new JSend('success', (array)$result->toArray());
 		}
 		
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 	}
 
 	/**
@@ -38,7 +38,7 @@ class MyController extends Controller
 	 */
 	public function points($user_id = null)
 	{
-		$result                     = \App\Models\PointLog::summary($user_id)->orderby('created_at', 'desc');
+		$result                     = \App\Entities\PointLog::summary($user_id)->orderby('created_at', 'desc');
 
 		$count                      = count($result->get(['id']));
 
@@ -67,7 +67,7 @@ class MyController extends Controller
 	 */
 	public function invitations($user_id = null)
 	{
-		$result                     = \App\Models\UserInvitationLog::userid($user_id)->orderby('created_at', 'desc');
+		$result                     = \App\Entities\UserInvitationLog::userid($user_id)->orderby('created_at', 'desc');
 
 		$count                      = count($result->get());
 
@@ -95,7 +95,7 @@ class MyController extends Controller
 	 */
 	public function addresses($user_id = null)
 	{
-		$result                     = \App\Models\Address::ownerid($user_id)->ownertype('App\Models\Customer');
+		$result                     = \App\Entities\Address::ownerid($user_id)->ownertype(['App\Entities\Customer', 'App\Models\Customer']);
 
 		$count                      = $result->count();
 
@@ -156,7 +156,7 @@ class MyController extends Controller
 										];
 
 		//1a. Get original data
-		$customer_data              = \App\Models\Customer::findornew($customer['id']);
+		$customer_data              = \App\Entities\Customer::findornew($customer['id']);
 
 		//1b. Validate Basic Customer Parameter
 		$validator                  = Validator::make($customer, $customer_rules);
@@ -185,7 +185,7 @@ class MyController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Models\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_customer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}
@@ -209,10 +209,10 @@ class MyController extends Controller
 		DB::beginTransaction();
 
 		//1. Check Link
-		$voucher_data              = \App\Models\Referral::code($code)->first();
+		$voucher_data              = \App\Entities\Referral::code($code)->first();
 		if(!$voucher_data)
 		{
-			$voucher_data			= \App\Models\Voucher::code($code)->type('promo_referral')->ondate('now')->first();
+			$voucher_data			= \App\Entities\Voucher::code($code)->type('promo_referral')->ondate('now')->first();
 		}
 
 		if(!$voucher_data)
@@ -240,12 +240,12 @@ class MyController extends Controller
 			if($voucher_data['type']=='referral')
 			{
 				$reference_id 			= $voucher_data['user_id'];
-				$reference_type			= 'App\Models\User';
+				$reference_type			= 'App\Entities\User';
 			}
 			else
 			{
 				$reference_id 			= $voucher_data['id'];
-				$reference_type			= 'App\Models\Voucher';
+				$reference_type			= 'App\Entities\Voucher';
 			}
 
 			$point                  =   [
@@ -255,7 +255,7 @@ class MyController extends Controller
 											'expired_at'            => $expired_at->format('Y-m-d H:i:s'),
 										];
 
-			$point_data             = new \App\Models\PointLog;
+			$point_data             = new \App\Entities\PointLog;
 			
 			$point_data->fill($point);
 
@@ -274,7 +274,7 @@ class MyController extends Controller
 
 		DB::commit();
 		
-		$final_costumer                 = \App\Models\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_costumer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_costumer);
 	}
@@ -305,7 +305,7 @@ class MyController extends Controller
 			{
 				if(!$errors->count())
 				{
-					$log_data		= new \App\Models\UserInvitationLog;
+					$log_data		= new \App\Entities\UserInvitationLog;
 
 					$log_rules		=   [
 												'email'			=> 'required|email',
@@ -342,7 +342,7 @@ class MyController extends Controller
 
 		DB::commit();
 		
-		$final_costumer                 = \App\Models\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_costumer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_costumer);
 	}

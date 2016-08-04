@@ -140,7 +140,7 @@ class BalinShippingOrder implements ShippingOrderInterface
 		\DB::Commit();
 
 		//6. kirim email shipping notes
-		$this->post->sendmailshippingpackage($this->pro_sale->sale, $this->sale['client_id']);
+		$this->post->sendmailshippingpackage($this->pro_sale->sale);
 
 		//7. Return Sale Model Object
 		$this->saved_data	= $this->pro_sale->sale;

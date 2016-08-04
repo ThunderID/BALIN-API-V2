@@ -6,7 +6,11 @@ use App\Entities\Sale;
 
 interface EffectTransactionInterface
 {
-	public function sendmailinvoice(Sale $sale, $client_id);
+	public function sendmailinvoice(Sale $sale);
 	
-	public function sendmailpaymentacceptance(Sale $sale, $client_id);
+	public function sendmailpaymentacceptance(Sale $sale);
+
+	public function sendmailcancelorder(Sale $sale);
+
+	public function sendmaildeliveredorder(Sale $sale);
 }

@@ -23,21 +23,21 @@ class StoreSettingController extends Controller
 	 */
 	public function index($type = null)
 	{
-		$result                 = new \App\Models\StoreSetting;
+		$result                 = new \App\Entities\StoreSetting;
 
 		switch (strtolower($type)) 
 		{
 			case 'slider':
-				$result         = \App\Models\Slider::with(['image']);
+				$result         = \App\Entities\Slider::with(['image']);
 				break;
 			case 'page':
-				$result         = new \App\Models\StorePage;
+				$result         = new \App\Entities\StorePage;
 				break;
 			case 'store':
-				$result         = new \App\Models\Store;
+				$result         = new \App\Entities\Store;
 				break;
 			case 'policy':
-				$result         = new \App\Models\Policy;
+				$result         = new \App\Entities\Policy;
 				break;
 		}
 
@@ -91,19 +91,19 @@ class StoreSettingController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\StoreSetting::id($id)->first();
+		$result                 = \App\Entities\StoreSetting::id($id)->first();
 
 		if($result)
 		{
 			if($result['type']=='slider')
 			{
-				$result         = \App\Models\Slider::id($id)->with(['images'])->first();
+				$result         = \App\Entities\Slider::id($id)->with(['images'])->first();
 			}
 
 			return new JSend('success', (array)$result->toArray());
 		}
 
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 	}
 
 	/**
@@ -138,7 +138,7 @@ class StoreSettingController extends Controller
 		//2a. Slider 
 		if(!$errors->count() && $setting['type'] == 'slider')
 		{
-			$setting_data           = \App\Models\Slider::findornew($setting['id']);
+			$setting_data           = \App\Entities\Slider::findornew($setting['id']);
 
 			$setting_rules          =   [
 												'started_at'                => 'date_format:"Y-m-d H:i:s"',
@@ -150,7 +150,7 @@ class StoreSettingController extends Controller
 		//2b. Page 
 		elseif(!$errors->count() && in_array($setting['type'], ['about_us', 'why_join', 'term_and_condition']))
 		{
-			$setting_data           = \App\Models\StorePage::findornew($setting['id']);
+			$setting_data           = \App\Entities\StorePage::findornew($setting['id']);
 
 			$setting_rules          =   [
 												'started_at'                => 'date_format:"Y-m-d H:i:s"',
@@ -161,7 +161,7 @@ class StoreSettingController extends Controller
 		//2c. Store 
 		elseif(!$errors->count() && in_array($setting['type'], ['url', 'logo', 'facebook_url', 'twitter_url', 'instagram_url', 'email', 'phone', 'address', 'bank_information']))
 		{
-			$setting_data           = \App\Models\Store::findornew($setting['id']);
+			$setting_data           = \App\Entities\Store::findornew($setting['id']);
 
 			$setting_rules          =   [
 												'started_at'                => 'date_format:"Y-m-d H:i:s"',
@@ -172,7 +172,7 @@ class StoreSettingController extends Controller
 		//2d. Policy 
 		else
 		{
-			$setting_data           = \App\Models\Policy::findornew($setting['id']);
+			$setting_data           = \App\Entities\Policy::findornew($setting['id']);
 
 			$setting_rules          =       [
 												'started_at'                => 'date_format:"Y-m-d H:i:s"',
@@ -204,7 +204,7 @@ class StoreSettingController extends Controller
 			{
 				if(!$errors->count())
 				{
-					$image_data		= \App\Models\Image::findornew($value['id']);
+					$image_data		= \App\Entities\Image::findornew($value['id']);
 
 					$image_rules	=   [
 											// 'imageable_id'              => 'exists:tmp_store_settings,id|'.($is_new ? '' : 'in:'.$setting_data['id']),
@@ -245,7 +245,7 @@ class StoreSettingController extends Controller
 				//if there was no error, check if there were things need to be delete
 				if(!$errors->count())
 				{
-					$images                            = \App\Models\Image::imageableid($setting['id'])->get(['id'])->toArray();
+					$images                            = \App\Entities\Image::imageableid($setting['id'])->get(['id'])->toArray();
 					
 					$image_should_be_ids               = [];
 					foreach ($images as $key => $value) 
@@ -259,7 +259,7 @@ class StoreSettingController extends Controller
 					{
 						foreach ($difference_image_ids as $key => $value) 
 						{
-							$image_data                = \App\Models\Image::find($value);
+							$image_data                = \App\Entities\Image::find($value);
 
 							if(!$image_data->delete())
 							{
@@ -282,11 +282,11 @@ class StoreSettingController extends Controller
 		
 		if($setting_data['type']=='slider')
 		{
-			$final_setting          = \App\Models\Slider::id($setting_data['id'])->with(['images'])->first()->toArray();
+			$final_setting          = \App\Entities\Slider::id($setting_data['id'])->with(['images'])->first()->toArray();
 		}
 		else
 		{
-			$final_setting          = \App\Models\StoreSetting::id($setting_data['id'])->first()->toArray();
+			$final_setting          = \App\Entities\StoreSetting::id($setting_data['id'])->first()->toArray();
 		}
 
 		return new JSend('success', (array)$final_setting);

@@ -137,6 +137,9 @@ public function __construct(ValidatingTransactionInterface $pre_sale, Validating
 				//5. update status bayar
 				$this->pro_sale->updatestatus($sale, 'paid'); 
 		
+				//6. do something for upline
+				$this->pro_sale->grantupline($this->pro_sale->sale); 
+
 				if($this->pro_sale->errors->count())
 				{
 					\DB::rollback();
@@ -148,10 +151,10 @@ public function __construct(ValidatingTransactionInterface $pre_sale, Validating
 
 				\DB::commit();
 
-				//6. kirim email bayar
+				//7. kirim email bayar
 				$this->post_sale->sendmailpaymentacceptance($this->pro_sale->sale, $this->sale['client_id']);
 
-				//7. update return value
+				//8. update return value
 				$this->saved_data		= $this->pro_sale->sale;
 
 				break;
@@ -184,7 +187,7 @@ public function __construct(ValidatingTransactionInterface $pre_sale, Validating
 				/** POST PROCESS */
 
 				//4. Send Mail
-				$this->post_sale->sendmailcancelorder($this->pro_sale->sale, $this->sale['client_id']);
+				$this->post_sale->sendmailcancelorder($this->pro_sale->sale);
 
 				//5. Return Sale Model Object
 				$this->saved_data	= $this->pro_sale->sale;

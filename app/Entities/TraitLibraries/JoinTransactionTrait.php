@@ -191,4 +191,27 @@ trait JoinTransactionTrait
 		})
 		;
 	}
+		
+	/**
+	 * check transaction log changed date
+	 *
+	 * @param string or array of datetime changed_at
+	 **/
+	public function scopeTransactionLogChangedAt($query, $variable)
+	{
+		if(!is_array($variable))
+		{
+			return $query->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable)))->orderBy('changed_at', 'desc');
+		}
+		else
+		{
+			if(is_null($variable[0]))
+			{
+				return $query->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable[1])));
+			}
+		}
+
+		return $query->where('changed_at', '>=', date('Y-m-d H:i:s', strtotime($variable[0])))->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable[1])))->orderBy('changed_at', 'asc');
+	}
+	
 }

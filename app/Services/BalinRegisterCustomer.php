@@ -113,7 +113,7 @@ class BalinRegisterCustomer implements RegisterCustomerInterface
 		\DB::commit();
 
 		//6. Send mail for customer
-		$this->post->sendactivationmail($this->pro->customer, $this->customer['client_id']);
+		$this->post->sendactivationmail($this->pro->customer);
 
 		//7. Return customer Model Object
 		$this->saved_data	= $this->pro->customer;

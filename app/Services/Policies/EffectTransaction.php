@@ -39,55 +39,47 @@ class EffectTransaction implements EffectTransactionInterface
 		}
 	}
 
-	public function sendmailinvoice(Sale $sale, $client_id)
+	public function sendmailinvoice(Sale $sale)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
-
 		$data				= ['invoice' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.invoice', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.invoice', ['data' => $data], function($message) use($sale)
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - INVOICE');
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - INVOICE');
 		}); 
 	}
 
-	public function sendmailpaymentacceptance(Sale $sale, $client_id)
+	public function sendmailpaymentacceptance(Sale $sale)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
-
 		$data				= ['paid' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.paid', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.paid', ['data' => $data], function($message) use($sale)
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - PAYMENT VALIDATION');
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - PAYMENT VALIDATION');
 		}); 
 	}
 
-	public function sendmailcancelorder(Sale $sale, $client_id)
+	public function sendmailcancelorder(Sale $sale)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
-
 		$data				= ['canceled' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.canceled', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.canceled', ['data' => $data], function($message) use($sale)
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - CANCEL ORDER');
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - CANCEL ORDER');
 		}); 
 	}
 
-	public function sendmaildeliveredorder(Sale $sale, $client_id)
+	public function sendmaildeliveredorder(Sale $sale)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
-
 		$data				= ['delivered' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.delivered', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.delivered', ['data' => $data], function($message) use($sale)
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - DELIVERED ORDER');
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - DELIVERED ORDER');
 		}); 
 	}
 }

@@ -3,12 +3,15 @@
 namespace App\Services\Policies;
 
 use App\Entities\User;
+use App\Entities\Customer;
 use App\Entities\Sale;
+use App\Entities\Purchase;
 use App\Entities\TransactionLog;
 use App\Entities\Varian;
 use App\Entities\ProductExtension;
 use App\Entities\Courier;
 use App\Entities\ShippingCost;
+use App\Entities\Supplier;
 use App\Entities\Voucher;
 use App\Entities\StoreSetting;
 
@@ -65,6 +68,14 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		}
 	}
 	
+	public function validatesupplier(Supplier $supplier)
+	{
+		if(!$supplier)
+		{
+			$this->errors->add('Supplier', 'Supplier tidak valid');
+		}
+	}
+
 	public function validatecheckoutstatus(Sale $sale)
 	{
 		if(!in_array($sale['status'], ['na', 'cart', 'wait']))
@@ -99,6 +110,24 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		}
 	}
 	
+	public function validatepurchaseitem(array $transaction_details)
+	{
+		foreach ($transaction_details as $key => $value) 
+		{
+			$varian 				= Varian::find($value['varian_id']);
+
+			if(!$varian)
+			{
+				$this->errors->add('Purchase', 'Item tidak valid');
+			}
+		}
+
+		if(empty($transaction_details))
+		{
+			$this->errors->add('Purchase', 'Tidak ada item di keranjang belanja');
+		}
+	}
+
 	public function validatestock(Varian $varian, $quantity)
 	{
 		if($varian->current_stock < $quantity)
@@ -188,7 +217,8 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	{
 		if(isset($voucher['code']))
 		{
-			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'debit_point'])->ondate('now')->first();
+			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost'])->ondate('now')->first();
+			// $voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'debit_point'])->ondate('now')->first();
 
 			$this->validatevoucher($voucher);
 
@@ -217,7 +247,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		}
 	}
 
-	public function calculatepointdiscount(User $user, Sale $sale)
+	public function calculatepointdiscount(Customer $user, Sale $sale)
 	{
 		if($sale->count())
 		{
@@ -247,9 +277,41 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 	public function getsalenumber(Sale $sale)
 	{
-		$prefix			= $sale->type[0].date("ym");
+		if(!empty($sale['ref_number']))
+		{
+			return $sale['ref_number'];
+		}
+
+		$prefix			= 's'.date("ym");
 
 		$latest_sale	= Sale::select('ref_number')
+								->where('ref_number', 'like', $prefix.'%')
+								->status(['wait', 'payment_process', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
+								->orderBy('ref_number', 'DESC')
+								->first();
+
+		if(empty($latest_sale))
+		{
+			$number		= 1;
+		}
+		else
+		{
+			$number		= 1 + (int)substr($latest_sale['ref_number'],5);
+		}
+
+		return $prefix . str_pad($number,4,"0",STR_PAD_LEFT);
+	}
+	
+	public function getpurchasenumber(Purchase $purchase)
+	{
+		if(!empty($purchase['ref_number']))
+		{
+			return $purchase['ref_number'];
+		}
+		
+		$prefix			= 'b'.date("ym");
+
+		$latest_sale	= Purchase::select('ref_number')
 								->where('ref_number', 'like', $prefix.'%')
 								->status(['wait', 'payment_process', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
 								->orderBy('ref_number', 'DESC')

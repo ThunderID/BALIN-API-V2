@@ -39,16 +39,16 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 		}
 	}
 
-	public function sendactivationmail(Customer $customer, $client_id)
+	public function sendactivationmail(Customer $customer)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
+		$template 			= 'balin';
 
 		$data				= ['user' => $customer, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.crm.welcome', ['data' => $data], function($message) use($customer, $template)
+		Mail::send('mail.balin.crm.welcome', ['data' => $data], function($message) use($customer)
 		{
-			$message->to($customer['email'], $customer['name'])->subject(strtoupper($template->located).' - WELCOME MAIL');
+			$message->to($customer['email'], $customer['name'])->subject(strtoupper('BALIN').' - WELCOME MAIL');
 		}); 
 	}
 }

@@ -8,6 +8,9 @@ use App\Entities\Traits\IsSliderTrait;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\TraitRelations\HasOneImageTrait;
+use App\Entities\TraitRelations\MorphManyImagesTrait;
+
 /** 
 	* Inheritance StoreSetting Model
 	* For every inheritance model, allowed to have only $type, fillable, rules, and available function
@@ -20,6 +23,13 @@ class Slider extends StoreSetting
 	use IsSliderTrait;
 
 	use GetAllTrait;
+
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use HasOneImageTrait;
+	use MorphManyImagesTrait;
 
 	/**
 	 * The attributes that are mass assignable.

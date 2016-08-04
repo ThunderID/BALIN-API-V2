@@ -36,7 +36,7 @@ class BroadcastController extends Controller
 			\App::abort(404);
 		}
 
-		$result						= new \App\Models\Queue;
+		$result						= new \App\Entities\Queue;
 		
 		$result 					= $result->userid($userid);
 
@@ -154,7 +154,7 @@ class BroadcastController extends Controller
 		}
 		else
 		{
-			$products 				= new \App\Models\Product;
+			$products 				= new \App\Entities\Product;
 			$products 				= $products->sellable(true);
 
 			if(isset($price['category_ids']))
@@ -170,7 +170,7 @@ class BroadcastController extends Controller
 
 			$parameter				= $price;
 
-			$queue 					= new \App\Models\Queue;
+			$queue 					= new \App\Entities\Queue;
 			$queue->fill([
 				'user_id'			=> $userid,
 				'process_name'		=> 'broadcast:discount',
@@ -198,7 +198,7 @@ class BroadcastController extends Controller
 
 		DB::commit();
 		
-		$final_queue				= \App\Models\Queue::id($queue['id'])->first()->toArray();
+		$final_queue				= \App\Entities\Queue::id($queue['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_queue);
 	}

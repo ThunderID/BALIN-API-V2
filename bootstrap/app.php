@@ -66,6 +66,10 @@ $app->middleware([
 
 $app->routeMiddleware([
     'csrf' => \Laravel\Lumen\Http\Middleware\VerifyCsrfToken::class,
+    
+    'oauth' => \LucaDegasperi\OAuth2Server\Middleware\OAuthMiddleware::class,
+    'oauth-client' => \LucaDegasperi\OAuth2Server\Middleware\OAuthClientOwnerMiddleware::class,
+    'oauth-user' => \LucaDegasperi\OAuth2Server\Middleware\OAuthUserOwnerMiddleware::class,
 
     'me'            => \App\Http\Middleware\CustomerAndAccessor::class,
     'staff'         => \App\Http\Middleware\StaffAndAccessor::class,
@@ -102,6 +106,8 @@ $app->register(App\Providers\ExpeditionServiceProvider::class);
 
 $app->register(GenTux\Jwt\Support\LumenServiceProvider::class);
 
+$app->register(\LucaDegasperi\OAuth2Server\Storage\FluentStorageServiceProvider::class);
+$app->register(\LucaDegasperi\OAuth2Server\OAuth2ServerServiceProvider::class);
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes

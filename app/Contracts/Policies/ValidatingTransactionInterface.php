@@ -3,17 +3,21 @@
 namespace App\Contracts\Policies;
 
 use App\Entities\User;
+use App\Entities\Customer;
 use App\Entities\Varian;
+use App\Entities\Purchase;
 use App\Entities\ProductExtension;
 use App\Entities\Courier;
 use App\Entities\ShippingCost;
 use App\Entities\Voucher;
 use App\Entities\Sale;
+use App\Entities\Supplier;
 
 interface ValidatingTransactionInterface
 {
 	public function validateprevioustransaction(User $user);
 	public function validatebuyer(User $user);
+	public function validatesupplier(Supplier $supplier);
 	public function validatecheckoutstatus(Sale $sale);
 	public function validatecheckedoutstatus(Sale $sale);
 	
@@ -35,10 +39,11 @@ interface ValidatingTransactionInterface
 	public function validatevoucher(Voucher $voucher);
 	public function calculatevoucherdiscount(Voucher $voucher);
 
-	public function calculatepointdiscount(User $user, Sale $sale);
+	public function calculatepointdiscount(Customer $user, Sale $sale);
 	public function calculatebills();
 	
 	public function getsalenumber(Sale $sale);
+	public function getpurchasenumber(Purchase $purchase);
 	public function getuniquenumber(Sale $sale);
 	public function getsubtotal();
 	public function getpackingcost();

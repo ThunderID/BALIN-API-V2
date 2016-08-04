@@ -21,9 +21,9 @@ class WarehouseController extends Controller
 	 */
 	public function card($id = null)
 	{
-		$varian                     = \App\Models\Varian::id($id);
+		$varian                     = \App\Entities\Varian::id($id);
 
-		$detail                     = \App\Models\TransactionDetail::varianid($id)->stockmovement(true);
+		$detail                     = \App\Entities\TransactionDetail::varianid($id)->stockmovement(true);
 
 		if(Input::has('search'))
 		{
@@ -36,7 +36,7 @@ class WarehouseController extends Controller
 					case 'ondate':
 						if(is_array($value))
 						{
-							$balance	= \App\Models\Varian::id($id)->TransactionLogChangedAt($value[0]);
+							$balance	= \App\Entities\Varian::id($id)->TransactionLogChangedAt($value[0]);
 							$prev_date 	= $value[0];
 							$detail     = $detail->TransactionLogChangedAt($value);
 							$varian     = $varian->TransactionLogChangedAt($value[1]);
@@ -56,7 +56,7 @@ class WarehouseController extends Controller
    
    		if(!$varian->first())
    		{
-        	return new JSend('error', (array)Input::all(), 'ID Tidak valid.');
+        	return response()->json( JSend::fail(['ID Tidak Valid.']));
    		}
 
 		$varian                     = $varian->with(['product'])->first()->toArray();
@@ -92,7 +92,7 @@ class WarehouseController extends Controller
 	 */
 	public function critical()
 	{
-		$setting                    = \App\Models\Policy::ondate('now')->type('critical_stock')->first();
+		$setting                    = \App\Entities\Policy::ondate('now')->type('critical_stock')->first();
 
 		if(!$setting)
 		{
@@ -103,7 +103,7 @@ class WarehouseController extends Controller
 			$critical               = 0 - $setting['value'];
 		}
 
-		$result                     = \App\Models\Varian::critical($critical);
+		$result                     = \App\Entities\Varian::critical($critical);
 		
 		$count                      = count($result->get(['id']));
 
@@ -132,7 +132,7 @@ class WarehouseController extends Controller
 	 */
 	public function opname()
 	{
-		$result                     = new \App\Models\Varian;
+		$result                     = new \App\Entities\Varian;
 
 		if(Input::has('sort'))
 		{

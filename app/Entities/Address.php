@@ -4,8 +4,16 @@ namespace App\Entities;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\TraitRelations\MorphToOwnerTrait;
+
 class Address extends BaseModel
 {
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use MorphToOwnerTrait;
+
 	/**
 	 * The database table used by the model.
 	 *
@@ -76,4 +84,35 @@ class Address extends BaseModel
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	/**
+	 * scope to get condition where Phone
+	 *
+	 * @param string or array of entity' Phone
+	 **/
+	public function scopePhone($query, $variable)
+	{
+		return 	$query->where('Phone', $variable);
+	}
+
+	/**
+	 * scope to get condition where Address
+	 *
+	 * @param string or array of entity' Address
+	 **/
+	public function scopeAddress($query, $variable)
+	{
+		return 	$query->where('Address', $variable);
+	}
+
+	/**
+	 * scope to get condition where Zipcode
+	 *
+	 * @param string or array of entity' Zipcode
+	 **/
+	public function scopeZipcode($query, $variable)
+	{
+		return 	$query->where('Zipcode', $variable);
+	}
+
 }

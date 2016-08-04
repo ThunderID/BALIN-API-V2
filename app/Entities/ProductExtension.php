@@ -7,6 +7,8 @@ use App\Entities\Traits\HasImageTrait;
 
 use App\Entities\Traits\GetAllTrait;
 
+use App\Entities\TraitRelations\MorphManyImagesTrait;
+
 use App\CrossServices\ClosedDoorModelObserver;
 
 /**
@@ -25,6 +27,12 @@ class ProductExtension extends BaseModel
 	 * Traits To Condition within itself
 	 */
 	use GetAllTrait;
+
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use MorphManyImagesTrait;
 
 	/**
 	 * The database table used by the model.

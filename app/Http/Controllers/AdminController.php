@@ -23,7 +23,7 @@ class AdminController extends Controller
 	 */
 	public function index()
 	{
-		$result                 = new \App\Models\Admin;
+		$result                 = new \App\Entities\Admin;
 
 		if(Input::has('search'))
 		{
@@ -82,9 +82,10 @@ class AdminController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['audits'])->get()->toArray();
-
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		$result                     = $result->get();
+	
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -95,14 +96,15 @@ class AdminController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\Admin::id($id)->with(['audits'])->first();
+		$result                 = \App\Entities\Admin::id($id)->first();
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success(['data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 	}
 
 	/**
@@ -143,7 +145,7 @@ class AdminController extends Controller
 										];
 
 		//1a. Get original data
-		$admin_data                 = \App\Models\Admin::findornew($admin['id']);
+		$admin_data                 = \App\Entities\Admin::findornew($admin['id']);
 
 		//1b. Validate Basic Admin Parameter
 		$validator                  = Validator::make($admin, $admin_rules);
@@ -172,7 +174,7 @@ class AdminController extends Controller
 
 		DB::commit();
 		
-		$final_admin                 = \App\Models\Admin::id($admin_data['id'])->with(['audits'])->first()->toArray();
+		$final_admin                 = \App\Entities\Admin::id($admin_data['id'])->with(['audits'])->first()->toArray();
 
 		return new JSend('success', (array)$final_admin);
 	}

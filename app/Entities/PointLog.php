@@ -6,6 +6,7 @@ use App\CrossServices\ClosedDoorModelObserver;
 
 use App\Entities\TraitRelations\BelongsToUserTrait;
 use App\Entities\TraitRelations\MorphToReferenceTrait;
+use App\Entities\TraitRelations\HasManyPointLogsTrait;
 
 class PointLog extends BaseModel
 {
@@ -15,6 +16,7 @@ class PointLog extends BaseModel
 	 */
 	use BelongsToUserTrait;
 	use MorphToReferenceTrait;
+	use HasManyPointLogsTrait;
 
 	/**
 	 * The database table used by the model.

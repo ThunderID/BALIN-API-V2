@@ -4,7 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\MessageBag;
 
-use App\Entities\User;
+use App\Entities\Customer;
 use App\Entities\Sale;
 use App\Entities\TransactionLog;
 
@@ -76,7 +76,7 @@ class BalinCheckout implements CheckoutInterface
 	 */
 	public function save()
 	{
-		$customer 						= User::findorfail($this->sale['user_id']);
+		$customer 						= Customer::findorfail($this->sale['user_id']);
 		$sale 							= Sale::findornew($this->sale['id']);
 		
 		/** PREPROCESS */
@@ -97,13 +97,13 @@ class BalinCheckout implements CheckoutInterface
 		$this->pre->validateshippingaddress($this->sale['shipment']); 
 
 		//6. Validate voucher
-		$this->pre->validateshoppingvoucher(is_null($this->sale['voucher']) ? [] : $this->sale['voucher']); 
+		$this->pre->validateshoppingvoucher(!isset($this->sale['voucher']) ? [] : $this->sale['voucher']); 
 
 		//7. Validate Checkout Status
 		$this->pre->validatecheckoutstatus($sale); 
 
 		//8. Calculatepoint discount
-		$this->pre->calculatepointdiscount($customer); 
+		$this->pre->calculatepointdiscount($customer, $sale); 
 
 		//9. Generate unique number
 		$this->sale['unique_number']	= $this->pre->getuniquenumber($sale); 
@@ -172,12 +172,12 @@ class BalinCheckout implements CheckoutInterface
 		/** POST PROCESS */
 
 		//21. Send Mail
-		$this->post->sendmailinvoice($this->pro->sale, $this->sale['client_id']);
+		// $this->post->sendmailinvoice($this->pro->sale);
 
 		//22. Send Mail for bills
 		if($this->pre->getbills() == 0)
 		{
-			$this->post->sendmailpaymentacceptance($this->pro->sale, $this->sale['client_id']);
+			// $this->post->sendmailpaymentacceptance($this->pro->sale);
 		}
 
 		//23. Return Sale Model Object

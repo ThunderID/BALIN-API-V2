@@ -12,7 +12,7 @@ use App\Http\Controllers\Veritrans\Veritrans_VtDirect;
 use App\Http\Controllers\Veritrans\Veritrans_VtWeb;
 use App\Http\Controllers\Veritrans\Veritrans_Sanitizer;
 
-use App\Services\BalinDeleteExpedition as Checkout;
+use App\Services\BalinRollbackStock as Checkout;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
@@ -67,14 +67,14 @@ class TrySaleController extends Controller
 		// 	            ];
 		// $jwt 		= new JwtToken;
 		// $app 			= \App\Entities\Customer::first()->toArray();
-		$app 			= \App\Entities\Courier::with(['shippingcosts', 'images'])->first();
+		$app 			= \App\Entities\Purchase::with(['transactiondetails', 'supplier'])->first()->toArray();
 		// $app 			= \App\Entities\Customer::id(24)->first()->toArray();
 // $app['reference_code'] = 'GIFTTOMMY';
 		// $app['date_of_birth'] 	= '1983-10-18 00:00:00';
 		// $app['email'] 	= 'mo@balin.id';
 		// unset($app['id']);
 		// $app 				= \App\Entities\Sale::status(['delivered'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->wherehas('paidpointlogs', function($q){$q;})->take(1)->get()->toArray();
-		// $app 				= \App\Models\Sale::id(78)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
+		// $app 				= \App\Entities\Sale::id(78)->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
 // dd($app->delete());
 // dd($app);
 // 		$modified = $app[0];
@@ -114,7 +114,7 @@ class TrySaleController extends Controller
 
 // 		$transaction 					= $notif->transaction_status;
 
-// 			$paid_data					= new \App\Models\Payment;
+// 			$paid_data					= new \App\Entities\Payment;
 
 // 			$payment['id']				= null;
 // 			$payment['transaction_id']	= $app['id'];
@@ -147,7 +147,7 @@ $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
 // dd($app);
 // 		$token = $jwt->createToken($payload);
 // dd($token);
-		// $try 						= new \App\Models\Sale;
+		// $try 						= new \App\Entities\Sale;
 		// $try->fill(['user_id' => 1]);
 		// if(!$try->save())
 		// {
@@ -167,12 +167,12 @@ $app['client_id'] = 'f3d259ddd3ed8ff3843839b';
 		// 	return new JSend('error', (array)Input::all(), $this->class->getError());
 		// }
 
-		// $this->class->fill($app);
+		$this->class->fill($app);
 		// $this->class->fill($app[0]);
 		// $this->class->fill($modified);
 
-		if(!$this->class->delete($app))
-		// if(!$this->class->save())
+		// if(!$this->class->delete($app))
+		if(!$this->class->save())
 		{
 			return new JSend('error', (array)Input::all(), $this->class->getError());
 		}

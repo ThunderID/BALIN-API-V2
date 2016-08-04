@@ -12,6 +12,10 @@ use App\Entities\TraitLibraries\SelectStockTrait;
 use App\Entities\TraitLibraries\JoinProductTrait;
 use App\Entities\TraitLibraries\JoinTransactionTrait;
 use App\Entities\TraitLibraries\FieldNameTrait;
+use App\Entities\TraitLibraries\FieldSlugTrait;
+use App\Entities\TraitLibraries\SellableTrait;
+use App\Entities\TraitLibraries\SelectPriceTrait;
+use App\Entities\TraitLibraries\SelectStatTrait;
 
 use App\Entities\TraitRelations\HasManyVariansTrait;
 use App\Entities\TraitRelations\HasManyPricesTrait;
@@ -48,6 +52,10 @@ class Product extends BaseModel
 	use JoinProductTrait;
 	use JoinTransactionTrait;
 	use FieldNameTrait;
+	use FieldSlugTrait;
+	use SellableTrait;
+	use SelectPriceTrait;
+	use SelectStatTrait;
 
 	/**
 	 * Relationship Traits
@@ -143,15 +151,5 @@ class Product extends BaseModel
 	public function scopeUPC($query, $variable)
 	{
 		return 	$query->where('upc', $variable);
-	}
-
-	/**
-	 * scope to find slug of product
-	 *
-	 * @param string of slug
-	 */
-	public function scopeSlug($query, $variable)
-	{
-		return 	$query->where('slug', $variable);
 	}
 }

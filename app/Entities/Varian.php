@@ -146,4 +146,17 @@ class Varian extends BaseModel
 
 		return 	$query->where('size', $variable);
 	}
+	
+	/**
+	 * scope to find varian who hath current stock
+	 *
+	 * @param threshold
+	 */
+	public function scopeCritical($query, $variable)
+	{
+		return 	$query
+				->HavingCurrentStock($variable)
+				// ->orderby('current_stock', 'asc')
+				;
+	}
 }

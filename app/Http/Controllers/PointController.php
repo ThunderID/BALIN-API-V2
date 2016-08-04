@@ -23,7 +23,7 @@ class PointController extends Controller
 	 */
 	public function index()
 	{
-		$result                 = new \App\Models\PointLog;
+		$result                 = new \App\Entities\PointLog;
 
 		if(Input::has('search'))
 		{
@@ -125,7 +125,7 @@ class PointController extends Controller
 
 
 		//1. Get original data
-		$point_data                 = \App\Models\PointLog::findornew($point['id']);
+		$point_data                 = \App\Entities\PointLog::findornew($point['id']);
 
 		if(!$errors->count())
 		{
@@ -144,7 +144,7 @@ class PointController extends Controller
 			}
 			else
 			{
-				$point_data                    = new \App\Models\PointLog;
+				$point_data                    = new \App\Entities\PointLog;
 
 				$point_data                    = $point_data->fill($point);
 
@@ -164,7 +164,7 @@ class PointController extends Controller
 
 		DB::commit();
 		
-		$final_point                 = \App\Models\PointLog::id($point_data['id'])->with(['user'])->first()->toArray();
+		$final_point                 = \App\Entities\PointLog::id($point_data['id'])->with(['user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_point);
 	}

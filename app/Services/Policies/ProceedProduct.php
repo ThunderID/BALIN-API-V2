@@ -57,6 +57,7 @@ class ProceedProduct implements ProceedProductInterface
 			$stored_varian				= Varian::findornew($value['id']);
 			
 			$stored_varian->fill($value);
+			$stored_varian->product_id 	= $product->id;
 
 			if(!$stored_varian->save())
 			{
@@ -96,10 +97,10 @@ class ProceedProduct implements ProceedProductInterface
 
 		foreach ($price as $key => $value) 
 		{
-
 			$stored_price				= Price::findornew($value['id']);
 			
 			$stored_price->fill($value);
+			$stored_price->product_id 	= $product->id;
 
 			if(!$stored_price->save())
 			{
@@ -141,6 +142,7 @@ class ProceedProduct implements ProceedProductInterface
 		{
 
 			$stored_label				= ProductLabel::findornew($value['id']);
+			$stored_label->product_id 	= $product->id;
 			
 			$stored_label->fill($value);
 
@@ -204,7 +206,7 @@ class ProceedProduct implements ProceedProductInterface
 
 		foreach ($image as $key => $value) 
 		{
-			if($value['is_default'] == true)
+			if(isset($value['is_default']) && $value['is_default'] == true)
 			{
 				$images					= Image::where('imageable_id', $product->id)
 											->wherein('imageable_type', ['App\Models\Product', 'App\Entities\Product'])
@@ -229,6 +231,8 @@ class ProceedProduct implements ProceedProductInterface
 			$stored_image				= Image::findornew($value['id']);
 			
 			$stored_image->fill($value);
+			$stored_image->imageable_id		= $product->id;
+			$stored_image->imageable_type	= get_class($product);
 
 			if(!$stored_image->save())
 			{

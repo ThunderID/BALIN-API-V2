@@ -112,7 +112,7 @@ class BalinDeliveredOrder implements DeliveredOrderInterface
 		\DB::Commit();
 
 		//3. kirim email Delivered notes
-		$this->post->sendmaildeliveredorder($this->pro->sale, $this->sale['client_id']);
+		$this->post->sendmaildeliveredorder($this->pro->sale);
 
 		//4. Return Sale Model Object
 		$this->saved_data	= $this->pro->sale;

@@ -118,7 +118,7 @@ class BalinCancelOrder implements CancelOrderInterface
 		/** POST PROCESS */
 
 		//4. Send Mail
-		$this->post->sendmailcancelorder($this->pro->sale, $this->sale['client_id']);
+		$this->post->sendmailcancelorder($this->pro->sale);
 
 		//5. Return Sale Model Object
 		$this->saved_data	= $this->pro->sale;

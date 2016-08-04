@@ -51,5 +51,36 @@ trait JoinProductTrait
 		})
 		;
 	}
+	
+	/**
+	 * joining varian from transaction detail
+	 *
+	 **/
+	public function scopeJoinVarianFromTransactionDetail($query, $variable)
+	{
+		return $query
+		->join('varians', function ($join) use($variable) 
+			 {
+									$join->on ( 'varians.id', '=', 'transaction_details.varian_id' )
+									->wherenull('varians.deleted_at')
+									;
+			})
+		;
+	}
 
+	/**
+	 * joining product from varian
+	 *
+	 **/
+	public function scopeJoinProductFromVarian($query, $variable)
+	{
+		return $query
+		 ->join('products', function ($join) use($variable) 
+			 {
+									$join->on ( 'varians.product_id', '=', 'products.id' )
+									->wherenull('products.deleted_at')
+									;
+			})
+		;
+	}
 }

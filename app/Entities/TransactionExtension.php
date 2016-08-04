@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\CrossServices\ClosedDoorModelObserver;
 
 use App\Entities\TraitRelations\BelongsToProductExtensionTrait;
+use App\Entities\TraitRelations\BelongsToTransactionTrait;
 
 class TransactionExtension extends BaseModel
 {
@@ -13,7 +14,8 @@ class TransactionExtension extends BaseModel
 	 *
 	 */
 	use BelongsToProductExtensionTrait;
-	
+	use BelongsToTransactionTrait;
+
 	/**
 	 * The database table used by the model.
 	 *

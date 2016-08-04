@@ -7,6 +7,9 @@ use App\Entities\Traits\IsVoucherTrait;
 
 use App\Entities\Traits\GetAllTrait;
 
+use App\Entities\TraitRelations\HasManyTransactionsTrait;
+use App\Entities\TraitRelations\HasManyQuotaLogsTrait;
+
 use App\CrossServices\ClosedDoorModelObserver;
 
 /** 
@@ -26,6 +29,13 @@ class Voucher extends VoucherCampaign
 	use IsVoucherTrait;
 
 	use GetAllTrait;
+	
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use HasManyTransactionsTrait;
+	use HasManyQuotaLogsTrait;
 
 	/**
 	 * The attributes that are mass assignable.

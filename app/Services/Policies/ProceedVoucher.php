@@ -65,7 +65,7 @@ class ProceedVoucher implements ProceedVoucherInterface
 
 	public function deletequota(Voucher $voucher)
 	{
-		foreach ($voucher->quotas as $key => $value) 
+		foreach ($voucher->quotalogs as $key => $value) 
 		{
 			if(!$value->delete())
 			{

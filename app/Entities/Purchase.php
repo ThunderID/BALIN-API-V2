@@ -9,6 +9,7 @@ use App\Entities\Traits\IsBuyTrait;
 use App\Entities\Traits\GetAllTrait;
 
 use App\Entities\TraitLibraries\JoinTransactionTrait;
+use App\Entities\TraitLibraries\FieldTransactionTrait;
 
 use App\Entities\TraitRelations\BelongsToSupplierTrait;
 use App\Entities\TraitRelations\HasManyTransactionDetailsTrait;
@@ -41,6 +42,7 @@ class Purchase extends Transaction
 	 *
 	 */
 	use JoinTransactionTrait;
+	use FieldTransactionTrait;
 	
 	/**
 	 * Relationship Traits
@@ -69,7 +71,7 @@ class Purchase extends Transaction
 	 */
 	protected $rules				=	[
 											'supplier_id'					=> 'exists:suppliers,id',
-											'type'							=> 'in:sell',
+											'type'							=> 'required|in:buy',
 											'ref_number'					=> 'max:255',
 											'transact_at'					=> 'date_format:"Y-m-d H:i:s"',
 										];

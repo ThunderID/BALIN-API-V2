@@ -39,16 +39,14 @@ class EffectShipment implements EffectShipmentInterface
 		}
 	}
 
-	public function sendmailshippingpackage(Sale $sale, $client_id)
+	public function sendmailshippingpackage(Sale $sale)
 	{
-		$template 			= ClientTemplate::clientid($client_id)->first();
-
 		$data				= ['shipped' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.'.$template->located.'.order.shipped', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.shipped', ['data' => $data], function($message) use($sale, $template)
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper($template->located).' - SHIPPING INFORMATION');
+			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - SHIPPING INFORMATION');
 		}); 
 	}
 }

@@ -39,12 +39,12 @@ class AuthController extends Controller
 		{
 			$sso_data 					= Input::get('sso');
 			//1. check sso
-			$sso 						= \App\Models\User::email($sso_data['email'])->ssomedia(['facebook'])->first();
+			$sso 						= \App\Entities\User::email($sso_data['email'])->ssomedia(['facebook'])->first();
 
 			//1a. register sso
 			if(!$sso)
 			{
-				$sso					= new \App\Models\Customer;
+				$sso					= new \App\Entities\Customer;
 
 				$sso->fill([
 						'name'			=> $sso_data['name'],
@@ -120,7 +120,7 @@ class AuthController extends Controller
 										];
 
 		//1a. Get original data
-		$customer_data              = \App\Models\Customer::findornew($customer['id']);
+		$customer_data              = \App\Entities\Customer::findornew($customer['id']);
 
 		//1b. Validate Basic Customer Parameter
 		$validator                  = Validator::make($customer, $customer_rules);
@@ -144,7 +144,7 @@ class AuthController extends Controller
 		//2. check invitation
 		if(!$errors->count() && isset($customer['reference_code']))
 		{
-			$referral_data					= \App\Models\Referral::code($customer['reference_code'])->first();
+			$referral_data					= \App\Entities\Referral::code($customer['reference_code'])->first();
 
 			if(!$referral_data)
 			{
@@ -156,7 +156,7 @@ class AuthController extends Controller
 			}
 			else
 			{
-				$store                      = \App\Models\StoreSetting::type('voucher_point_expired')->Ondate('now')->first();
+				$store                      = \App\Entities\StoreSetting::type('voucher_point_expired')->Ondate('now')->first();
 
 				if($store)
 				{
@@ -171,11 +171,11 @@ class AuthController extends Controller
 				$point                  =   [
 												'user_id'               => $customer_data['id'],
 												'reference_id'        	=> $referral_data['user_id'],
-												'reference_type'        => 'App\Models\User',
+												'reference_type'        => 'App\Entities\User',
 												'expired_at'            => $expired_at->format('Y-m-d H:i:s'),
 											];
 
-				$point_data             = new \App\Models\PointLog;
+				$point_data             = new \App\Entities\PointLog;
 				
 				$point_data->fill($point);
 
@@ -188,7 +188,7 @@ class AuthController extends Controller
 
 		if(!$errors->count() && isset($referral_data))
 		{
-			$invitation 				= \App\Models\UserInvitationLog::email($customer_data['email'])->userid($referral_data['user_id'])->first();
+			$invitation 				= \App\Entities\UserInvitationLog::email($customer_data['email'])->userid($referral_data['user_id'])->first();
 
 			if($invitation)
 			{
@@ -210,7 +210,7 @@ class AuthController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Models\Customer::id($customer_data['id'])->first()->toArray();
+		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}
@@ -234,7 +234,7 @@ class AuthController extends Controller
 		DB::beginTransaction();
 
 		//1. Check Link
-		$customer_data              = \App\Models\Customer::activationlink($link)->first();
+		$customer_data              = \App\Entities\Customer::activationlink($link)->first();
 
 		if(!$customer_data)
 		{
@@ -264,7 +264,7 @@ class AuthController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Models\Customer::id($customer_data['id'])->first()->toArray();
+		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}
@@ -288,7 +288,7 @@ class AuthController extends Controller
 		DB::beginTransaction();
 
 		//1. Check Link
-		$customer_data              = \App\Models\Customer::email($email)->notSSOMedia(['facebook'])->first();
+		$customer_data              = \App\Entities\Customer::email($email)->notSSOMedia(['facebook'])->first();
 
 		if(!$customer_data)
 		{
@@ -314,7 +314,7 @@ class AuthController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Models\Customer::id($customer_data['id'])->first()->toArray();
+		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}
@@ -329,7 +329,7 @@ class AuthController extends Controller
 		$errors                     = new MessageBag();
 
 		//1. Check Link
-		$customer_data              = \App\Models\Customer::resetpasswordlink($link)->notSSOMedia(['facebook'])->first();
+		$customer_data              = \App\Entities\Customer::resetpasswordlink($link)->notSSOMedia(['facebook'])->first();
 
 		if(!$customer_data)
 		{
@@ -364,7 +364,7 @@ class AuthController extends Controller
 		DB::beginTransaction();
 
 		//1. Check Email
-		$customer_data              = \App\Models\Customer::email($email)->notSSOMedia(['facebook'])->first();
+		$customer_data              = \App\Entities\Customer::email($email)->notSSOMedia(['facebook'])->first();
 
 		if(!$customer_data)
 		{
@@ -394,7 +394,7 @@ class AuthController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Models\Customer::id($customer_data['id'])->first()->toArray();
+		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}

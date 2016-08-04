@@ -20,7 +20,7 @@ class ReportController extends Controller
 	 */
 	public function voucher()
 	{
-		$result                     = new \App\Models\Sale;
+		$result                     = new \App\Entities\Sale;
 
 		if(Input::has('sort'))
 		{
@@ -99,7 +99,7 @@ class ReportController extends Controller
 	 */
 	public function product()
 	{
-		$result                     = new \App\Models\Varian;
+		$result                     = new \App\Entities\Varian;
 
 		if(Input::has('search'))
 		{

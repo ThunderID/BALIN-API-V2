@@ -392,14 +392,3 @@ $app->group(['middleware' => 'oauth|staff', 'namespace' => 'App\Http\Controllers
 		]
 	);
 });
-
-// $app->group(['middleware' => 'jwt', 'namespace' => 'App\Http\Controllers'], function($app)  {
-    $app->get('/try/to/add/to/cart', 'TrySaleController@addtocart');
-// });
-
-
-// $app->get('/try/to/add/to/cart',
-// 	[
-// 		'uses'				=> 'TrySaleController@addtocart'
-// 	]
-// );

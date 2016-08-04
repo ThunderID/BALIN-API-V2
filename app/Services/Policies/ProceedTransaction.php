@@ -3,6 +3,7 @@
 namespace App\Services\Policies;
 
 use App\Entities\Sale;
+use App\Entities\Purchase;
 use App\Entities\TransactionLog;
 use App\Entities\TransactionExtension;
 use App\Entities\TransactionDetail;
@@ -12,6 +13,8 @@ use App\Entities\Voucher;
 use App\Entities\QuotaLog;
 use App\Entities\PointLog;
 use App\Entities\User;
+use App\Entities\Transaction;
+use App\Entities\StoreSetting;
 
 use Illuminate\Support\MessageBag;
 
@@ -44,6 +47,20 @@ class ProceedTransaction implements ProceedTransactionInterface
 		$this->sale		= $stored_sale;
 	}
 	
+	public function storepurchase(array $purchase)
+	{
+		$stored_purchase		= Purchase::findornew($purchase['id']);
+		$stored_purchase->fill($purchase);
+
+		if(!$stored_purchase->save())
+		{
+			$this->errors->add('Purchase', $stored_purchase->getError());
+		}
+
+		$this->sale			= $stored_purchase;
+	}
+	
+
 	public function storesaleitem(Sale $sale, array $transaction_details)
 	{
 		foreach ($transaction_details as $key => $value) 
@@ -65,6 +82,31 @@ class ProceedTransaction implements ProceedTransactionInterface
 			if(!$tdetail->save())
 			{
 				$this->errors->add('Sale', $tdetail->getError());
+			}
+		}
+	}
+
+	public function storepurchaseitem(Purchase $purchase, array $transaction_details)
+	{
+		foreach ($transaction_details as $key => $value) 
+		{
+			$tdetail 	= TransactionDetail::transactionid($purchase->id)->varianid($value['varian_id'])->first();
+
+			if($tdetail)
+			{
+				$tdetail->fill($value);
+			}
+			else
+			{
+				$tdetail = new TransactionDetail;
+				$tdetail->fill($value);
+			}
+
+			$tdetail->transaction_id = $purchase->id;
+
+			if(!$tdetail->save())
+			{
+				$this->errors->add('Purchase', $tdetail->getError());
 			}
 		}
 	}
@@ -100,6 +142,8 @@ class ProceedTransaction implements ProceedTransactionInterface
 
 		if(!$address)
 		{
+			$address 					= new Address;
+			
 			$address->fill($shipment['address']);
 
 			if(!$address->save())
@@ -228,7 +272,7 @@ class ProceedTransaction implements ProceedTransactionInterface
 		}
 	}
 
-	public function updatestatus(Sale $sale, string $status)
+	public function updatestatus(Transaction $sale, string $status)
 	{
 		if(strtolower($sale->status) != strtolower($status))
 		{
@@ -240,7 +284,56 @@ class ProceedTransaction implements ProceedTransactionInterface
 				$this->errors->add('Status', $new_status->getError());
 			}
 
-			$this->sale				= Sale::id($sale['id'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
+		}
+		
+		if(str_is('*Purchase', get_class($sale)))
+		{
+			$this->sale			= get_class($sale)::id($sale['id'])->with(['transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'supplier'])->first();
+		}
+		else
+		{
+			$this->sale			= get_class($sale)::id($sale['id'])->with(['voucher', 'transactionlogs', 'customer', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
+		}
+	}
+
+	public function grantupline(Sale $sale)
+	{
+		if($sale->customer()->count())
+		{
+			$customer 				= $sale->customer;
+
+			$upline					= PointLog::userid($customer->user_id)->referencetype(['App\Models\User', 'App\Entities\User'])->first();
+
+			$point					= StoreSetting::type('downline_purchase_bonus')->Ondate('now')->first();
+
+			$expired				= StoreSetting::type('downline_purchase_bonus_expired')->Ondate('now')->first();
+
+			$whoisupline                        = 0;
+
+			if($upline  && $upline->reference()->count() && $upline->reference->referral()->count())
+			{
+				$whoisupline                    = $upline->reference->referral->value;
+			}
+			
+
+			if($upline && $point && $expired  && $whoisupline == 0 && $upline->reference()->count() && $upline->reference->referral()->count())
+			{
+				$pointlog                       = new PointLog;
+
+				$pointlog->fill([
+						'user_id'				=> $upline->reference_id,
+						'reference_id'			=> $sale->id,
+						'reference_type'		=> get_class($sale),
+						'amount'                => $point->value,
+						'expired_at'			=> date('Y-m-d H:i:s', strtotime($sale->transact_at.' '.$expired->value)),
+						'notes'					=> 'Bonus belanja '.$sale->customer->name
+					]);
+
+				if(!$pointlog->save())
+				{
+					$this->errors->add('Sale', $pointlog->getError());
+				}
+			}
 		}
 	}
 }

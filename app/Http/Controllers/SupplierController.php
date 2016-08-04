@@ -23,7 +23,7 @@ class SupplierController extends Controller
 	 */
 	public function index()
 	{
-		$result                 = new \App\Models\Supplier;
+		$result                 = new \App\Entities\Supplier;
 
 		if(Input::has('search'))
 		{
@@ -70,14 +70,14 @@ class SupplierController extends Controller
 	 */
 	public function detail($id = null)
 	{
-		$result                 = \App\Models\Supplier::id($id)->first();
+		$result                 = \App\Entities\Supplier::id($id)->first();
 	   
 		if($result)
 		{
 			return new JSend('success', (array)$result->toArray());
 
 		}
-		return new JSend('error', (array)Input::all(), 'ID Tidak Valid.');
+		return response()->json( JSend::fail(['ID Tidak Valid.']));
 
 	}
 
@@ -113,7 +113,7 @@ class SupplierController extends Controller
 										];
 
 		//1a. Get original data
-		$supplier_data              = \App\Models\Supplier::findornew($supplier['id']);
+		$supplier_data              = \App\Entities\Supplier::findornew($supplier['id']);
 
 		//1b. Validate Basic Supplier Parameter
 		$validator                  = Validator::make($supplier, $supplier_rules);
@@ -143,7 +143,7 @@ class SupplierController extends Controller
 
 		DB::commit();
 		
-		$final_supplier              = \App\Models\Supplier::id($supplier_data['id'])->first()->toArray();
+		$final_supplier              = \App\Entities\Supplier::id($supplier_data['id'])->first()->toArray();
 
 		return new JSend('success', (array)$final_supplier);
 	}
@@ -156,7 +156,7 @@ class SupplierController extends Controller
 	public function delete($id = null)
 	{
 		//
-		$supplier                   = \App\Models\Supplier::id($id)->first();
+		$supplier                   = \App\Entities\Supplier::id($id)->first();
 
 		if(!$supplier)
 		{

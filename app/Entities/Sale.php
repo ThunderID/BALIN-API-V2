@@ -12,6 +12,11 @@ use App\Entities\Traits\IsSellTrait;
 use App\Entities\Traits\GetAllTrait;
 
 use App\Entities\TraitLibraries\JoinTransactionTrait;
+use App\Entities\TraitLibraries\JoinProductTrait;
+use App\Entities\TraitLibraries\JoinShipmentTrait;
+use App\Entities\TraitLibraries\SelectProductNotesTrait;
+use App\Entities\TraitLibraries\SelectAddressNotesTrait;
+use App\Entities\TraitLibraries\FieldTransactionTrait;
 
 use App\Services\Entities\TraitLibraries\SaleTrait;
 
@@ -54,7 +59,12 @@ class Sale extends Transaction
 	 *
 	 */
 	use JoinTransactionTrait;
-	
+	use JoinProductTrait;
+	use JoinShipmentTrait;
+	use SelectProductNotesTrait;
+	use SelectAddressNotesTrait;
+	use FieldTransactionTrait;
+
 	use SaleTrait;
 
 	/**

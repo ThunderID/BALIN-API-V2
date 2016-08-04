@@ -5,10 +5,12 @@ namespace App\Entities;
 use App\Entities\Traits\IsCategoryTrait;
 
 use App\Entities\TraitLibraries\FieldNameTrait;
+use App\Entities\TraitLibraries\FieldSlugTrait;
 
 use App\Entities\TraitRelations\BelongsToCategoryClusterTrait;
+use App\Entities\TraitRelations\BelongsToManyProductsTrait;
 
-use App\CrossServices\ClosedDoorModelObserver;
+use App\Entities\Observers\ClusterObserver;
 
 /** 
 	* Inheritance Transaction Model
@@ -26,12 +28,14 @@ class Category extends CategoryCluster
 	 *
 	 */
 	use FieldNameTrait;
+	use FieldSlugTrait;
 	
 	/**
 	 * Relationship Traits
 	 *
 	 */
 	use BelongsToCategoryClusterTrait;
+	use BelongsToManyProductsTrait;
 
 	/**
 	 * The attributes that are mass assignable.
@@ -81,7 +85,7 @@ class Category extends CategoryCluster
 	{
         parent::boot();
 
-        Category::observe(new ClosedDoorModelObserver());
+        Category::observe(new ClusterObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

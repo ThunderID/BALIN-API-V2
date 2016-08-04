@@ -12,12 +12,15 @@ use App\Entities\CategoryCluster;
 use App\Entities\Image;
 
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Str;
 
 class ValidatingProduct implements ValidatingProductInterface
 {
 	public $errors;
 
 	public $product;
+
+	protected $slug;
 
 	/**
 	 * construct function, iniate error
@@ -30,7 +33,7 @@ class ValidatingProduct implements ValidatingProductInterface
 
 	public function validateproduct(array $product)
 	{
-		if(!isset($product['slug']))
+		if(empty($product['slug']))
 		{
 			$product['slug']	= Str::slug($product['name']);
 		}
@@ -48,6 +51,8 @@ class ValidatingProduct implements ValidatingProductInterface
 		{
 			$this->errors->add('Product', 'UPC produk sudah terdaftar');
 		}
+
+		$this->slug 			= $product['slug'];
 	}
 
 	public function validatevarian(array $varian)
@@ -98,5 +103,11 @@ class ValidatingProduct implements ValidatingProductInterface
 			}
 		}
 	}
+
+	public function getslug()
+	{
+		return $this->slug;
+	}
+
 }
 

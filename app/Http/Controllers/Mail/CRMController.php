@@ -23,7 +23,7 @@ class CRMController extends Controller
 	{
 		$this->clientId		= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getClientId();
 
-		$template 			= \App\Models\ClientTemplate::clientid($this->clientId)->first();
+		$template 			= \App\Entities\ClientTemplate::clientid($this->clientId)->first();
 
 		if(!$template)
 		{

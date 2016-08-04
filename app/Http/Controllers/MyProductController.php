@@ -20,7 +20,7 @@ class MyProductController extends Controller
     public function recommended($user_id = 0)
     {
         //1. Check tag/category viewed
-        $stat                       = \App\Models\StatUserView::userid($user_id)->statabletype(['App\Models\Category', 'App\Models\Tag'])->get(['statable_id'])->toArray();
+        $stat                       = \App\Entities\StatUserView::userid($user_id)->statabletype(['App\Entities\Category', 'App\Entities\Tag'])->get(['statable_id'])->toArray();
 
         //1b. Get slugs
         $slugs                      = [];
@@ -28,10 +28,10 @@ class MyProductController extends Controller
         $purchased_varians          = [];
         foreach ($stat as $key => $value) 
         {
-            $slugs[]                = \App\Models\Cluster::find($value['statable_id'])['slug'];
+            $slugs[]                = \App\Entities\Cluster::find($value['statable_id'])['slug'];
         }
 
-        $purchased                  = \App\Models\TransactionDetail::TransactionSellOn(['paid', 'packed', 'shipping', 'delivered'])->where('transactions.user_id',$user_id)->groupby('varian_id')->with(['varian', 'varian.product', 'varian.product.clusters'])->get()->toArray();
+        $purchased                  = \App\Entities\TransactionDetail::TransactionSellOn(['paid', 'packed', 'shipping', 'delivered'])->where('transactions.user_id',$user_id)->groupby('varian_id')->with(['varian', 'varian.product', 'varian.product.clusters'])->get()->toArray();
 
         foreach ($purchased as $key => $value) 
         {
@@ -52,7 +52,7 @@ class MyProductController extends Controller
         $productids                 = array_unique($purchased_prods);
         $variansize                 = array_unique($purchased_varians);
 
-        $result                     = \App\Models\Product::sellable(true);
+        $result                     = \App\Entities\Product::sellable(true);
         if(!empty($slug))
         {
             $result                 = $result->clustersslug($slug);
@@ -95,7 +95,7 @@ class MyProductController extends Controller
         $purchased_prods            = [];
 
         //1. get purchased item
-        $purchased                  = \App\Models\TransactionDetail::TransactionSellOn(['paid', 'packed', 'shipping', 'delivered'])->where('transactions.user_id',$user_id)->groupby('varian_id')->with(['varian'])->get()->toArray();
+        $purchased                  = \App\Entities\TransactionDetail::TransactionSellOn(['paid', 'packed', 'shipping', 'delivered'])->where('transactions.user_id',$user_id)->groupby('varian_id')->with(['varian'])->get()->toArray();
 
         foreach ($purchased as $key => $value) 
         {
@@ -105,7 +105,7 @@ class MyProductController extends Controller
 
         $productids                 = array_unique($purchased_prods);
 
-        $result                     = \App\Models\Product::id($productids)->sellable(true);
+        $result                     = \App\Entities\Product::id($productids)->sellable(true);
 
         $count                      = count($result->get(['id']));
 
@@ -134,7 +134,7 @@ class MyProductController extends Controller
     public function viewed($user_id = 0)
     {
         //1. Check product viewed
-        $stat                       = \App\Models\StatUserView::userid($user_id)->statabletype('App\Models\Product')->get(['statable_id'])->toArray();
+        $stat                       = \App\Entities\StatUserView::userid($user_id)->statabletype('App\Entities\Product')->get(['statable_id'])->toArray();
 
         //1b. Get ids
         $viewed_prods               = [];
@@ -146,7 +146,7 @@ class MyProductController extends Controller
 
         $productids                 = array_unique($viewed_prods);
 
-        $result                     = \App\Models\Product::id($productids)->sellable(true);
+        $result                     = \App\Entities\Product::id($productids)->sellable(true);
 
         $count                      = count($result->get(['id']));
 

@@ -80,13 +80,19 @@ class BalinStoreProduct implements StoreProductInterface
 		$this->pre->validateproduct($this->product); 
 
 		//2. Validate varians
-		$this->pre->validatevarian($this->product['varians']); 
+		if(isset($this->product['varians']))
+		{
+			$this->pre->validatevarian($this->product['varians']); 
+		}
 
 		//3. Validate prices
 		$this->pre->validateprice($this->product['prices']); 
 
 		//4. Validate labels
-		$this->pre->validatelabel($this->product['labels']); 
+		if(isset($this->product['labels']))
+		{
+			$this->pre->validatelabel($this->product['labels']); 
+		}
 
 		//5. Validate clusters
 		$this->pre->validatecluster(array_merge($this->product['tags'], $this->product['categories'])); 
@@ -106,17 +112,24 @@ class BalinStoreProduct implements StoreProductInterface
 		/** PROCESS */
 
 		//7. store product
+		$this->product['slug']			= $this->pre->Getslug();
 		$this->pro->storeproduct($this->product); 
 
 		//8. store varians
-		$this->pro->storevarian($this->pro->product, $this->product['varians']); 
-
+		if(isset($this->product['varians']))
+		{
+			$this->pro->storevarian($this->pro->product, $this->product['varians']); 
+		}
+		
 		//9. store prices
 		$this->pro->storeprice($this->pro->product, $this->product['prices']); 
 
 		//10. store labels
-		$this->pro->storelabel($this->pro->product, $this->product['labels']); 
-
+		if(isset($this->product['labels']))
+		{
+			$this->pro->storelabel($this->pro->product, $this->product['labels']); 
+		}
+		
 		//11. store clusters
 		$this->pro->storecluster($this->pro->product, array_merge($this->product['tags'], $this->product['categories'])); 
 

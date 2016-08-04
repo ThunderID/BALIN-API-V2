@@ -28,7 +28,7 @@ class UIController extends Controller
 		$user						= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
 		$user						= json_decode($user, true)['data'];
 
-		$result                     = new \App\Models\Product;
+		$result                     = new \App\Entities\Product;
 
 		if(Input::has('search'))
 		{
@@ -134,9 +134,10 @@ class UIController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['varians', 'images', 'labels'])->get()->toArray();
+		$result                     = $result->with(['varians', 'images', 'labels'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -148,11 +149,11 @@ class UIController extends Controller
 	{
 		if($type=='category')
 		{
-			$result                 = \App\Models\Category::orderby('path', 'asc')->with(['category']);
+			$result                 = \App\Entities\Category::orderby('path', 'asc')->with(['category']);
 		}
 		else
 		{
-			$result                 = \App\Models\Tag::orderby('path', 'asc')->with(['tag']);
+			$result                 = \App\Entities\Tag::orderby('path', 'asc')->with(['tag']);
 		}
 
 		if(Input::has('search'))
@@ -188,9 +189,10 @@ class UIController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -200,7 +202,7 @@ class UIController extends Controller
 	 */
 	public function labels($type = null)
 	{
-		$result                 = \App\Models\ProductLabel::selectraw('lable as label')->groupby('label');
+		$result                 = \App\Entities\ProductLabel::selectraw('lable as label')->groupby('label');
 
 		if(Input::has('search'))
 		{
@@ -253,9 +255,10 @@ class UIController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -265,10 +268,10 @@ class UIController extends Controller
 	 */
 	public function config($type = null)
 	{
-		$sliders						= \App\Models\Slider::ondate('now')->with(['image'])->get()->toArray();
-		$storeinfo						= new \App\Models\Store;
-		$storepage						= new \App\Models\StorePage;
-		$storepolicy					= new \App\Models\Policy;
+		$sliders						= \App\Entities\Slider::ondate('now')->with(['image'])->get()->toArray();
+		$storeinfo						= new \App\Entities\Store;
+		$storepage						= new \App\Entities\StorePage;
+		$storepolicy					= new \App\Entities\Policy;
 		$storeinfo 						= $storeinfo->default(true)->get()->toArray();
 		$storepage 						= $storepage->default(true)->get()->toArray();
 		$storepolicy 					= $storepolicy->default(true)->type('expired_paid')->first()->toArray();
@@ -283,7 +286,8 @@ class UIController extends Controller
 
 		$store['info']['expired_paid']	= $storepolicy;
 
-		return new JSend('success', (array)$store);
+		return response()->json( JSend::success($store)->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -293,7 +297,7 @@ class UIController extends Controller
 	 */
 	public function extensions($type = null)
 	{
-		$result                 = \App\Models\ProductExtension::active(true);
+		$result                 = \App\Entities\ProductExtension::active(true);
 
 		if(Input::has('search'))
 		{
@@ -346,8 +350,9 @@ class UIController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

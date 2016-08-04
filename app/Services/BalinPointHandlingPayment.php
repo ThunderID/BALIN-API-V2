@@ -32,7 +32,7 @@ class BalinPointHandlingPayment implements HandlingPaymentInterface
 	 * construct function, iniate error
 	 *
 	 */
-public function __construct(ValidatingTransactionInterface $pre_sale, ValidatingPaymentInterface $pre, ProceedTransactionInterface $pro_sale, ProceedPaymentInterface $pro, EffectTransactionInterface $post_sale, EffectPaymentInterface $post)
+	public function __construct(ValidatingTransactionInterface $pre_sale, ValidatingPaymentInterface $pre, ProceedTransactionInterface $pro_sale, ProceedPaymentInterface $pro, EffectTransactionInterface $post_sale, EffectPaymentInterface $post)
 	{
 		$this->errors 		= new MessageBag;
 		$this->pre_sale		= $pre_sale;
@@ -136,7 +136,7 @@ public function __construct(ValidatingTransactionInterface $pre_sale, Validating
 		\DB::commit();
 
 		//7. kirim email bayar
-		$this->post_sale->sendmailpaymentacceptance($this->pro_sale->sale, $this->sale['client_id']);
+		$this->post_sale->sendmailpaymentacceptance($this->pro_sale->sale);
 
 		$this->saved_data		= $this->pro_sale->sale;
 

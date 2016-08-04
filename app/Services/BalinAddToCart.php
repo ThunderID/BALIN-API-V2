@@ -86,26 +86,68 @@ class BalinAddToCart implements AddToCartInterface
 		//2. Validate Buyer
 		$this->pre->validatebuyer($customer); 
 
-		//3. Validate Stock With Quantity
+		//3. Validate Stock, Price, Calculate Price main product
 		$this->pre->validatesaleitem($this->sale['transactiondetails']); 
+
+		if(isset($this->sale['transactionextensions']))
+		{
+			//4. Validate Stock, Calculate Price of packing ornament
+			$this->pre->validatepackingornament($this->sale['transactionextensions']); 
+		}
+
+		if(isset($this->sale['shipment']))
+		{
+			//5. Validate shipping cost, calculate shipping cost address
+			$this->pre->validateshippingaddress($this->sale['shipment']); 
+		}
+
+		if(isset($this->sale['voucher']))
+		{
+			//6. Validate voucher
+			$this->pre->validateshoppingvoucher(is_null($this->sale['voucher']) ? [] : $this->sale['voucher']); 
+		}
 
 		if($this->pre->errors->count())
 		{
-			$this->errors 		= $this->pre->errors;
+			$this->errors 				= $this->pre->errors;
 
 			return false;
 		}
 
+		$this->purchase['type']			= 'sell'; 
+
+		//8. set transact_at
+		$this->sale['transact_at'] 		= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+
+		//9. set shipping cost 
+		$this->sale['shipping_cost']	= $this->pre->getshippingcost();
+
+		//10. set voucher discount 
+		$this->sale['voucher_discount']	= $this->pre->getvoucherdiscount();
+
 		\DB::BeginTransaction();
 
 		/** PROCESS */
-		//4. Store Data Transaksi
-		$this->pro->store($this->sale); 
 
-		//5. Store sale item
-		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
+		//11. Store Data Transaksi
+		$this->pro->store($this->sale); 
 		
-		//6. Store Log Transaksi
+		//12. Store sale item
+		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
+
+		//13. Store packing ornament
+		if(isset($this->sale['transactionextensions']))
+		{
+			$this->pro->storepackingornament($this->pro->sale, $this->sale['transactionextensions']); 
+		}
+
+		//14. Store Shipping Address
+		if(isset($this->sale['shipment']))
+		{
+			$this->pro->shippingaddress($this->pro->sale, $this->sale['shipment']); 
+		}
+
+		//15. Store Log Transaksi
 		$this->pro->updatestatus($this->pro->sale, 'cart'); 
 		
 		if($this->pro->errors->count())
@@ -119,7 +161,7 @@ class BalinAddToCart implements AddToCartInterface
 
 		\DB::commit();
 
-		//7. Return Sale Model Object
+		//16. Return Sale Model Object
 		$this->saved_data	= $this->pro->sale;
 
 		return true;

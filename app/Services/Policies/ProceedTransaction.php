@@ -272,7 +272,7 @@ class ProceedTransaction implements ProceedTransactionInterface
 		}
 	}
 
-	public function updatestatus(Transaction $sale, string $status)
+	public function updatestatus(Transaction $sale, $status)
 	{
 		if(strtolower($sale->status) != strtolower($status))
 		{

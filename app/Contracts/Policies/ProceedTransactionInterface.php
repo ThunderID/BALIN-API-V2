@@ -26,7 +26,7 @@ interface ProceedTransactionInterface
 	
 	public function creditbalinpoint(User $user, Sale $sale, $pointdiscount);
 
-	public function updatestatus(Transaction $sale, string $status);
+	public function updatestatus(Transaction $sale, $status);
 
 	public function grantupline(Sale $sale);
 }

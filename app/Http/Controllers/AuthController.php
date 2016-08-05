@@ -415,6 +415,7 @@ class AuthController extends Controller
 		if(Input::has('email'))
 		{
 			$user						= \App\Entities\User::email(\Illuminate\Support\Facades\Input::get('email'))->first();
+			$issue['me']				= $user->toArray();
 		}
 		else
 		{
@@ -423,7 +424,6 @@ class AuthController extends Controller
 
         $token 							= $jwt->createToken($user);
 		$issue['token']['token']		= $token;
-		$issue['me']					= $user->toArray();
 		
 		return new \App\Libraries\JSend('success', (array)$issue);
     }

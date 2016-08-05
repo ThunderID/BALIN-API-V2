@@ -414,8 +414,13 @@ class AuthController extends Controller
     {
 		if(Input::has('email'))
 		{
-			$user						= \App\Entities\User::email(\Illuminate\Support\Facades\Input::get('email'))->first();
-			$issue['me']				= $user->toArray();
+			$check						= Auth::attempt(['email' => Input::get('email'), 'password' => Input::get('password')]);
+			$user						= Auth::user();
+
+			if(!$check)
+			{
+				return new JSend('error', (array)Input::all(), ['User tidak ada']);
+			}
 		}
 		else
 		{
@@ -424,6 +429,7 @@ class AuthController extends Controller
 
         $token 							= $jwt->createToken($user);
 		$issue['token']['token']		= $token;
+		$issue['me']					= $user->toArray();
 		
 		return new \App\Libraries\JSend('success', (array)$issue);
     }

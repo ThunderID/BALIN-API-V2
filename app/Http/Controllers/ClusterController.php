@@ -170,7 +170,7 @@ class ClusterController extends Controller
 
 		DB::commit();
 		
-		if(str_is('*Category', get_class($sale)))
+		if(str_is('*Category', get_class($cluster_data)))
 		{
 			$final_cluster              = Category::id($cluster_data['id'])->with(['category', 'products'])->first();
 		}

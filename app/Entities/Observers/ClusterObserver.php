@@ -6,6 +6,8 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 
 use App\Entities\CategoryCluster as Cluster;
+use App\Entities\Category;
+use App\Entities\Tag;
 
 /**
  * Used in Cluster, Tag, Category model
@@ -75,7 +77,14 @@ class ClusterObserver
         }
 
         //2. check slug
-        $category                       = get_class($model)::slug($model->slug)->notid($id)->first();
+        if(str_is('*Category', get_class($model)))
+        {
+            $category                       = Category::slug($model->slug)->notid($id)->first();
+        }
+        else
+        {
+            $category                       = Tag::slug($model->slug)->notid($id)->first();
+        }
 
         if($category)
         {

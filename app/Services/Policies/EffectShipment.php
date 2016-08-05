@@ -25,8 +25,10 @@ class EffectShipment implements EffectShipmentInterface
 	function __construct()
 	{
 		$this->errors 		= new MessageBag;
-		$storeinfo			= Store::default(true)->get()->toArray();
-		$policy				= Policy::default(true)->get()->toArray();
+		$storeinfo			= new Store;
+		$storeinfo 			= $storeinfo->default(true)->get()->toArray();
+		$policy				= new Policy;
+		$policy 			= $policy->default(true)->get()->toArray();
 
 		foreach ($storeinfo as $key => $value) 
 		{

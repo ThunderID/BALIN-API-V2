@@ -170,7 +170,14 @@ class ClusterController extends Controller
 
 		DB::commit();
 		
-		$final_cluster              = get_class($cluster_data)::id($cluster_data['id'])->with(['category', 'products'])->first();
+		if(str_is('*Category', get_class($sale)))
+		{
+			$final_cluster              = Category::id($cluster_data['id'])->with(['category', 'products'])->first();
+		}
+		else
+		{
+			$final_cluster              = Tag::id($cluster_data['id'])->with(['category', 'products'])->first();
+		}
 
 		return response()->json( JSend::success($final_cluster->toArray())->asArray())
 					->setCallback($this->request->input('callback'));

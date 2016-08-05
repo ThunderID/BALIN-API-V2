@@ -288,11 +288,11 @@ class ProceedTransaction implements ProceedTransactionInterface
 		
 		if(str_is('*Purchase', get_class($sale)))
 		{
-			$this->sale			= get_class($sale)::id($sale['id'])->with(['transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'supplier'])->first();
+			$this->sale			= Purchase::id($sale['id'])->with(['transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'supplier'])->first();
 		}
 		else
 		{
-			$this->sale			= get_class($sale)::id($sale['id'])->with(['voucher', 'transactionlogs', 'customer', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
+			$this->sale			= Sale::id($sale['id'])->with(['voucher', 'transactionlogs', 'customer', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
 		}
 	}
 

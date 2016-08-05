@@ -22,7 +22,7 @@ class CreateProductExtensionTable extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->index(['deleted_at', 'upc', 'name']);
+            $table->index(['deleted_at', 'name']);
         });
     }
 

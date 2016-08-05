@@ -9,9 +9,20 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use \GenTux\Jwt\JwtToken;
+use \GenTux\Jwt\GetsJwtToken;
 
 class AuthController extends Controller
 {
+	use GetsJwtToken;
+
+	public $token;
+
+	function __construct(JwtToken $jwt)
+	{
+		$this->token 					= $jwt;
+	}
+
 	/**
 	 * Authenticate user
 	 *
@@ -398,4 +409,39 @@ class AuthController extends Controller
 
 		return new JSend('success', (array)$final_customer);
 	}
+
+	public function createToken(JwtToken $jwt)
+    {
+		if(Input::has('email'))
+		{
+			$user						= \App\Entities\User::email(\Illuminate\Support\Facades\Input::get('email'))->first();
+		}
+		else
+		{
+			$user 						= new \App\Entities\User;
+		}
+
+        $token 							= $jwt->createToken($user);
+		$issue['token']['token']		= $token;
+		$issue['me']					= $user->toArray();
+		
+		return new \App\Libraries\JSend('success', (array)$issue);
+    }
+
+
+	public function getme()
+    {
+        $payload                    = $this->jwtPayload();
+		
+		if($payload['context']['role']=='customer')
+		{
+			$user						= \App\Entities\Customer::id($payload['context']['id'])->first();
+		}
+		else
+		{
+			$user						= \App\Entities\Admin::id($payload['context']['id'])->first();
+		}
+
+		return new \App\Libraries\JSend('success', (array)$user);
+    }
 }

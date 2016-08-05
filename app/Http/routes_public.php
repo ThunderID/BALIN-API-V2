@@ -20,7 +20,7 @@
 * EXTENSIONS				: Line 103 - 107
 */
 
-$app->group(['middleware' => 'oauth', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// AUTHENTICATE

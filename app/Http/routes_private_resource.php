@@ -14,7 +14,7 @@
 * MY PURCHASE ORDER 		: Line 88 - 110
 */
 
-$app->group(['middleware' => 'oauth|me', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt|me', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// MY SUMMARY

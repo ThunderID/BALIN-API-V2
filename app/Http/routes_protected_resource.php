@@ -40,7 +40,7 @@
 * Report					: Line 336 - 346
 */
 
-$app->group(['middleware' => 'oauth|staff', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt|staff', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// PRODUCTS
@@ -249,7 +249,7 @@ $app->group(['middleware' => 'oauth|staff', 'namespace' => 'App\Http\Controllers
 	);
 });
 
-$app->group(['middleware' => 'oauth|manager', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt|manager', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// VOUCHERS
@@ -317,7 +317,7 @@ $app->group(['middleware' => 'oauth|manager', 'namespace' => 'App\Http\Controlle
 	);
 });
 
-$app->group(['middleware' => 'oauth|admin', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt|admin', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// ADMINISTRATORS
@@ -374,7 +374,7 @@ $app->group(['middleware' => 'oauth|admin', 'namespace' => 'App\Http\Controllers
 	);
 });
 
-$app->group(['middleware' => 'oauth|staff', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt|staff', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// TOOLS

@@ -12,12 +12,14 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use GenTux\Jwt\JwtPayloadInterface;
+
 /**
  * Used for User Models
  * 
  * @author cmooy
  */
-class User extends BaseModel implements AuthenticatableContract, CanResetPasswordContract 
+class User extends BaseModel implements AuthenticatableContract, CanResetPasswordContract, JwtPayloadInterface
 {
 	use Authenticatable, CanResetPassword;
 
@@ -128,4 +130,17 @@ class User extends BaseModel implements AuthenticatableContract, CanResetPasswor
 	{
 		return $query->whereNotIn('sso_media', $variable);
 	}
+
+	public function getPayload()
+    {
+        return [
+            'sub' => $this->id,
+            'exp' => time() + 7200,
+            'context' => [
+                'id' 		=> $this->id,
+                'email' 	=> $this->email,
+                'role'		=> $this->role
+            ]
+        ];
+    }
 }

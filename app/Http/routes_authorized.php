@@ -27,41 +27,30 @@
 * Returned JSend 	: [token => [access_token => 'xx', token_type => 'Bearer', expires_in => 00]]
 */
 
-$app->post('/oauth/access_token', function() 
-{
-	$issue['token']								= \LucaDegasperi\OAuth2Server\Facades\Authorizer::issueAccessToken();
 
-	if(\Illuminate\Support\Facades\Auth::check())
-	{
-		$issue['me']							= \Illuminate\Support\Facades\Auth::user()->toArray();
+$app->post('/oauth/access_token',
+	[
+		'uses'				=> 'AuthController@createToken'
+	]
+);
 
-		return new \App\Libraries\JSend('success', (array)$issue);
-	}
-	else
-	{
-		return new \App\Libraries\JSend('error', (array)['No Data'], 'User invalid :( ');
-	}
 
-});
+$app->post('/oauth/client/access_token',
+	[
+		'uses'				=> 'AuthController@createToken'
+	]
+);
 
-$app->post('/oauth/client/access_token', function() 
-{
-	$issue['token']								= \LucaDegasperi\OAuth2Server\Facades\Authorizer::issueAccessToken();
-	
-	return new \App\Libraries\JSend('success', (array)$issue);
-});
-
-$app->group(['middleware' => 'oauth', 'namespace' => 'App\Http\Controllers'], function ($app) 
+$app->group(['middleware' => 'jwt', 'namespace' => 'App\Http\Controllers'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// Gettin' Me
 	// ------------------------------------------------------------------------------------
 
-	$app->get('/me', function() 
-	{
-		$user 								= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
-
-		return $user;
-	});
+	$app->get('/me',
+		[
+			'uses'				=> 'AuthController@getme'
+		]
+	);
 });
 

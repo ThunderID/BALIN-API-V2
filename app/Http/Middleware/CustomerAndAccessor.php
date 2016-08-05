@@ -6,27 +6,13 @@ use Closure;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
-use League\OAuth2\Server\Exception\AccessDeniedException;
-use LucaDegasperi\OAuth2Server\Authorizer;
+use App\Libraries\JSend;
+
+use GenTux\Jwt\GetsJwtToken;
 
 class CustomerAndAccessor
 {
-    /**
-     * The Authorizer instance.
-     *
-     * @var \LucaDegasperi\OAuth2Server\Authorizer
-     */
-    protected $authorizer;
-
-    /**
-     * Create a new oauth client middleware instance.
-     *
-     * @param \LucaDegasperi\OAuth2Server\Authorizer $authorizer
-     */
-    public function __construct(Authorizer $authorizer)
-    {
-        $this->authorizer = $authorizer;
-    }
+     use GetsJwtToken;
 
     /**
      * Handle an incoming request.
@@ -40,22 +26,18 @@ class CustomerAndAccessor
      */
     public function handle($request, Closure $next)
     {
-        $this->authorizer->setRequest($request);
+        $payload                    = $this->jwtPayload();
 
-        $user                       = $this->authorizer->getResourceOwnerId();
-
-        $user                       = json_decode($user, true)['data'];
-
-        if (in_array($user['role'], ['staff', 'store_manager', 'admin'])) 
+        if (in_array($payload['context']['role'], ['staff', 'store_manager', 'admin'])) 
         {
             return $next($request);
         }
-        elseif(isset($request->route()[2]['user_id']) && $request->route()[2]['user_id'] == $user['id'])
+        elseif(isset($request->route()[2]['user_id']) && $request->route()[2]['user_id'] == $payload['context']['id'])
         {
             return $next($request);
         }
 
-        throw new AccessDeniedException();
+        return response()->json( JSend::error(['Unautorized User'])->asArray());
     }
 }
 

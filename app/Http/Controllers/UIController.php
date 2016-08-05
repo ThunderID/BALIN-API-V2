@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use App\Events\ProductSearched;
 
+use \GenTux\Jwt\GetsJwtToken;
+
 /**
  * Handle Protected Resource of customer
  * 
@@ -18,6 +20,8 @@ use App\Events\ProductSearched;
  */
 class UIController extends Controller
 {
+	use GetsJwtToken;
+	
 	/**
 	 * Display all sellable products
 	 *
@@ -25,8 +29,9 @@ class UIController extends Controller
 	 */
 	public function products()
 	{
-		$user						= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
-		$user						= json_decode($user, true)['data'];
+        $payload                    = $this->jwtPayload();
+        
+		$user						= \App\Entities\Customer::id($payload['context']['id'])->first();
 
 		$result                     = new \App\Entities\Product;
 

@@ -32,7 +32,7 @@
 * Contact					: Line 103
 */
 
-$app->group(['middleware' => 'oauth', 'namespace' => 'App\Http\Controllers\Mail', 'prefix' => 'mail'], function ($app) 
+$app->group(['middleware' => 'jwt', 'namespace' => 'App\Http\Controllers\Mail', 'prefix' => 'mail'], function ($app) 
 {
 	// ------------------------------------------------------------------------------------
 	// ORDER

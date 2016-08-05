@@ -21,16 +21,7 @@ class OrderController extends Controller
 {
 	function __construct()
 	{
-		$this->clientId		= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getClientId();
-
-		$template 			= \App\Entities\ClientTemplate::clientid($this->clientId)->first();
-
-		if(!$template)
-		{
-			\App::abort(404);
-		}
-
-		$this->template 	= $template['located'];
+		$this->template 	= 'balin';
 	}
 
 	/**

@@ -91,7 +91,10 @@ class BalinCheckout implements CheckoutInterface
 		$this->pre->validatesaleitem($this->sale['transactiondetails']); 
 
 		//4. Validate Stock, Calculate Price of packing ornament
-		$this->pre->validatepackingornament($this->sale['transactionextensions']); 
+		if(isset($this->sale['transactionextensions']))
+		{
+			$this->pre->validatepackingornament($this->sale['transactionextensions']); 
+		}
 
 		//5. Validate shipping cost, calculate shipping cost address
 		$this->pre->validateshippingaddress($this->sale['shipment']); 
@@ -135,8 +138,11 @@ class BalinCheckout implements CheckoutInterface
 		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
 
 		//15. Store packing ornament
-		$this->pro->storepackingornament($this->pro->sale, $this->sale['transactionextensions']); 
-
+		if(isset($this->sale['transactionextensions']))
+		{
+			$this->pro->storepackingornament($this->pro->sale, $this->sale['transactionextensions']); 
+		}
+		
 		//16. Store Shipping Address
 		$this->pro->shippingaddress($this->pro->sale, $this->sale['shipment']); 
 

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 use App\Services\BalinCheckout;
 use App\Services\BankTransferHandlingPayment;
+use App\Services\VeritransProcessingPayment;
 use App\Services\BalinPackingOrder;
 use App\Services\BalinShippingOrder;
 use App\Services\BalinDeliveredOrder;
@@ -19,9 +20,10 @@ use Request, Carbon\Carbon;
 
 class MyOrderController extends Controller
 {
-	public function __construct(Request $request, BalinCheckout $balincheckout, BankTransferHandlingPayment $balinpaid, BalinPackingOrder $balinpack, BalinShippingOrder $balinship, BalinDeliveredOrder $balindeliver, BalinCancelOrder $balincancel, BalinAddToCart $balincart)
+	public function __construct(Request $request, VeritransProcessingPayment $veritranscheckout, BalinCheckout $balincheckout, BankTransferHandlingPayment $balinpaid, BalinPackingOrder $balinpack, BalinShippingOrder $balinship, BalinDeliveredOrder $balindeliver, BalinCancelOrder $balincancel, BalinAddToCart $balincart)
 	{
 		$this->request 				= $request;
+		$this->veritranscheckout	= $veritranscheckout;
 		$this->balincheckout		= $balincheckout;
 		$this->balinpaid			= $balinpaid;
 		$this->balinpack			= $balinpack;
@@ -134,6 +136,9 @@ class MyOrderController extends Controller
 				break;
 			case 'canceled':
 				$sale_store			= $this->balincancel;
+				break;
+			case 'veirtrans_processing_payment':
+				$sale_store			= $this->veritranscheckout;
 				break;
 			default:
 				$sale_store			= $this->balincart;

@@ -43,5 +43,11 @@ class ValidatingStoreSetting implements ValidatingStoreSettingInterface
 	{
 		//
 	}
+
+	public function validatebanner(array $banner)
+	{
+		//
+	}
+
 }
 

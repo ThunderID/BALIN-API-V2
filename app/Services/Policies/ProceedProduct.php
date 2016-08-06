@@ -260,7 +260,6 @@ class ProceedProduct implements ProceedProductInterface
 		}
 	}
 
-
 	public function deleteproduct(Product $product)
 	{
 		if(!$product->delete())

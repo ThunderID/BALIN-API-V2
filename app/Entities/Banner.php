@@ -6,7 +6,7 @@ use App\Entities\Traits\HasImageTrait;
 
 use App\Entities\Traits\GetAllTrait;
 
-use App\Entities\Traits\IsSliderTrait;
+use App\Entities\Traits\IsBannerTrait;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
@@ -17,17 +17,17 @@ use App\Entities\TraitRelations\MorphManyImagesTrait;
 	* Inheritance StoreSetting Model
 	* For every inheritance model, allowed to have only $type, fillable, rules, and available function
 */
-class Slider extends StoreSetting
+class Banner extends StoreSetting
 {
 	/**
 	 * Traits To Calculated Relations
 	 */
 	use HasImageTrait;
-
+	
 	/**
 	 * Traits To Condition within itself
 	 */
-	use IsSliderTrait;
+	use IsBannerTrait;
 
 	use GetAllTrait;
 
@@ -47,7 +47,6 @@ class Slider extends StoreSetting
 											'type'								,
 											'value'								,
 											'started_at'						,
-											'ended_at'							,
 										];
 
 	/**
@@ -56,9 +55,8 @@ class Slider extends StoreSetting
 	 * @var array
 	 */
 	protected $rules				=	[
-											'type'								=> 'in:slider',
+											'type'								=> 'in:left_banner,right_banner,full_banner',
 											'started_at'						=> 'date_format:"Y-m-d H:i:s"'/*|after: - 1 second'*/,
-											'ended_at'							=> 'date_format:"Y-m-d H:i:s"'/*|after: - 1 second'*/,
 										];
 
 	/**
@@ -87,7 +85,7 @@ class Slider extends StoreSetting
 	{
         parent::boot();
  
-        Slider::observe(new ClosedDoorModelObserver());
+        Banner::observe(new ClosedDoorModelObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use App\Services\BalinStoreWebSliderSetting;
+use App\Services\BalinStoreWebBannerSetting;
+use App\Services\BalinStoreWebSetting;
+use App\Services\BalinStoreWebPolicySetting;
+use App\Services\BalinStoreWebPageSetting;
 
 /**
  * Handle Protected display and store of setting, there were 4 type of setting, there are slider, page, store, and policy
@@ -15,6 +22,16 @@ use Illuminate\Support\Facades\DB;
  */
 class StoreSettingController extends Controller
 {
+	public function __construct(Request $request, BalinStoreWebSliderSetting $balinslider, BalinStoreWebBannerSetting $balinbanner, BalinStoreWebSetting $balinstore, BalinStoreWebPolicySetting $balinpolicy, BalinStoreWebPageSetting $balinpage)
+	{
+		$this->request 				= $request;
+		$this->balinslider			= $balinslider;
+		$this->balinbanner			= $balinbanner;
+		$this->balinstore			= $balinstore;
+		$this->balinpolicy			= $balinpolicy;
+		$this->balinpage			= $balinpage;
+	}
+
 	/**
 	 * Display all settings
 	 *
@@ -29,6 +46,9 @@ class StoreSettingController extends Controller
 		{
 			case 'slider':
 				$result         = \App\Entities\Slider::with(['image']);
+				break;
+			case 'banner':
+				$result         = \App\Entities\Banner::with(['image']);
 				break;
 			case 'page':
 				$result         = new \App\Entities\StorePage;
@@ -120,175 +140,36 @@ class StoreSettingController extends Controller
 
 		$errors                     = new MessageBag();
 
-		DB::beginTransaction();
-
 		//1. Validate StoreSetting Parameter
 		$setting                    = Input::get('setting');
-		
-		if(is_null($setting['id']))
+	
+		switch ($setting['type']) 
 		{
-			$is_new                 = true;
-		}
-		else
-		{
-			$is_new                 = false;
-		}
-
-		//2. Validate setting parameter
-		//2a. Slider 
-		if(!$errors->count() && $setting['type'] == 'slider')
-		{
-			$setting_data           = \App\Entities\Slider::findornew($setting['id']);
-
-			$setting_rules          =   [
-												'started_at'                => 'date_format:"Y-m-d H:i:s"',
-												'ended_at'                  => 'date_format:"Y-m-d H:i:s"|after:started_at',
-											];
-
-			$validator              = Validator::make($setting, $setting_rules);
-		}
-		//2b. Page 
-		elseif(!$errors->count() && in_array($setting['type'], ['about_us', 'why_join', 'term_and_condition']))
-		{
-			$setting_data           = \App\Entities\StorePage::findornew($setting['id']);
-
-			$setting_rules          =   [
-												'started_at'                => 'date_format:"Y-m-d H:i:s"',
-											];
-
-			$validator              = Validator::make($setting, $setting_rules);
-		}
-		//2c. Store 
-		elseif(!$errors->count() && in_array($setting['type'], ['url', 'logo', 'facebook_url', 'twitter_url', 'instagram_url', 'email', 'phone', 'address', 'bank_information']))
-		{
-			$setting_data           = \App\Entities\Store::findornew($setting['id']);
-
-			$setting_rules          =   [
-												'started_at'                => 'date_format:"Y-m-d H:i:s"',
-											];
-
-			$validator              = Validator::make($setting, $setting_rules);
-		}
-		//2d. Policy 
-		else
-		{
-			$setting_data           = \App\Entities\Policy::findornew($setting['id']);
-
-			$setting_rules          =       [
-												'started_at'                => 'date_format:"Y-m-d H:i:s"',
-											];
-
-			$validator              = Validator::make($setting, $setting_rules);
+			case 'slider':
+				$store_setting			= $this->balinslider;
+				break;
+			case 'left_banner':case 'right_banner':case 'full_banner':
+				$store_setting			= $this->balinbanner;
+				break;
+			case 'about_us':case 'why_join':case 'term_and_condition':
+				$store_setting			= $this->balinpage;
+				break;
+			case 'url': case 'logo': case 'facebook_url': case 'twitter_url': case 'instagram_url': case 'email': case 'phone': case 'address': case 'bank_information' :
+				$store_setting			= $this->balinstore;
+				break;
+			default:
+				$store_setting			= $this->balinpolicy;
+				break;
 		}
 
-		if (!$validator->passes())
-		{
-			$errors->add('StoreSetting', $validator->errors());
-		}
-		else
-		{
-			//if validator passed, save setting
-			$setting_data           = $setting_data->fill($setting);
+		$store_setting->fill($setting);
 
-			if(!$setting_data->save())
-			{
-				$errors->add('StoreSetting', $setting_data->getError());
-			}
+		if(!$store_setting->save())
+		{
+			return response()->json( JSend::error($store_setting->getError()->toArray())->asArray());
 		}
 
-		//3. save image for slider
-		if(!$errors->count() && isset($setting['images']) && is_array($setting['images']) && $setting_data['type']=='slider')
-		{
-			$image_current_ids         = [];
-			foreach ($setting['images'] as $key => $value) 
-			{
-				if(!$errors->count())
-				{
-					$image_data		= \App\Entities\Image::findornew($value['id']);
-
-					$image_rules	=   [
-											// 'imageable_id'              => 'exists:tmp_store_settings,id|'.($is_new ? '' : 'in:'.$setting_data['id']),
-											// 'imageable_type'			=> ($is_new ? '' : 'in:'.get_class($setting_data)),
-											'thumbnail'                 => 'required|max:255',
-											'image_xs'                  => 'required|max:255',
-											'image_sm'                  => 'required|max:255',
-											'image_md'                  => 'required|max:255',
-											'image_lg'                  => 'required|max:255',
-											'is_default'                => 'boolean',
-										];
-
-					$validator      	= Validator::make($value, $image_rules);
-
-					//if there was image and validator false
-					if(!$validator->passes())
-					{
-						$errors->add('Image', $validator->errors());
-					}
-					else
-					{
-						$value['imageable_id']          = $setting_data['id'];
-						$value['imageable_type']        = get_class($setting_data);
-
-						$image_data                     = $image_data->fill($value);
-
-						if(!$image_data->save())
-						{
-							$errors->add('Image', $image_data->getError());
-						}
-						else
-						{
-							$image_current_ids[]       = $image_data['id'];
-						}
-					}
-				}
-
-				//if there was no error, check if there were things need to be delete
-				if(!$errors->count())
-				{
-					$images                            = \App\Entities\Image::imageableid($setting['id'])->get(['id'])->toArray();
-					
-					$image_should_be_ids               = [];
-					foreach ($images as $key => $value) 
-					{
-						$image_should_be_ids[]         = $value['id'];
-					}
-
-					$difference_image_ids              = array_diff($image_should_be_ids, $image_current_ids);
-
-					if($difference_image_ids)
-					{
-						foreach ($difference_image_ids as $key => $value) 
-						{
-							$image_data                = \App\Entities\Image::find($value);
-
-							if(!$image_data->delete())
-							{
-								$errors->add('Image', $image_data->getError());
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
-		
-		if($setting_data['type']=='slider')
-		{
-			$final_setting          = \App\Entities\Slider::id($setting_data['id'])->with(['images'])->first()->toArray();
-		}
-		else
-		{
-			$final_setting          = \App\Entities\StoreSetting::id($setting_data['id'])->first()->toArray();
-		}
-
-		return new JSend('success', (array)$final_setting);
+		return response()->json( JSend::success($store_setting->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

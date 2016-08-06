@@ -11,4 +11,6 @@ interface ValidatingStoreSettingInterface
 	public function validateslider(array $slider);
 
 	public function validatepolicy(array $policy);
+
+	public function validatebanner(array $banner);
 }

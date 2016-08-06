@@ -274,6 +274,7 @@ class UIController extends Controller
 	public function config($type = null)
 	{
 		$sliders						= \App\Entities\Slider::ondate('now')->with(['image'])->get()->toArray();
+		$banners						= \App\Entities\Banner::default(true)->with(['image'])->get()->toArray();
 		$storeinfo						= new \App\Entities\Store;
 		$storepage						= new \App\Entities\StorePage;
 		$storepolicy					= new \App\Entities\Policy;
@@ -287,6 +288,11 @@ class UIController extends Controller
 		foreach ($storepage as $key => $value) 
 		{
 			$store[$value['type']]		= $value;
+		}
+
+		foreach ($banners as $key => $value) 
+		{
+			$store['banners'][$value['type']]	= $value;
 		}
 
 		$store['info']['expired_paid']	= $storepolicy;

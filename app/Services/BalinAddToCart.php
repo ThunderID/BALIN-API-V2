@@ -77,6 +77,7 @@ class BalinAddToCart implements AddToCartInterface
 	public function save()
 	{
 		$customer 						= User::findorfail($this->sale['user_id']);
+		$pre_sale 						= Sale::id($this->sale['id'])->first();
 	
 		/** PREPROCESS */
 
@@ -88,6 +89,12 @@ class BalinAddToCart implements AddToCartInterface
 
 		//3. Validate Stock, Price, Calculate Price main product
 		$this->pre->validatesaleitem($this->sale['transactiondetails']); 
+
+		//4. Generate unique number
+		if($pre_sale)
+		{
+			$this->sale['unique_number']	= $this->pre->getuniquenumber($pre_sale); 
+		}
 
 		if(isset($this->sale['transactionextensions']))
 		{

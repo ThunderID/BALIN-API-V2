@@ -172,11 +172,11 @@ class ClusterController extends Controller
 		
 		if(str_is('*Category', get_class($cluster_data)))
 		{
-			$final_cluster              = Category::id($cluster_data['id'])->with(['category', 'products'])->first();
+			$final_cluster              = \App\Entities\Category::id($cluster_data['id'])->with(['category', 'products'])->first();
 		}
 		else
 		{
-			$final_cluster              = Tag::id($cluster_data['id'])->with(['category', 'products'])->first();
+			$final_cluster              = \App\Entities\Tag::id($cluster_data['id'])->with(['category', 'products'])->first();
 		}
 
 		return response()->json( JSend::success($final_cluster->toArray())->asArray())
@@ -206,7 +206,7 @@ class ClusterController extends Controller
 			return response()->json( JSend::error(['Category/Tag tidak ditemukan.']));
 		}
 
-		$result                     = $cluster;
+		$result                     = $cluster->toArray();
 
 		if($cluster->delete())
 		{

@@ -441,11 +441,11 @@ class AuthController extends Controller
 		
 		if($payload['context']['role']=='customer')
 		{
-			$user						= \App\Entities\Customer::id($payload['context']['id'])->first();
+			$user						= \App\Entities\Customer::id($payload['context']['id'])->first()->toArray();
 		}
 		else
 		{
-			$user						= \App\Entities\Admin::id($payload['context']['id'])->first();
+			$user						= \App\Entities\Admin::id($payload['context']['id'])->first()->toArray();
 		}
 
 		return new \App\Libraries\JSend('success', (array)$user);

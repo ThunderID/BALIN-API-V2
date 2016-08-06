@@ -56,6 +56,12 @@ $app->singleton(
 |
 */
 
+$app->configure('mail');
+$app->configure('services');
+$app->register(Sichikawa\LaravelSendgridDriver\MailServiceProvider::class);
+
+unset($app->availableBindings['mailer']);
+
 $app->middleware([
     // Illuminate\Cookie\Middleware\EncryptCookies::class,
     // Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,

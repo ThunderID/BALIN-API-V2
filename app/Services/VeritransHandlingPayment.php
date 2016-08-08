@@ -152,7 +152,7 @@ public function __construct(ValidatingTransactionInterface $pre_sale, Validating
 				\DB::commit();
 
 				//7. kirim email bayar
-				$this->post_sale->sendmailpaymentacceptance($this->pro_sale->sale, $this->sale['client_id']);
+				$this->post_sale->sendmailpaymentacceptance($this->pro_sale->sale);
 
 				//8. update return value
 				$this->saved_data		= $this->pro_sale->sale;

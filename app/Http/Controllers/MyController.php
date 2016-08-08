@@ -2,18 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
 use App\Libraries\JSend;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 use App\Entities\StoreSetting;
+use App\Entities\Voucher;
+use App\Entities\Referral;
+use App\Entities\Customer;
 
-use Carbon\Carbon;
+use App\Services\BalinEntryReferral;
+use App\Services\BalinEntryPromoReferral;
+
 
 class MyController extends Controller
 {
+	public function __construct(Request $request, BalinEntryReferral $referral, BalinEntryPromoReferral $promo_referral)
+	{
+		$this->request 					= $request;
+		$this->referral 				= $referral;
+		$this->promo_referral 			= $promo_referral;
+	}
+
 	/**
 	 * Display a customer by me
 	 *
@@ -21,7 +36,7 @@ class MyController extends Controller
 	 */
 	public function detail($user_id = null)
 	{
-		$result                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
+		$result                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
 
 		if($result)
 		{
@@ -156,7 +171,7 @@ class MyController extends Controller
 										];
 
 		//1a. Get original data
-		$customer_data              = \App\Entities\Customer::findornew($customer['id']);
+		$customer_data              = Customer::findornew($customer['id']);
 
 		//1b. Validate Basic Customer Parameter
 		$validator                  = Validator::make($customer, $customer_rules);
@@ -185,7 +200,7 @@ class MyController extends Controller
 
 		DB::commit();
 		
-		$final_customer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_customer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_customer);
 	}
@@ -202,81 +217,42 @@ class MyController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data code.');
 		}
 
-		$code                       = Input::get('code');
+		$code                       = Input::only('code');
+		$customer 					= Customer::findorfail($user_id);
+		$referral					= Referral::code($code['code'])->first();
 
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
-
-		//1. Check Link
-		$voucher_data              = \App\Entities\Referral::code($code)->first();
-		if(!$voucher_data)
+		if(!$referral)
 		{
-			$voucher_data			= \App\Entities\Voucher::code($code)->type('promo_referral')->ondate('now')->first();
-		}
-
-		if(!$voucher_data)
-		{
-			$errors->add('Redeem', 'Code tidak valid.');
-		}
-		elseif($voucher_data->quota <= 0)
-		{
-			$errors->add('Redeem', 'Quota referral sudah habis.');
+			$promo_ref 				= Voucher::code($code['code'])->ondate('now')->type(['promo_referral'])->first();
+			
+			if(!$promo_ref)
+			{
+				return new JSend('error', (array)Input::all(), 'Code tidak valid.');
+			}
+			else
+			{
+				$referral_store 	= $this->promo_referral;
+			}
 		}
 		else
 		{
-			$store                      = StoreSetting::type('voucher_point_expired')->Ondate('now')->first();
-
-			if($store)
-			{
-				$expired_at             = new Carbon($store->value);
-			}
-			else
-			{
-				$expired_at             = new Carbon('+ 3 months');
-			}
-
-			//if validator passed, save voucher
-			if($voucher_data['type']=='referral')
-			{
-				$reference_id 			= $voucher_data['user_id'];
-				$reference_type			= 'App\Entities\User';
-			}
-			else
-			{
-				$reference_id 			= $voucher_data['id'];
-				$reference_type			= 'App\Entities\Voucher';
-			}
-
-			$point                  =   [
-											'user_id'               => $user_id,
-											'reference_id'        	=> $reference_id,
-											'reference_type'        => $reference_type,
-											'expired_at'            => $expired_at->format('Y-m-d H:i:s'),
-										];
-
-			$point_data             = new \App\Entities\PointLog;
-			
-			$point_data->fill($point);
-
-			if(!$point_data->save())
-			{
-				$errors->add('Redeem', $point_data->getError());
-			}
+			$referral_store			= $this->referral;
 		}
 
-		if($errors->count())
+
+		//1. Check Link
+		$customer 					= $customer->toArray();
+		$customer['reference_code']	= $code['code'];
+
+		$referral_store->fill($customer);
+
+		if(!$referral_store->save())
 		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
+			return response()->json( JSend::error($referral_store->getError()->toArray())->asArray());
 		}
 
-		DB::commit();
-		
-		$final_costumer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
-
-		return new JSend('success', (array)$final_costumer);
+		return response()->json( JSend::success($referral_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 
@@ -342,7 +318,7 @@ class MyController extends Controller
 
 		DB::commit();
 		
-		$final_costumer                 = \App\Entities\Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_costumer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
 
 		return new JSend('success', (array)$final_costumer);
 	}

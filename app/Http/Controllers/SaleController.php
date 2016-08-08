@@ -208,7 +208,7 @@ class SaleController extends Controller
 			case 'paid':
 				$sale_store			= $this->balinpaid;
 				break;
-			case 'packing':
+			case 'packed':
 				$sale_store			= $this->balinpack;
 				break;
 			case 'shipping':

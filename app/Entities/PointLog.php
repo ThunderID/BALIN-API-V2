@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\CrossServices\ClosedDoorModelObserver;
 
 use App\Entities\TraitRelations\BelongsToUserTrait;
+use App\Entities\TraitRelations\BelongsToPointLogTrait;
 use App\Entities\TraitRelations\MorphToReferenceTrait;
 use App\Entities\TraitRelations\HasManyPointLogsTrait;
 
@@ -15,6 +16,7 @@ class PointLog extends BaseModel
 	 *
 	 */
 	use BelongsToUserTrait;
+	use BelongsToPointLogTrait;
 	use MorphToReferenceTrait;
 	use HasManyPointLogsTrait;
 
@@ -116,6 +118,16 @@ class PointLog extends BaseModel
 	public  function scopeDebit($query, $variable)
 	{
 		return $query->where('amount', '>', 0);
+	}
+
+	/**
+	 * scope to find credit amount for user
+	 *
+	 * @param none
+	 */
+	public  function scopeCredit($query, $variable)
+	{
+		return $query->where('amount', '<', 0);
 	}
 
 	/**

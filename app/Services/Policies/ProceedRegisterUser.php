@@ -68,7 +68,7 @@ class ProceedRegisterUser implements ProceedRegisterUserInterface
 			$this->errors->add('Customer', 'Tidak dapat melakukan registrasi saat ini.');
 		}
 
-		$stored_referral->fill(['code' => $referral['referral_code'], 'type' => 'referral', 'value' => 0]);
+		$stored_referral->fill(['code' => $referral['referral_code'], 'type' => 'referral', 'value' => 0, 'user_id' => $customer->id]);
 
 		if(!$stored_referral->save())
 		{

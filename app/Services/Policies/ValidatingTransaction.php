@@ -345,7 +345,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 			while($amount)
 			{
-				$prev_number			= Sale::orderBy('id', 'DESC')->status(['wait', 'process_payment'])->first();
+				$prev_number			= Sale::orderBy('id', 'DESC')->status(['wait', 'veritrans_processing_payment'])->first();
 
 				$limit					= StoreSetting::type('limit_unique_number')->ondate('now')->first();
 
@@ -358,7 +358,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 					$unique_number		= $i+ 1;
 				}
 
-				$amount					= Sale::amount($this->bills - $unique_number)->status(['wait', 'process_payment'])->notid($sale->id)->first();
+				$amount					= Sale::amount($this->bills - $unique_number)->status(['wait', 'veritrans_processing_payment'])->notid($sale->id)->first();
 				$i						= $i+1;
 			}
 

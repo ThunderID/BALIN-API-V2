@@ -251,7 +251,9 @@ class ProceedTransaction implements ProceedTransactionInterface
 	{
 		foreach ($sale->paidpointlogs as $key => $value) 
 		{
-			if($value->amount < 0)
+			$kiddos 						= PointLog::where('point_log_id', $value->id)->debit(true)->sum('amount');
+
+			if($value->amount < 0 && abs($kiddos) < abs($value->amount))
 			{
 				$point                      = new PointLog;
 				$point->fill([

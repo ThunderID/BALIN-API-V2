@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
+use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
@@ -10,10 +12,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-use Carbon\Carbon;
-use \GenTux\Jwt\JwtToken;
-use \GenTux\Jwt\GetsJwtToken;
+use GenTux\Jwt\JwtToken;
+use GenTux\Jwt\GetsJwtToken;
+
 use App\Services\BalinRegisterCustomer;
+use App\Services\BalinAccountActivate;
 
 class AuthController extends Controller
 {
@@ -21,11 +24,12 @@ class AuthController extends Controller
 
 	public $token;
 
-	public function __construct(Request $request, JwtToken $jwt, BalinRegisterCustomer $register)
+	public function __construct(Request $request, JwtToken $jwt, BalinRegisterCustomer $register, BalinAccountActivate $activate)
 	{
 		$this->token 					= $jwt;
-		$this->register 				= $register;
 		$this->request 					= $request;
+		$this->register 				= $register;
+		$this->activate 				= $activate;
 	}
 
 	/**
@@ -115,46 +119,22 @@ class AuthController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
 		}
 
-		$link                       = Input::get('link');
-
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
+		$link					= Input::get('link');
 
 		//1. Check Link
-		$customer_data              = \App\Entities\Customer::activationlink($link)->first();
+		$customer				= ['activation_link' => $link];
 
-		if(!$customer_data)
-		{
-			$errors->add('Customer', 'Link tidak valid.');
-		}
-		elseif($customer_data->is_active)
-		{
-			$errors->add('Customer', 'Link tidak valid.');
-		}
-		else
-		{
-			//if validator passed, save customer
-			$customer_data           = $customer_data->fill(['is_active' => true, 'activation_link' => '', 'date_of_birth' => ((strtotime($customer_data['date_of_birth'])) ? $customer_data['date_of_birth']->format('Y-m-d H:i:s') : '')]);
-
-			if(!$customer_data->save())
-			{
-				$errors->add('Customer', $customer_data->getError());
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
+		$customer_store 		= $this->activate;
 		
-		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
+		$customer_store->fill($customer);
 
-		return new JSend('success', (array)$final_customer);
+		if(!$customer_store->save())
+		{
+			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
+		}
+
+		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**

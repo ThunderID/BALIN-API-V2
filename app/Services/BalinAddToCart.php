@@ -118,7 +118,7 @@ class BalinAddToCart implements AddToCartInterface
 		if(isset($this->sale['voucher']))
 		{
 			//6. Validate voucher
-			$this->pre->validateshoppingvoucher(is_null($this->sale['voucher']) ? [] : $this->sale['voucher']); 
+			$this->pre->validateshoppingvoucher((is_null($this->sale['voucher']) || !is_array($this->sale['voucher'])) ? [] : $this->sale['voucher']); 
 		}
 
 		if($this->pre->errors->count())

@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use App\Libraries\JSend;
 
 use App\Contracts\Policies\EffectTransactionInterface;
+use App\Contracts\Policies\EffectShipmentInterface;
 
 use \Exception;
 
@@ -26,10 +27,11 @@ class OrderController extends Controller
 	protected $request;
 	protected $post;
 
-	function __construct(Request $request, EffectTransactionInterface $post)
+	function __construct(Request $request, EffectTransactionInterface $post, EffectShipmentInterface $post_ship)
 	{
-		$this->request 	= $request;
-		$this->post 	= $post;
+		$this->request 		= $request;
+		$this->post 		= $post;
+		$this->post_ship 	= $post_ship;
 	}
 
 	/**
@@ -72,30 +74,12 @@ class OrderController extends Controller
 	 */
 	public function shipped()
 	{
-		$shipped 				= Input::get('order');
-		$store 					= Input::get('store');
+		$shipped 			= Input::get('order');
 
-		// checking shipped data
-		if(empty($shipped))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post_ship->sendmailshippingpackage(Sale::id($shipped['id'])->status(['shipping'])->first());
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['shipped' => $shipped, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.order.shipped', ['data' => $data], function($message) use($shipped)
-		{
-			$message->to($shipped['user']['email'], $shipped['user']['name'])->subject(strtoupper($this->template).' - SHIPPING INFORMATION');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -107,29 +91,11 @@ class OrderController extends Controller
 	public function delivered()
 	{
 		$delivered 				= Input::get('order');
-		$store 					= Input::get('store');
-
-		// checking delivered data
-		if(empty($delivered))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['delivered' => $delivered, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.order.delivered', ['data' => $data], function($message) use($delivered)
-		{
-			$message->to($delivered['user']['email'], $delivered['user']['name'])->subject(strtoupper($this->template).' - DELIVERED ORDER');
-		}); 
 		
-		return new JSend('success', (array)Input::all());
+		$this->post->sendmaildeliveredorder(Sale::id($delivered['id'])->status(['delivered'])->first());
+
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -141,28 +107,10 @@ class OrderController extends Controller
 	public function canceled()
 	{
 		$canceled 				= Input::get('order');
-		$store 					= Input::get('store');
-
-		// checking canceled data
-		if(empty($canceled))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['canceled' => $canceled, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.order.canceled', ['data' => $data], function($message) use($canceled)
-		{
-			$message->to($canceled['user']['email'], $canceled['user']['name'])->subject(strtoupper($this->template).' - CANCEL ORDER');
-		}); 
 		
-		return new JSend('success', (array)Input::all());
+		$this->post->sendmailcancelorder(Sale::id($canceled['id'])->status(['canceled'])->first());
+
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 }

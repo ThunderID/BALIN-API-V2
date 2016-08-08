@@ -52,10 +52,10 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 
 		$downline 			 	= PointLog::userid($exists_ref['user_id'])->referenceid($customer['id'])->first();
 
-		// if($downline)
-		// {
-		// 	$this->errors->add('Customer', 'Tidak dapat menggunakan referral code downline Anda');
-		// }
+		if($downline)
+		{
+			$this->errors->add('Customer', 'Tidak dapat menggunakan referral code downline Anda');
+		}
 
 		$this->referral 		= $exists_ref;
 	}
@@ -82,7 +82,7 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 			$this->errors->add('Referral', 'Promo Referral tidak valid');
 		}
 
-		if($exists_ref->quota <= 0)
+		if($exists_ref && $exists_ref->quota <= 0)
 		{
 			$this->errors->add('Referral', 'Quota Promo Referral sudah habis');
 		}

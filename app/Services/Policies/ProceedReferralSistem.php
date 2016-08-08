@@ -92,9 +92,9 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 		}
 
 		$point					=   [
-										'user_id'			=> $referral['user_id'],
-										'reference_id'		=> $customer['id'],
-										'reference_type'	=> get_class($customer),
+										'user_id'			=> $customer['id'],
+										'reference_id'		=> $referral['id'],
+										'reference_type'	=> get_class($referral),
 										'expired_at'		=> $expired_at->format('Y-m-d H:i:s'),
 										'amount'			=> $gift->value,
 										'notes'				=> 'Mereferensikan '.$customer['name'],

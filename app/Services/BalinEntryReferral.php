@@ -116,7 +116,7 @@ class BalinEntryReferral implements EntryUplineInterface
 		\DB::commit();
 
 		//7. Return customer Model Object
-		$this->saved_data	= $this->pro->referral;
+		$this->saved_data	= Customer::id($this->customer['id'])->first();
 
 		return true;
 	}

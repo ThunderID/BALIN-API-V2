@@ -5,13 +5,11 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-use App\Models\Queue;
-
 use DB, Carbon\Carbon;
 
 use \Illuminate\Support\MessageBag as MessageBag;
 
-use App\Models\Sale;
+use App\Entities\Sale;
 use App\Http\Controllers\Veritrans\Veritrans_Config;
 use App\Http\Controllers\Veritrans\Veritrans_Transaction;
 use App\Http\Controllers\Veritrans\Veritrans_ApiRequestor;
@@ -19,6 +17,8 @@ use App\Http\Controllers\Veritrans\Veritrans_Notification;
 use App\Http\Controllers\Veritrans\Veritrans_VtDirect;
 use App\Http\Controllers\Veritrans\Veritrans_VtWeb;
 use App\Http\Controllers\Veritrans\Veritrans_Sanitizer;
+
+use App\Services\VeritransHandlingPayment;
 
 class HandlingPaymentVeritransCommand extends Command {
 	/**
@@ -40,9 +40,11 @@ class HandlingPaymentVeritransCommand extends Command {
 	 *
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct(VeritransHandlingPayment $veritrans_handler)
 	{
 		parent::__construct();
+
+		$this->veritrans_handler 	= $veritrans_handler;
 	}
 
 	/**
@@ -71,35 +73,28 @@ class HandlingPaymentVeritransCommand extends Command {
 		// Uncomment for production environment
 		Veritrans_Config::$isProduction	= env('VERITRANS_PRODUCTION', false);
 
-		$waiting_transaction			= Sale::status('veritrans_processing_payment')->get();
+		$waiting_transaction			= Sale::status('veritrans_processing_payment')->with(['voucher', 'transactionlogs', 'customer', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->get();
 
 		foreach ($waiting_transaction as $key => $value) 
 		{
-			$notif 							= new Veritrans_Notification(['transaction_id' => $value['ref_number']]);
+			$notif 								= new Veritrans_Notification(['transaction_id' => $value['ref_number']]);
 
-			$transaction 					= $notif->transaction_status;
+			$sale 								= $value->toArray();
+			$sale['payment']['id']				= '';
+			$sale['payment']['transaction_id']	= $sale['id'];
+			$sale['payment']['method']			= $notif->payment_type;
+			$sale['payment']['destination']		= 'Veritrans';
+			$sale['payment']['account_name']	= $notif->masked_card;
+			$sale['payment']['account_number']	= $notif->approval_code;
+			$sale['payment']['ondate']			= \Carbon\Carbon::parse($notif->transaction_time)->format('Y-m-d H:i:s');
+			$sale['payment']['amount']			= $notif->gross_amount;
+			$sale['payment']['status']			= $notif->transaction_status;
 
-			if($transaction=='settlement')
-			{
-				$paid_data					= new \App\Models\Payment;
-	
-				$payment['transaction_id']	= $value['id'];
-				$payment['method']			= $notif->payment_type;
-				$payment['destination']		= 'Veritrans';
-				$payment['account_name']	= $notif->masked_card;
-				$payment['account_number']	= $notif->approval_code;
-				$payment['ondate']			= \Carbon\Carbon::parse($notif->transaction_time)->format('Y-m-d H:i:s');
-				$payment['amount']			= $notif->gross_amount;
+			$sale_store 						= $this->veritrans_handler;
 
-				$paid_data					= $paid_data->fill($payment);
+			$sale_store->fill($sale);
 
-				if(!$paid_data->save())
-				{
-					\Log::error(json_encode($paid_data));
-
-					return false;
-				}
-			}
+			$sale_store->save();
 		}
 
 		return true;

@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Mail;
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Input;
-
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
 
 use App\Libraries\JSend;
+
+use App\Entities\Customer;
+use App\Contracts\Policies\EffectRegisterUserInterface;
 
 use \Exception;
 
@@ -19,18 +22,21 @@ use \Exception;
  */
 class CRMController extends Controller
 {
-	function __construct()
+	protected $customer;
+	protected $errors;
+	protected $saved_data;
+	protected $pre;
+	protected $post;
+	protected $pro;
+
+	/**
+	 * construct function, iniate error
+	 *
+	 */
+	function __construct(Request $request, EffectRegisterUserInterface $post)
 	{
-		$this->clientId		= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getClientId();
-
-		$template 			= \App\Entities\ClientTemplate::clientid($this->clientId)->first();
-
-		if(!$template)
-		{
-			\App::abort(404);
-		}
-
-		$this->template 	= $template['located'];
+		$this->request 	= $request;
+		$this->post 	= $post;
 	}
 
 	/**
@@ -42,29 +48,11 @@ class CRMController extends Controller
 	public function welcome()
 	{
 		$user 					= Input::get('user');
-		$store 					= Input::get('store');
 
-		// checking user data
-		if(empty($user))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post->sendactivationmail(Customer::id($user['id'])->first());
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['user' => $user, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.crm.welcome', ['data' => $data], function($message) use($user)
-		{
-			$message->to($user['email'], $user['name'])->subject(strtoupper($this->template).' - WELCOME MAIL');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**

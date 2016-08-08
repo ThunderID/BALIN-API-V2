@@ -9,6 +9,7 @@ use App\Models\ClientTemplate;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 
 use App\Contracts\Policies\EffectRegisterUserInterface;
 
@@ -41,14 +42,19 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 
 	public function sendactivationmail(Customer $customer)
 	{
-		$template 			= 'balin';
+		$template 					= 'balin';
 
-		$data				= ['user' => $customer, 'balin' => $this->storeinfo];
+		$this->storeinfo['action']	= 'https://balin.id/activation/link/'.$customer['activation_link'];
+
+		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.balin.crm.welcome', ['data' => $data], function($message) use($customer)
+		Mail::send('mail.balin.crm.welcome', ['data' => $data], function (Message $message) use ($customer, $data) 
 		{
-			$message->to($customer['email'], $customer['name'])->subject(strtoupper('BALIN').' - WELCOME MAIL');
-		}); 
+			$message->to($customer['email'], $customer['name'])
+			->subject(strtoupper('BALIN').' - WELCOME MAIL')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 }

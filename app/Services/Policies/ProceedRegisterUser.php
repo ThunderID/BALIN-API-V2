@@ -12,6 +12,7 @@ use Carbon\Carbon;
 use App\Contracts\Policies\ProceedRegisterUserInterface;
 
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Facades\Hash;
 
 class ProceedRegisterUser implements ProceedRegisterUserInterface
 {
@@ -31,7 +32,13 @@ class ProceedRegisterUser implements ProceedRegisterUserInterface
 	public function storecustomer(array $customer)
 	{
 		$stored_customer			= Customer::findornew($customer['id']);
+		
 		$stored_customer->fill($customer);
+
+		if(Hash::needsRehash($stored_customer->password))
+		{
+			$stored_customer->password 	= Hash::make($stored_customer->password);
+		}
 
 		if(!$stored_customer->save())
 		{

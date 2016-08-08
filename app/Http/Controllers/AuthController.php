@@ -33,66 +33,46 @@ class AuthController extends Controller
 	 *
 	 * @return Response
 	 */
-	public function signin()
+	public function ssosignin($sso_data)
 	{
-		$email                          = Input::get('email');
-		$password                       = Input::get('password');
-		
-		$check                          = Auth::attempt(['email' => $email, 'password' => $password]);
+		//1. check sso
+		$sso 						= \App\Entities\Customer::email($sso_data['email'])->ssomedia(['facebook'])->first();
 
-		if ($check)
+		//1a. register sso
+		if(!$sso)
 		{
-			$result['id']               = Auth::user()['id'];
-			$result['name']             = Auth::user()['name'];
-			$result['email']            = Auth::user()['email'];
-			$result['date_of_birth']    = Auth::user()['date_of_birth'];
-			$result['role']             = Auth::user()['role'];
-			$result['gender']           = Auth::user()['gender'];
+			$customer				= 	[
+											'id'			=> '',
+											'name'			=> $sso_data['name'],
+											'email'			=> $sso_data['email'],
+											'gender'		=> $sso_data['user']['gender'],
+											'sso_id'		=> $sso_data['id'],
+											'sso_media'		=> 'facebook',
+											'sso_data'		=> json_encode($sso_data['user']),
+											'role'			=> 'customer',
+										];
 
-			return new JSend('success', (array)$result);
-		}
-		elseif(Input::has('sso'))
-		{
-			$sso_data 					= Input::get('sso');
-			//1. check sso
-			$sso 						= \App\Entities\User::email($sso_data['email'])->ssomedia(['facebook'])->first();
-
-			//1a. register sso
-			if(!$sso)
-			{
-				$sso					= new \App\Entities\Customer;
-
-				$sso->fill([
-						'name'			=> $sso_data['name'],
-						'email'			=> $sso_data['email'],
-						'gender'		=> $sso_data['user']['gender'],
-						'sso_id'		=> $sso_data['id'],
-						'sso_media'		=> 'facebook',
-						'sso_data'		=> json_encode($sso_data['user']),
-						'role'			=> 'customer',
-					]);
-
-				if (!$sso->save())
-				{
-					return new JSend('error', (array)Input::all(), $sso->getError());
-				}
-
-				$is_new					= true;
-			}
+			$customer_store 		= $this->register;
 			
-			Auth::loginUsingId($sso['id']);
+			$customer_store->fill($customer);
 
-			$result['id']               = Auth::user()['id'];
-			$result['name']             = Auth::user()['name'];
-			$result['email']            = Auth::user()['email'];
-			$result['date_of_birth']    = Auth::user()['date_of_birth'];
-			$result['role']             = Auth::user()['role'];
-			$result['gender']           = Auth::user()['gender'];
+			if(!$customer_store->save())
+			{
+				return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
+			}
 
-			return new JSend('success', (array)$result);
+			$user					= $customer_store->getData();
 		}
+		else
+		{
+			$user 					= $sso;
+		}
+
+		$token 						= $this->token->createToken($user);
+		$issue['token']['token']	= $token;
+		$issue['me']				= $user->toArray();
 		
-		return new JSend('error', (array)Input::all(), 'Username atau password tidak valid.');
+		return new \App\Libraries\JSend('success', (array)$issue);
 	}
 
 	/**
@@ -316,7 +296,14 @@ class AuthController extends Controller
 
 			if(!$check)
 			{
-				return new JSend('error', (array)Input::all(), ['User tidak ada']);
+				if(Input::has('sso'))
+				{
+					return $this->ssosignin(Input::get('sso'));
+				}
+				else
+				{
+					return new JSend('error', (array)Input::all(), ['User tidak ada']);
+				}
 			}
 		}
 		else

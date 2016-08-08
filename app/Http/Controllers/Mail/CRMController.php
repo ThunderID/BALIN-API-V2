@@ -22,12 +22,8 @@ use \Exception;
  */
 class CRMController extends Controller
 {
-	protected $customer;
-	protected $errors;
-	protected $saved_data;
-	protected $pre;
+	protected $request;
 	protected $post;
-	protected $pro;
 
 	/**
 	 * construct function, iniate error

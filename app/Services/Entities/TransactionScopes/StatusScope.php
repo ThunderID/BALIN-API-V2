@@ -25,7 +25,7 @@ class StatusScope implements ScopeInterface
 	{
 		$builder
 				->selectraw('IFNULL(transaction_logs.status, "na") as status')
-				->LeftJoinTransactionLogFromTransactionOnStatus(['cart','wait', 'payment_process','paid', 'packed', 'shipping','delivered','canceled','abandoned'])
+				->LeftJoinTransactionLogFromTransactionOnStatus(['cart','wait', 'veritrans_processing_payment','paid', 'packed', 'shipping','delivered','canceled','abandoned'])
 				->groupby('transactions.id')
 				;
 	}

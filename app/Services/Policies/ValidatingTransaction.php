@@ -217,7 +217,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	{
 		if(isset($voucher['code']))
 		{
-			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost'])->ondate('now')->first();
+			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'promo_referral'])->ondate('now')->first();
 			// $voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'debit_point'])->ondate('now')->first();
 
 			$this->validatevoucher($voucher);
@@ -251,7 +251,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	{
 		if($sale->count())
 		{
-			$bills		= $sale->bills;
+			$bills		= $sale->bills + $sale->unique_number;
 		}
 		else
 		{
@@ -272,7 +272,12 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 	public function calculatebills()
 	{
-		$this->bills	= $this->subtotal + $this->packingcost + $this->shippingcost - $this->voucherdiscount - $this->pointdiscount - $this->paymentamount - $this->uniquenumber;
+		$this->bills	= $this->subtotal + $this->packingcost + $this->shippingcost - $this->voucherdiscount - $this->pointdiscount - $this->paymentamount;
+
+		if($this->bills > 0)
+		{
+			$this->bills = $this->bills  - $this->uniquenumber;
+		}
 	}
 
 	public function getsalenumber(Sale $sale)
@@ -286,7 +291,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 		$latest_sale	= Sale::select('ref_number')
 								->where('ref_number', 'like', $prefix.'%')
-								->status(['wait', 'payment_process', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
+								->status(['wait', 'veritrans_processing_payment', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
 								->orderBy('ref_number', 'DESC')
 								->first();
 
@@ -313,7 +318,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 		$latest_sale	= Purchase::select('ref_number')
 								->where('ref_number', 'like', $prefix.'%')
-								->status(['wait', 'payment_process', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
+								->status(['wait', 'veritrans_processing_payment', 'paid', 'packed', 'shipping', 'delivered', 'canceled'])
 								->orderBy('ref_number', 'DESC')
 								->first();
 
@@ -333,29 +338,36 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	{
 		$this->calculatebills();
 
-		$i							= 0;
-		$amount						= true;
-
-		while($amount)
+		if($this->bills > 0)
 		{
-			$prev_number			= Sale::orderBy('id', 'DESC')->status(['wait', 'process_payment'])->first();
+			$i							= 0;
+			$amount						= true;
 
-			$limit					= StoreSetting::type('limit_unique_number')->ondate('now')->first();
-
-			if($prev_number['unique_number'] < $limit['value'])
+			while($amount)
 			{
-				$unique_number		= $i+ $prev_number['unique_number'] + 1;
-			}
-			else
-			{
-				$unique_number		= $i+ 1;
+				$prev_number			= Sale::orderBy('id', 'DESC')->status(['wait', 'process_payment'])->first();
+
+				$limit					= StoreSetting::type('limit_unique_number')->ondate('now')->first();
+
+				if($prev_number['unique_number'] < $limit['value'])
+				{
+					$unique_number		= $i+ $prev_number['unique_number'] + 1;
+				}
+				else
+				{
+					$unique_number		= $i+ 1;
+				}
+
+				$amount					= Sale::amount($this->bills - $unique_number)->status(['wait', 'process_payment'])->notid($sale->id)->first();
+				$i						= $i+1;
 			}
 
-			$amount					= Sale::amount($this->bills - $unique_number)->status(['wait', 'process_payment'])->notid($sale->id)->first();
-			$i						= $i+1;
+			return $unique_number;
 		}
-
-		return $unique_number;
+		else
+		{
+			return 0;
+		}
 	}
 
 	public function getsubtotal()

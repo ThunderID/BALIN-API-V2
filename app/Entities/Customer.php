@@ -125,4 +125,18 @@ class Customer extends User
 		}
 		return 	$query->where($query->getModel()->table.'.activation_link', $variable);
 	}
+
+	/**
+	 * scope to get condition where activation link
+	 *
+	 * @param string or array of entity' activation link
+	 **/
+	public function scopeSSOMedia($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return $query->whereIn($query->getModel()->table.'.sso_media', $variable);
+		}
+		return 	$query->where($query->getModel()->table.'.sso_media', $variable);
+	}
 }

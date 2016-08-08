@@ -7,6 +7,7 @@ use Illuminate\Support\MessageBag;
 use App\Entities\Customer;
 use App\Entities\Sale;
 use App\Entities\TransactionLog;
+use App\Entities\Voucher;
 
 use App\Contracts\CheckoutInterface;
 
@@ -107,7 +108,7 @@ class BalinCheckout implements CheckoutInterface
 
 		//8. Calculatepoint discount
 		$this->pre->calculatepointdiscount($customer, $sale); 
-
+		
 		//9. Generate unique number
 		$this->sale['unique_number']	= $this->pre->getuniquenumber($sale); 
 
@@ -127,30 +128,73 @@ class BalinCheckout implements CheckoutInterface
 		//12. set voucher discount 
 		$this->sale['voucher_discount']	= $this->pre->getvoucherdiscount();
 
+		//------- Area of validating entry promo referral -------//
+
+		//13. Get referral code
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']))
+		{
+			$this->pre_voucher->validatedownline($customer); 
+
+			if($this->pre_voucher->errors->count())
+			{
+				$this->errors 				= $this->pre_voucher->errors;
+
+				return false;
+			}
+
+		}
+
+		//----- End Area of validating entry promo referral -----//
+
 		\DB::BeginTransaction();
 
 		/** PROCESS */
 
-		//13. Store Data Transaksi
+		//14. Store Data Transaksi
 		$this->pro->store($this->sale); 
 		
-		//14. Store sale item
+		//15. Store sale item
 		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
 
-		//15. Store packing ornament
+		//16. Store packing ornament
 		if(isset($this->sale['transactionextensions']))
 		{
 			$this->pro->storepackingornament($this->pro->sale, $this->sale['transactionextensions']); 
 		}
 		
-		//16. Store Shipping Address
+		//17. Store Shipping Address
 		$this->pro->shippingaddress($this->pro->sale, $this->sale['shipment']); 
 
-		//17. Reduce Quota Voucher
+		//18a. Reduce Quota Voucher
 		if($this->pro->sale->voucher()->count())
 		{
 			$this->pro->creditquotavoucher($this->pro->sale->voucher, 1, 'Belanja #'.$this->sale['ref_number']); 
 		}
+
+		//------- Area of store entry promo referral -------//
+		
+		//18b. reduce and add point if voucher -eq promo referral
+		if(!$this->pro->sale->voucher()->count() && isset($this->sale['voucher']['code']))
+		{
+			$promo_referral 		= Voucher::code($this->sale['voucher']['code'])->type('promo_referral')->first();
+			
+			//18bi. Store bonus for downline
+			$this->pro_sale->storebonusesvoucher($customer, $promo_referral); 
+
+			//18bii. requce upline quota
+			$this->pro_sale->storequotavoucher($promo_referral, $customer); 
+
+			if($this->pro_sale->errors->count())
+			{
+				\DB::rollback();
+
+				$this->errors 		= $this->pro_sale->errors;
+
+				return false;
+			}
+		}		
+
+		//----- End Area of store entry promo referral -----//
 
 		//18. Reduce Balin Point
 		$this->pro->creditbalinpoint($customer, $this->pro->sale, $this->pre->getpointdiscount()); 
@@ -178,12 +222,12 @@ class BalinCheckout implements CheckoutInterface
 		/** POST PROCESS */
 
 		//21. Send Mail
-		// $this->post->sendmailinvoice($this->pro->sale);
+		$this->post->sendmailinvoice($this->pro->sale);
 
 		//22. Send Mail for bills
 		if($this->pre->getbills() == 0)
 		{
-			// $this->post->sendmailpaymentacceptance($this->pro->sale);
+			$this->post->sendmailpaymentacceptance($this->pro->sale);
 		}
 
 		//23. Return Sale Model Object

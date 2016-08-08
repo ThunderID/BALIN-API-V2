@@ -40,7 +40,7 @@ class MyOrderController extends Controller
 	 */
 	public function index($user_id = null)
 	{
-		$result                     = \App\Entities\Sale::userid($user_id)->status(['wait', 'canceled', 'payment_process', 'paid', 'shipping', 'packed', 'delivered']);
+		$result                     = \App\Entities\Sale::userid($user_id)->status(['wait', 'canceled', 'veritrans_processing_payment', 'paid', 'shipping', 'packed', 'delivered']);
 
 		$count                      = count($result->get());
 
@@ -68,14 +68,14 @@ class MyOrderController extends Controller
 	 */
 	public function detail($user_id = null, $order_id = null)
 	{
-		$result                 = \App\Entities\Sale::userid($user_id)->id($order_id)->status(['wait', 'payment_process', 'canceled', 'paid', 'shipping', 'packed', 'delivered'])->with(['payment', 'orderlogs', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'shipment', 'shipment.courier', 'shipment.address', 'voucher', 'customer', 'transactionextensions', 'transactionextensions.productextension'])->first();
+		$result                 = \App\Entities\Sale::userid($user_id)->id($order_id)->status(['wait', 'veritrans_processing_payment', 'canceled', 'paid', 'shipping', 'packed', 'delivered'])->with(['payment', 'orderlogs', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'shipment', 'shipment.courier', 'shipment.address', 'voucher', 'customer', 'transactionextensions', 'transactionextensions.productextension'])->first();
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray());
 		}
 
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.']));
 	}
 
 	/**
@@ -85,7 +85,7 @@ class MyOrderController extends Controller
 	 */
 	public function refnumber($user_id = null, $refnumber = null)
 	{
-		$result                 = \App\Entities\Sale::userid($user_id)->refnumber($refnumber)->status(['wait', 'payment_process', 'canceled', 'paid', 'shipping', 'packed', 'delivered'])->with(['payment', 'orderlogs', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'shipment', 'shipment.courier', 'shipment.address', 'voucher', 'customer', 'transactionextensions', 'transactionextensions.productextension'])->first();
+		$result                 = \App\Entities\Sale::userid($user_id)->refnumber($refnumber)->status(['wait', 'veritrans_processing_payment', 'canceled', 'paid', 'shipping', 'packed', 'delivered'])->with(['payment', 'orderlogs', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'shipment', 'shipment.courier', 'shipment.address', 'voucher', 'customer', 'transactionextensions', 'transactionextensions.productextension'])->first();
 
 		if($result)
 		{

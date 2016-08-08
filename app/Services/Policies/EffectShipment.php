@@ -9,6 +9,7 @@ use App\Models\ClientTemplate;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 
 use App\Contracts\Policies\EffectShipmentInterface;
 
@@ -46,9 +47,12 @@ class EffectShipment implements EffectShipmentInterface
 		$data				= ['shipped' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.balin.order.shipped', ['data' => $data], function($message) use($sale, $template)
+		Mail::send('mail.balin.order.shipped', ['data' => $data], function (Message $message) use ($sale, $data) 
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - SHIPPING INFORMATION');
-		}); 
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - SHIPPING INFORMATION')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 }

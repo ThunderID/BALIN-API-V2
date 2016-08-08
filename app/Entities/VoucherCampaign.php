@@ -65,7 +65,7 @@ class VoucherCampaign extends BaseModel
 	{
 		if(is_array($variable))
 		{
-			return $query->whereIn($query->getModel()->table.'.code', $value);
+			return $query->whereIn($query->getModel()->table.'.code', $variable);
 		}
 		return 	$query->where($query->getModel()->table.'.code', $variable);
 	}

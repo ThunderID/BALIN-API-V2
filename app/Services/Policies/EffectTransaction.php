@@ -9,6 +9,7 @@ use App\Models\ClientTemplate;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Mail\Message;
 
 use App\Contracts\Policies\EffectTransactionInterface;
 
@@ -46,10 +47,13 @@ class EffectTransaction implements EffectTransactionInterface
 		$data				= ['invoice' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.balin.order.invoice', ['data' => $data], function($message) use($sale)
+		Mail::send('mail.balin.order.invoice', ['data' => $data], function (Message $message) use ($sale, $data) 
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - INVOICE');
-		}); 
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - INVOICE')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 
 	public function sendmailpaymentacceptance(Sale $sale)
@@ -57,10 +61,13 @@ class EffectTransaction implements EffectTransactionInterface
 		$data				= ['paid' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.balin.order.paid', ['data' => $data], function($message) use($sale)
+		Mail::send('mail.balin.order.paid', ['data' => $data], function (Message $message) use ($sale, $data) 
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - PAYMENT VALIDATION');
-		}); 
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - PAYMENT VALIDATION')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 
 	public function sendmailcancelorder(Sale $sale)
@@ -68,20 +75,26 @@ class EffectTransaction implements EffectTransactionInterface
 		$data				= ['canceled' => $sale, 'balin' => $this->storeinfo];
 
 		//send mail
-		Mail::send('mail.balin.order.canceled', ['data' => $data], function($message) use($sale)
+		Mail::send('mail.balin.order.canceled', ['data' => $data], function (Message $message) use ($sale, $data) 
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - CANCEL ORDER');
-		}); 
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - CANCEL ORDER')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 
 	public function sendmaildeliveredorder(Sale $sale)
 	{
 		$data				= ['delivered' => $sale, 'balin' => $this->storeinfo];
-
+		
 		//send mail
-		Mail::send('mail.balin.order.delivered', ['data' => $data], function($message) use($sale)
+		Mail::send('mail.balin.order.delivered', ['data' => $data], function (Message $message) use ($sale, $data) 
 		{
-			$message->to($sale['user']['email'], $sale['user']['name'])->subject(strtoupper('BALIN').' - DELIVERED ORDER');
-		}); 
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - DELIVERED ORDER')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
 	}
 }

@@ -4,11 +4,15 @@ namespace App\Http\Controllers\Mail;
 
 use App\Http\Controllers\Controller;
 
-use Illuminate\Support\Facades\Input;
+use App\Entities\Sale;
 
+use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
 
 use App\Libraries\JSend;
+
+use App\Contracts\Policies\EffectTransactionInterface;
 
 use \Exception;
 
@@ -19,9 +23,13 @@ use \Exception;
  */
 class OrderController extends Controller
 {
-	function __construct()
+	protected $request;
+	protected $post;
+
+	function __construct(Request $request, EffectTransactionInterface $post)
 	{
-		$this->template 	= 'balin';
+		$this->request 	= $request;
+		$this->post 	= $post;
 	}
 
 	/**
@@ -32,30 +40,12 @@ class OrderController extends Controller
 	 */
 	public function invoice()
 	{
-		$invoice 				= Input::get('invoice');
-		$store 					= Input::get('store');
+		$invoice 		= Input::get('invoice');
 
-		// checking invoice data
-		if(empty($invoice))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post->sendmailinvoice(Sale::id($invoice['id'])->status(['wait', 'veritrans_processing_payment'])->first());
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['invoice' => $invoice, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.order.invoice', ['data' => $data], function($message) use($invoice)
-		{
-			$message->to($invoice['user']['email'], $invoice['user']['name'])->subject(strtoupper($this->template).' - INVOICE');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -66,30 +56,12 @@ class OrderController extends Controller
 	 */
 	public function paid()
 	{
-		$paid 				= Input::get('order');
-		$store 					= Input::get('store');
+		$paid 			= Input::get('order');
 
-		// checking paid data
-		if(empty($paid))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post->sendmailpaymentacceptance(Sale::id($paid['id'])->status(['paid'])->first());
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['paid' => $paid, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.order.paid', ['data' => $data], function($message) use($paid)
-		{
-			$message->to($paid['user']['email'], $paid['user']['name'])->subject(strtoupper($this->template).' - PAYMENT VALIDATION');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**

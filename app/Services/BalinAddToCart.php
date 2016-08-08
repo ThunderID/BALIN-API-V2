@@ -4,8 +4,9 @@ namespace App\Services;
 
 use Illuminate\Support\MessageBag;
 
-use App\Entities\User;
+use App\Entities\Customer;
 use App\Entities\Sale;
+use App\Entities\Voucher;
 use App\Entities\TransactionLog;
 
 use App\Contracts\AddToCartInterface;
@@ -13,6 +14,8 @@ use App\Contracts\AddToCartInterface;
 use App\Contracts\Policies\ValidatingTransactionInterface;
 use App\Contracts\Policies\ProceedTransactionInterface;
 use App\Contracts\Policies\EffectTransactionInterface;
+use App\Contracts\Policies\ValidatingReferralSistemInterface;
+use App\Contracts\Policies\ProceedReferralSistemInterface;
 
 class BalinAddToCart implements AddToCartInterface 
 {
@@ -20,19 +23,23 @@ class BalinAddToCart implements AddToCartInterface
 	protected $errors;
 	protected $saved_data;
 	protected $pre;
-	protected $post;
+	protected $pre_voucher;
 	protected $pro;
+	protected $pro_voucher;
+	protected $post;
 
 	/**
 	 * construct function, iniate error
 	 *
 	 */
-	function __construct(ValidatingTransactionInterface $pre, ProceedTransactionInterface $pro, EffectTransactionInterface $post)
+	function __construct(ValidatingTransactionInterface $pre, ProceedTransactionInterface $pro, EffectTransactionInterface $post, ValidatingReferralSistemInterface $pre_voucher, ProceedReferralSistemInterface $pro_voucher)
 	{
-		$this->errors 	= new MessageBag;
-		$this->pre 		= $pre;
-		$this->pro 		= $pro;
-		$this->post 	= $post;
+		$this->errors 		= new MessageBag;
+		$this->pre 			= $pre;
+		$this->pre_voucher 	= $pre_voucher;
+		$this->pro 			= $pro;
+		$this->pro_voucher 	= $pro_voucher;
+		$this->post 		= $post;
 	}
 
 	/**
@@ -76,7 +83,7 @@ class BalinAddToCart implements AddToCartInterface
 	 */
 	public function save()
 	{
-		$customer 						= User::findorfail($this->sale['user_id']);
+		$customer 						= Customer::findorfail($this->sale['user_id']);
 		$pre_sale 						= Sale::id($this->sale['id'])->first();
 	
 		/** PREPROCESS */
@@ -123,6 +130,24 @@ class BalinAddToCart implements AddToCartInterface
 
 		$this->purchase['type']			= 'sell'; 
 
+		//------- Area of validating entry promo referral -------//
+
+		//7. Get referral code
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']))
+		{
+			$this->pre_voucher->validatedownline($customer); 
+
+			if($this->pre_voucher->errors->count())
+			{
+				$this->errors 				= $this->pre_voucher->errors;
+
+				return false;
+			}
+
+		}
+
+		//----- End Area of validating entry promo referral -----//
+
 		//8. set transact_at
 		$this->sale['transact_at'] 		= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
 
@@ -154,7 +179,32 @@ class BalinAddToCart implements AddToCartInterface
 			$this->pro->shippingaddress($this->pro->sale, $this->sale['shipment']); 
 		}
 
-		//15. Store Log Transaksi
+		//------- Area of store entry promo referral -------//
+		
+		//15. reduce and add point if voucher -eq promo referral
+		if(!$this->pro->sale->voucher()->count() && isset($this->sale['voucher']['code']))
+		{
+			$promo_referral 		= Voucher::code($this->sale['voucher']['code'])->type('promo_referral')->first();
+			
+			//15a. Store bonus for downline
+			$this->pro_voucher->storebonusesvoucher($customer, $promo_referral); 
+
+			//15b. requce upline quota
+			$this->pro_voucher->storequotavoucher($promo_referral, $customer); 
+
+			if($this->pro_voucher->errors->count())
+			{
+				\DB::rollback();
+
+				$this->errors 		= $this->pro_voucher->errors;
+
+				return false;
+			}
+		}		
+
+		//----- End Area of store entry promo referral -----//
+
+		//16. Store Log Transaksi
 		$this->pro->updatestatus($this->pro->sale, 'cart'); 
 		
 		if($this->pro->errors->count())
@@ -168,7 +218,7 @@ class BalinAddToCart implements AddToCartInterface
 
 		\DB::commit();
 
-		//16. Return Sale Model Object
+		//17. Return Sale Model Object
 		$this->saved_data	= $this->pro->sale;
 
 		return true;

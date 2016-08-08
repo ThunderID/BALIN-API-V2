@@ -273,8 +273,10 @@ class UIController extends Controller
 	 */
 	public function config($type = null)
 	{
-		$sliders						= \App\Entities\Slider::ondate('now')->with(['image'])->get()->toArray();
-		$banners						= \App\Entities\Banner::default(true)->with(['image'])->get()->toArray();
+		$sliders						= new \App\Entities\Slider;
+		$sliders 						= $sliders->ondate('now')->with(['image'])->get()->toArray();
+		$banners						= new \App\Entities\Banner;
+		$banners 						= $banners->default(true)->with(['image'])->get()->toArray();
 		$storeinfo						= new \App\Entities\Store;
 		$storepage						= new \App\Entities\StorePage;
 		$storepolicy					= new \App\Entities\Policy;

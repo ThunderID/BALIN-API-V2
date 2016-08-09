@@ -62,7 +62,7 @@ class BalinStoreOrnament implements StoreOrnamentInterface
 	 */
 	public function fill(array $ornament)
 	{
-		$this->Ornament 		= $ornament;
+		$this->ornament 		= $ornament;
 	}
 
 	/**
@@ -77,7 +77,7 @@ class BalinStoreOrnament implements StoreOrnamentInterface
 		/** PREPROCESS */
 
 		//1. Validate Ornament
-		$this->pre->validateornament($this->Ornament); 
+		$this->pre->validateornament($this->ornament); 
 
 		if($this->pre->errors->count())
 		{
@@ -91,7 +91,10 @@ class BalinStoreOrnament implements StoreOrnamentInterface
 		/** PROCESS */
 
 		//2. store Ornament
-		$this->pro->storeornament($this->Ornament); 
+		$this->pro->storeornament($this->ornament); 
+
+		//3. store images
+		$this->pro->storeimage($this->pro->ornament, $this->ornament['images']); 
 
 		if($this->pro->errors->count())
 		{
@@ -104,7 +107,7 @@ class BalinStoreOrnament implements StoreOrnamentInterface
 
 		\DB::commit();
 
-		//3. Return Ornament Model Object
+		//4. Return Ornament Model Object
 		$this->saved_data	= $this->pro->ornament;
 
 		return true;

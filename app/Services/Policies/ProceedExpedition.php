@@ -126,7 +126,10 @@ class ProceedExpedition implements ProceedExpeditionInterface
 
 			$stored_image				= Image::findornew($value['id']);
 			
-			$stored_image->fill($value);
+			$stored_image 				= $stored_image->fill($value);
+
+			$stored_image->imageable_id		= $courier->id;
+			$stored_image->imageable_type	= get_class($courier);
 
 			if(!$stored_image->save())
 			{

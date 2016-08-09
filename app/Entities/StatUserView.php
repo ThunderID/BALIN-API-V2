@@ -2,10 +2,20 @@
 
 namespace App\Entities;
 
-use App\CrossServices\ClosedDoorModelObserver;
+use App\Entities\TraitRelations\BelongsToUserTrait;
+use App\Entities\TraitRelations\MorphToStatableTrait;
+
+// use App\CrossServices\ClosedDoorModelObserver;
 
 class StatUserView extends BaseModel
 {
+	/**
+	 * Relationship Traits.
+	 *
+	 */
+	use BelongsToUserTrait;
+	use MorphToStatableTrait;
+
 	/**
 	 * The database table used by the model.
 	 *
@@ -69,7 +79,7 @@ class StatUserView extends BaseModel
 	{
         parent::boot();
  
-        StatUserView::observe(new ClosedDoorModelObserver());
+        // StatUserView::observe(new ClosedDoorModelObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

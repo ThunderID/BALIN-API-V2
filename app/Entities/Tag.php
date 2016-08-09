@@ -5,7 +5,6 @@ namespace App\Entities;
 use App\Entities\Traits\IsTagTrait;
 
 use App\Entities\TraitLibraries\FieldNameTrait;
-use App\Entities\TraitLibraries\FieldSlugTrait;
 
 use App\Entities\TraitRelations\BelongsToCategoryClusterTrait;
 use App\Entities\TraitRelations\BelongsToManyProductsTrait;
@@ -28,7 +27,6 @@ class Tag extends CategoryCluster
 	 *
 	 */
 	use FieldNameTrait;
-	use FieldSlugTrait;
 	
 	/**
 	 * Relationship Traits

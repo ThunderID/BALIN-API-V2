@@ -4,6 +4,8 @@ namespace App\Entities;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\TraitLibraries\FieldSlugTrait;
+
 /**
  * Used for Sale and Purchase Models
  * 
@@ -11,6 +13,12 @@ use App\CrossServices\ClosedDoorModelObserver;
  */
 class CategoryCluster extends BaseModel
 {
+	/**
+	 * Libraries Traits for scopes
+	 *
+	 */
+	use FieldSlugTrait;
+
 	/**
 	 * The database table used by the model.
 	 *

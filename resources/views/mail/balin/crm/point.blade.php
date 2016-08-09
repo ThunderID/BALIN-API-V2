@@ -16,6 +16,7 @@
 
 				<p>
 					Anda Memiliki BALIN Point sebesar @thunder_mail_money_indo($data['point']['amount']) dari total point Anda yang akan expire tanggal {{date('d-m-Y H:i', strtotime($data['point']['expired_at']))}}.
+					Ayo, gunakan point Anda sebelum expire!
 				</p>
 
 				<h4>Anda Mungkin Suka</h4>

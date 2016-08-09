@@ -4,11 +4,19 @@ namespace App\Entities;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\TraitLibraries\JoinTransactionTrait;
+
 use App\Entities\TraitRelations\BelongsToVarianTrait;
 use App\Entities\TraitRelations\BelongsToTransactionTrait;
 
 class TransactionDetail extends BaseModel
 {
+	/**
+	 * Libraries Traits for scopes
+	 *
+	 */
+	use JoinTransactionTrait;
+
 	/**
 	 * Relationship Traits
 	 *

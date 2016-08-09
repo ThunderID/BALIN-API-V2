@@ -214,4 +214,43 @@ trait JoinTransactionTrait
 		return $query->where('changed_at', '>=', date('Y-m-d H:i:s', strtotime($variable[0])))->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable[1])))->orderBy('changed_at', 'asc');
 	}
 	
+
+	/**
+	 * collaborate join transaction, and logs for sale transaction
+	 *
+	 * @param string or array of transaction current status
+	 **/
+	public function scopeTransactionSellOn($query, $variable)
+	{
+		return $query->JoinTransactionFromTransactionDetail(true)->JoinTransactionLogFromTransactionOnStatus($variable)->transactiontype('sell');
+	}
+
+	/**
+	 * collaborate left join transaction, and logs for purchase and purchase transaction
+	 *
+	 * @param string or array of transaction current status
+	 **/
+	public function scopeTransactionBuyOn($query, $variable)
+	{
+		return $query->JoinTransactionFromTransactionDetail(true)->JoinTransactionLogFromTransactionOnStatus($variable)->transactiontype('buy');
+	}
+	
+	/**
+	 * check transaction type
+	 *
+	 * @param string or array of type
+	 **/
+	public function scopeTransactionType($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return $query->whereIn('transactions.type', $variable)
+			;
+		}
+		else
+		{
+			return $query->where('transactions.type', $variable)
+			;
+		}
+	}
 }

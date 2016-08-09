@@ -28,7 +28,6 @@ class Category extends CategoryCluster
 	 *
 	 */
 	use FieldNameTrait;
-	use FieldSlugTrait;
 	
 	/**
 	 * Relationship Traits

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models;
+namespace App\Entities;
 
-// use App\Models\Observers\QueueObserver;
+use App\Entities\TraitRelations\BelongsToUserTrait;
 
 /**
- * Used for Queue Models
+ * Used for Queue Entities
  * 
  * @author cmooy
  */
@@ -15,8 +15,8 @@ class Queue extends BaseModel
 	 * Relationship Traits.
 	 *
 	 */
-	use \App\Models\Traits\belongsTo\HasUserTrait;
-	
+	use BelongsToUserTrait;
+
 	/**
 	 * The database table used by the model.
 	 *
@@ -102,8 +102,6 @@ class Queue extends BaseModel
 	public static function boot() 
 	{
         parent::boot();
- 
-        // Queue::observe(new QueueObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/

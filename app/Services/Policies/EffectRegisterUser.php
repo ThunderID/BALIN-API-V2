@@ -5,7 +5,6 @@ namespace App\Services\Policies;
 use App\Entities\Customer;
 use App\Entities\Store;
 use App\Entities\Policy;
-use App\Models\ClientTemplate;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Mail;

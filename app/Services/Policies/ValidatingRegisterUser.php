@@ -40,16 +40,58 @@ class ValidatingRegisterUser implements ValidatingRegisterUserInterface
 
 	public function validateactivationlink(array $customer)
 	{
-		$exists_customer 			= Customer::activationlink($customer['activation_link'])->active(false)->first();
+		$exists_customer 				= Customer::activationlink($customer['activation_link'])->active(false)->first();
 
 		if(!$exists_customer)
 		{
 			$this->errors->add('Customer', 'Link tidak valid');
 		}
 
-		$this->customer 					= $exists_customer;
+		$this->customer 				= $exists_customer;
 	}
 	
+	public function validateresetpassword(array $customer)
+	{
+		$exists_customer 				= Customer::email($customer['email'])->notSSOMedia(['facebook'])->first();
+
+		if(!$exists_customer)
+		{
+			$this->errors->add('Customer', 'Email tidak valid');
+		}
+
+		$this->customer 				= $exists_customer;
+	}
+	
+	public function validateresetpasswordlink(array $customer)
+	{
+		$exists_customer 				= Customer::resetpasswordlink($customer['reset_password_link'])->notSSOMedia(['facebook'])->first();
+
+		if(!$exists_customer)
+		{
+			$this->errors->add('Customer', 'Link tidak valid');
+		}
+
+		$this->customer 				= $exists_customer;
+	}
+
+	public function validatechangepassword(array $customer)
+	{
+		$exists_customer 				= Customer::email($customer['email'])->notSSOMedia(['facebook'])->first();
+
+		if(!$exists_customer)
+		{
+			$this->errors->add('Customer', 'Tidak bisa mengubah password untuk email yang login dengan akun facebook');
+		}
+
+		if($exists_customer && $exists_customer->reset_password_link!='')
+		{
+			$this->errors->add('Customer', 'Password sedang dalam kondisi reset');
+		}
+
+		$this->customer 				= $exists_customer;
+	}
+	
+
 	public function getreferralcode(array $customer)
 	{
 		$letters 							= 'abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
@@ -135,6 +177,19 @@ class ValidatingRegisterUser implements ValidatingRegisterUserInterface
 		$customer['activation_link']		= $activation_link;
 
 		$this->customer 					= $customer;
+	}
+
+	public function getresetpassword(Customer $customer)
+	{
+		do
+		{
+			$reset_password_link			= md5(uniqid(rand(), TRUE));
+	
+			$exists_link					= Customer::resetpasswordlink($reset_password_link)->first();
+		}
+		while($exists_link);
+
+		return $reset_password_link;
 	}
 }
 

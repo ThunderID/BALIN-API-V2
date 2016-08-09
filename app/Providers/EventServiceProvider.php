@@ -15,8 +15,8 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ProductSearched' => [
             'App\Listeners\StatProductViewed',
         ],
-        'App\Events\AuditStore' => [
-            'App\Listeners\SaveAudit',
-        ],
+        // 'App\Events\AuditStore' => [
+        //     'App\Listeners\SaveAudit',
+        // ],
     ];
 }

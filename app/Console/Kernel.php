@@ -35,5 +35,9 @@ class Kernel extends ConsoleKernel
 		//running queue (every five minutes)
 		$schedule->command('point:expirequeue PointExpireQueueCommand')
 				 ->dailyAt('06:00');
+
+		//running queue (every five minutes)
+		$schedule->command('veritrans:notification HandlingPaymentVeritransCommand')
+				 ->everyFiveMinutes();
 	}
 }

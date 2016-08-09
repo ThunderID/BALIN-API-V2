@@ -30,8 +30,6 @@ class UIController extends Controller
 	public function products()
 	{
         $payload                    = $this->jwtPayload();
-        
-		$user						= \App\Entities\Customer::id($payload['context']['id'])->first();
 
 		$result                     = new \App\Entities\Product;
 
@@ -52,18 +50,18 @@ class UIController extends Controller
 					case 'slug':
 						$result     = $result->slug($value);
 
-						if($user)
+						if(!is_null($payload['context']['id']))
 						{
-							$data['user_id']    = $user['id'];
+							$data['user_id']    = $payload['context']['id'];
 						}
 						$data['slug']           = $value;
 						$data['type']           = 'product';
 						break;
 					case 'categories':
 						$result     = $result->categoriesslug($value);
-						if($user)
+						if(!is_null($payload['context']['id']))
 						{
-							$data['user_id']    = $user['id'];
+							$data['user_id']    = $payload['context']['id'];
 						}
 						$data['slug']           = $value;
 						$data['type']           = 'category';
@@ -71,9 +69,9 @@ class UIController extends Controller
 					case 'tags':
 						$result     = $result->tagsslug($value);
 
-						if($user)
+						if(!is_null($payload['context']['id']))
 						{
-							$data['user_id']    = $user['id'];
+							$data['user_id']    = $payload['context']['id'];
 						}
 						$data['slug']           = $value;
 						$data['type']           = 'tag';

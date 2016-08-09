@@ -5,6 +5,7 @@ namespace App\Contracts\Policies;
 use App\Entities\Customer;
 use App\Entities\Referral;
 use App\Entities\Voucher;
+use App\Entities\UserInvitationLog;
 
 interface ProceedReferralSistemInterface
 {
@@ -17,4 +18,6 @@ interface ProceedReferralSistemInterface
 	public function storebonusesvoucher(Customer $customer, Voucher $voucher);
 
 	public function storequotavoucher(Voucher $voucher, Customer $customer);
+
+	public function storeinvitationlog(UserInvitationLog $invitationlog);
 }

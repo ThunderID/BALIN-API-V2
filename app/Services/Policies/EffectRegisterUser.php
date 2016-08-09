@@ -58,4 +58,20 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
 		});
 	}
+	
+	public function sendresetpasswordmail(Customer $customer)
+	{
+		$this->storeinfo['action']	= 'https://balin.id/reset/password/'.$customer['reset_password_link'];
+
+		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
+
+		//send mail
+		Mail::send('mail.balin.account.password', ['data' => $data], function (Message $message) use ($customer, $data) 
+		{
+			$message->to($customer['email'], $customer['name'])
+			->subject(strtoupper('BALIN').' - RESET PASSWORD')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
+	}
 }

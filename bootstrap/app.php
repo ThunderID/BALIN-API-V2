@@ -104,7 +104,7 @@ $app->register(App\Providers\SupplierServiceProvider::class);
 $app->register(App\Providers\ExpeditionServiceProvider::class);
 
 // $app->register(App\Providers\VeritransPaymentServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(GenTux\Jwt\Support\LumenServiceProvider::class);
 /*

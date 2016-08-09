@@ -16,7 +16,11 @@ use GenTux\Jwt\JwtToken;
 use GenTux\Jwt\GetsJwtToken;
 
 use App\Services\BalinRegisterCustomer;
+use App\Services\BalinRegisterCustomerByInvitation;
 use App\Services\BalinAccountActivate;
+use App\Services\BalinResetPassword;
+use App\Services\BalinResettingPassword;
+use App\Services\BalinChangePassword;
 
 class AuthController extends Controller
 {
@@ -24,12 +28,16 @@ class AuthController extends Controller
 
 	public $token;
 
-	public function __construct(Request $request, JwtToken $jwt, BalinRegisterCustomer $register, BalinAccountActivate $activate)
+	public function __construct(Request $request, JwtToken $jwt, BalinRegisterCustomerByInvitation $regist_by_invite, BalinRegisterCustomer $register, BalinAccountActivate $activate, BalinResetPassword $reset, BalinResettingPassword $resetting, BalinChangePassword $changepwd)
 	{
 		$this->token 					= $jwt;
 		$this->request 					= $request;
+		$this->regist_by_invite 		= $regist_by_invite;
 		$this->register 				= $register;
 		$this->activate 				= $activate;
+		$this->reset 					= $reset;
+		$this->resetting 				= $resetting;
+		$this->changepwd 				= $changepwd;
 	}
 
 	/**
@@ -92,8 +100,15 @@ class AuthController extends Controller
 		}
 
 		$customer                   = Input::get('customer');
-	
-		$customer_store 			= $this->register;
+
+		if(isset($customer['reference_code']))
+		{
+			$customer_store 		= $this->regist_by_invite;
+		}
+		else
+		{
+			$customer_store 		= $this->register;
+		}
 		
 		$customer_store->fill($customer);
 
@@ -101,6 +116,7 @@ class AuthController extends Controller
 		{
 			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
 		}
+
 
 		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
@@ -149,42 +165,22 @@ class AuthController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
 		}
 
-		$email						= Input::get('email');
-
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
+		$email					= Input::get('email');
 
 		//1. Check Link
-		$customer_data              = \App\Entities\Customer::email($email)->notSSOMedia(['facebook'])->first();
+		$customer				= ['email' => $email];
 
-		if(!$customer_data)
-		{
-			$errors->add('Customer', 'Email tidak valid.');
-		}
-		else
-		{
-			//if validator passed, save customer
-			$customer_data           = $customer_data->fill(['reset_password_link' => $customer_data->generateResetPasswordLink(), 'date_of_birth' => (strtotime($customer_data['date_of_birth']) ? $customer_data['date_of_birth']->format('Y-m-d H:i:s') : '')]);
-
-			if(!$customer_data->save())
-			{
-				$errors->add('Customer', $customer_data->getError());
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
+		$customer_store 		= $this->reset;
 		
-		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
+		$customer_store->fill($customer);
 
-		return new JSend('success', (array)$final_customer);
+		if(!$customer_store->save())
+		{
+			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
+		}
+
+		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -194,22 +190,20 @@ class AuthController extends Controller
 	 */
 	public function reset($link = '')
 	{
-		$errors                     = new MessageBag();
-
 		//1. Check Link
-		$customer_data              = \App\Entities\Customer::resetpasswordlink($link)->notSSOMedia(['facebook'])->first();
+		$customer				= ['reset_password_link' => $link];
 
-		if(!$customer_data)
+		$customer_store 		= $this->resetting;
+		
+		$customer_store->fill($customer);
+
+		if(!$customer_store->save())
 		{
-			$errors->add('Customer', 'Link tidak valid.');
+			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
 		}
 
-		if($errors->count())
-		{
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		return new JSend('success', (array)$customer_data->toArray());
+		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -219,52 +213,27 @@ class AuthController extends Controller
 	 */
 	public function change()
 	{
-		if(!Input::has('email') || !Input::has('password'))
+		if(!Input::has('email'))
 		{
 			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
 		}
 
-		$email						= Input::get('email');
-		$password					= Input::get('password');
+		$email					= Input::get('email');
 
-		$errors                     = new MessageBag();
+		//1. Check Link
+		$customer				= ['email' => $email];
 
-		DB::beginTransaction();
-
-		//1. Check Email
-		$customer_data              = \App\Entities\Customer::email($email)->notSSOMedia(['facebook'])->first();
-
-		if(!$customer_data)
-		{
-			$errors->add('Customer', 'Email tidak valid.');
-		}
-		elseif(empty($customer_data->reset_password_link))
-		{
-			$errors->add('Customer', 'Email tidak valid.');
-		}
-		else
-		{
-			//if validator passed, save customer
-			$customer_data           = $customer_data->fill(['reset_password_link' => '', 'password' => $password, 'date_of_birth' => (strtotime($customer_data['date_of_birth']) ? $customer_data['date_of_birth']->format('Y-m-d H:i:s') : '')]);
-
-			if(!$customer_data->save())
-			{
-				$errors->add('Customer', $customer_data->getError());
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
+		$customer_store 		= $this->changepwd;
 		
-		$final_customer                 = \App\Entities\Customer::id($customer_data['id'])->first()->toArray();
+		$customer_store->fill($customer);
 
-		return new JSend('success', (array)$final_customer);
+		if(!$customer_store->save())
+		{
+			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
+		}
+
+		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	public function createToken(JwtToken $jwt)

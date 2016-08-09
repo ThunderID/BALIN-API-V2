@@ -4,6 +4,7 @@ namespace App\Services\Policies;
 
 use App\Entities\Store;
 use App\Entities\Policy;
+use App\Entities\Customer;
 
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Mail;
@@ -50,6 +51,21 @@ class EffectReferralSistem implements EffectReferralSistemInterface
 		{
 			$message->to($point['user']['email'], $point['user']['name'])
 			->subject(strtoupper('BALIN').' - POINT REMINDER')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
+	}
+	
+	public function sendinvitationmail(Customer $customer, $email)
+	{
+		$this->storeinfo['action'] 	= 'https://balin.id/invite/by/'.$customer['code_referral'];
+		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
+
+		//send mail
+		Mail::send('mail.balin.account.invitation', ['data' => $data], function (Message $message) use ($customer, $data, $email) 
+		{
+			$message->to($email, $email)
+			->subject(strtoupper('BALIN').' - INVITATION FROM '.strtoupper($customer['name']))
 			->from('cs@balin.id', 'BALIN INDONESIA')
 			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
 		});

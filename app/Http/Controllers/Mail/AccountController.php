@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers\Mail;
 
+use App\Libraries\JSend;
+
 use App\Http\Controllers\Controller;
 
 use Illuminate\Support\Facades\Input;
-
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
 
-use App\Libraries\JSend;
+use App\Contracts\Policies\EffectRegisterUserInterface;
+use App\Contracts\Policies\EffectReferralSistemInterface;
 
 use \Exception;
+use App\Entities\Customer;
 
 /**
  * Handle order mail sender
@@ -19,18 +23,15 @@ use \Exception;
  */
 class AccountController extends Controller
 {
-	function __construct()
+	protected $request;
+	protected $post;
+	protected $post_ref;
+
+	function __construct(Request $request, EffectRegisterUserInterface $post, EffectReferralSistemInterface $post)
 	{
-		$this->clientId		= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getClientId();
-
-		$template 			= \App\Entities\ClientTemplate::clientid($this->clientId)->first();
-
-		if(!$template)
-		{
-			\App::abort(404);
-		}
-
-		$this->template 	= $template['located'];
+		$this->request 		= $request;
+		$this->post 		= $post;
+		$this->post_ref 	= $post_ref;
 	}
 
 	/**
@@ -41,30 +42,12 @@ class AccountController extends Controller
 	 */
 	public function password()
 	{
-		$user 					= Input::get('user');
-		$store 					= Input::get('store');
-
-		// checking user data
-		if(empty($user))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['user' => $user, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.account.password', ['data' => $data], function($message) use($user)
-		{
-			$message->to($user['email'], $user['name'])->subject(strtoupper($this->template).' - RESET PASSWORD');
-		}); 
+		$user 				= Input::get('user');
 		
-		return new JSend('success', (array)Input::all());
+		$this->post->sendresetpasswordmail(Customer::id($user['id'])->first());
+
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -75,39 +58,11 @@ class AccountController extends Controller
 	 */
 	public function invitation()
 	{
-		$user 					= Input::get('user');
-		$email 					= Input::get('email');
-		$store 					= Input::get('store');
-
-		// checking user data
-		if(empty($user))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		// checking email data
-		if(empty($email) || !is_array($email))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['user' => $user, 'balin' => $store];
-
-		foreach ($email as $key => $value) 
-		{
-			//send mail
-			Mail::send('mail.'.$this->template.'.account.invitation', ['data' => $data], function($message) use($user, $value)
-			{
-				$message->to($value['email'], $value['email'])->subject(strtoupper($this->template).' INVITATION FROM '.strtoupper($user['name']));
-			}); 
-		}
+		$user 				= Input::get('user');
 		
-		return new JSend('success', (array)Input::all());
+		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first());
+
+		return response()->json( JSend::success(['Email terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 }

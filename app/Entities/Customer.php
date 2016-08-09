@@ -139,4 +139,19 @@ class Customer extends User
 		}
 		return 	$query->where($query->getModel()->table.'.sso_media', $variable);
 	}
+
+	/**
+	 * scope to get condition where reset password link
+	 *
+	 * @param string or array of entity' reset password link
+	 **/
+	public function scopeResetPasswordLink($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return $query->whereIn($query->getModel()->table.'.reset_password_link', $variable);
+		}
+		return 	$query->where($query->getModel()->table.'.reset_password_link', $variable);
+	}
+
 }

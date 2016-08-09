@@ -41,15 +41,15 @@ class StatProductViewed
 		//1. check stat type
 		if($event->stat['type']=='category')
 		{
-			$data                   = new \App\Models\Category;
+			$data                   = new \App\Entities\Category;
 		}
 		elseif($event->stat['type']=='tag')
 		{
-			$data                   = new \App\Models\Tag;
+			$data                   = new \App\Entities\Tag;
 		}
 		elseif($event->stat['type']=='product')
 		{
-			$data                   = new \App\Models\Product;
+			$data                   = new \App\Entities\Product;
 		}
 
 		//2. check every item searched
@@ -86,7 +86,7 @@ class StatProductViewed
 
 		foreach ($checkslug as $key => $value) 
 		{
-			$statuser					= new \App\Models\StatUserView;
+			$statuser					= new \App\Entities\StatUserView;
 
 			$statuser->fill(['user_id' => $userid, 'statable_id' => $value['id'], 'statable_type' => get_class($data)]);
 			

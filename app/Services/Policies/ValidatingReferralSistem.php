@@ -6,6 +6,7 @@ use App\Entities\Customer;
 use App\Entities\Referral;
 use App\Entities\Voucher;
 use App\Entities\PointLog;
+use App\Entities\UserInvitationLog;
 
 use App\Contracts\Policies\ValidatingReferralSistemInterface;
 
@@ -16,6 +17,8 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 	public $errors;
 	
 	public $referral;
+
+	public $invitationlog;
 
 	/**
 	 * construct function, iniate error
@@ -88,6 +91,18 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 		}
 		
 		$this->referral 		= $exists_ref;
+	}
+
+	public function validateinvitation(Referral $referral, array $customer)
+	{
+		$invitation				= UserInvitationLog::userid($referral['user_id'])->email($customer['email'])->first();
+
+		if(!$invitation)
+		{
+			$this->errors->add('Referral', 'Invitation tidak valid');
+		}
+
+		$this->invitationlog 	= $invitation;
 	}
 }
 

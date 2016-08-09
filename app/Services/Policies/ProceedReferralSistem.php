@@ -8,6 +8,7 @@ use App\Entities\Voucher;
 use App\Entities\PointLog;
 use App\Entities\QuotaLog;
 use App\Entities\StoreSetting;
+use App\Entities\UserInvitationLog;
 
 use Carbon\Carbon;
 
@@ -20,6 +21,8 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 	public $errors;
 	
 	public $referral;
+
+	public $point;
 
 	/**
 	 * construct function, iniate error
@@ -69,6 +72,7 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 		}
 
 		$this->referral 		= $customer;
+		$this->point 			= $point_data;
 	}
 
 	public function storebonusesforupline(Referral $referral, Customer $customer)
@@ -92,9 +96,9 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 		}
 
 		$point					=   [
-										'user_id'			=> $customer['id'],
-										'reference_id'		=> $referral['id'],
-										'reference_type'	=> get_class($referral),
+										'user_id'			=> $referral['user_id'],
+										'reference_id'		=> $this->point['id'],
+										'reference_type'	=> get_class($this->point),
 										'expired_at'		=> $expired_at->format('Y-m-d H:i:s'),
 										'amount'			=> $gift->value,
 										'notes'				=> 'Mereferensikan '.$customer['name'],
@@ -180,6 +184,16 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 		}
 
 		$this->referral 		= $customer;
+	}
+
+	public function storeinvitationlog(UserInvitationLog $invitationlog)
+	{
+		$invitationlog->is_used	= true;
+
+		if(!$invitationlog->save())
+		{
+			$this->errors->add('Redeem', $invitationlog->getError());
+		}
 	}
 }
 

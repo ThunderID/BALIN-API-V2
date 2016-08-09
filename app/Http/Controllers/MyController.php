@@ -18,15 +18,17 @@ use App\Entities\Customer;
 
 use App\Services\BalinEntryReferral;
 use App\Services\BalinEntryPromoReferral;
+use App\Services\BalinInviteFriend;
 
 
 class MyController extends Controller
 {
-	public function __construct(Request $request, BalinEntryReferral $referral, BalinEntryPromoReferral $promo_referral)
+	public function __construct(Request $request, BalinEntryReferral $referral, BalinEntryPromoReferral $promo_referral, BalinInviteFriend $invitation)
 	{
 		$this->request 					= $request;
 		$this->referral 				= $referral;
 		$this->promo_referral 			= $promo_referral;
+		$this->invitation 				= $invitation;
 	}
 
 	/**
@@ -268,58 +270,17 @@ class MyController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data invitations.');
 		}
 
-		$invitations				= Input::get('invitations');
+		$user['id'] 			= $user_id;
+		$user['friends'] 		= Input::get('invitations');
 
-		$errors						= new MessageBag();
+		$this->invitation->fill($user);
 
-		DB::beginTransaction();
-
-		//1. Store mail
-		if(!$errors->count())
+		if(!$this->invitation->save())
 		{
-			foreach ($invitations as $key => $value) 
-			{
-				if(!$errors->count())
-				{
-					$log_data		= new \App\Entities\UserInvitationLog;
-
-					$log_rules		=   [
-												'email'			=> 'required|email',
-											];
-
-					$validator			= Validator::make($value, $log_rules);
-
-					//if there was log and validator false
-					if (!$validator->passes())
-					{
-						$errors->add('log', $validator->errors());
-					}
-					else
-					{
-						$value['user_id']		= $user_id;
-
-						$log_data				= $log_data->fill($value);
-
-						if(!$log_data->save())
-						{
-							$errors->add('Log', $log_data->getError());
-						}
-					}
-				}
-			}
-		}
-		
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
+			return response()->json( JSend::error($this->invitation->getError()->toArray())->asArray());
 		}
 
-		DB::commit();
-		
-		$final_costumer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
-
-		return new JSend('success', (array)$final_costumer);
+		return response()->json( JSend::success(['Undangan terkirim']))
+					->setCallback($this->request->input('callback'));
 	}
 }

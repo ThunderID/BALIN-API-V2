@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use App\Services\BalinStoreAdmin;
 
 /**
  * Handle Protected Resource of admin
@@ -15,6 +19,12 @@ use Illuminate\Support\Facades\DB;
  */
 class AdminController extends Controller
 {
+	public function __construct(Request $request, BalinStoreAdmin $admin)
+	{
+		$this->request 				= $request;
+		$this->admin 				= $admin;
+	}
+
 	/**
 	 * Display all admins
 	 *
@@ -68,7 +78,7 @@ class AdminController extends Controller
 			}
 		}
 		
-		$count                      = count($result->get(['id']));
+		$count                      = count($result->get());
 
 		if(Input::has('skip'))
 		{
@@ -100,7 +110,7 @@ class AdminController extends Controller
 
 		if($result)
 		{
-			return response()->json( JSend::success(['data' => $result->toArray()])->asArray())
+			return response()->json( JSend::success($result->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 
@@ -119,63 +129,19 @@ class AdminController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data admin.');
 		}
 
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
-
 		//1. Validate Admin Parameter
-		$admin                      = Input::get('admin');
+		$admin				= Input::get('admin');
+
+		$admin_store		= $this->admin;
+			
+		$admin_store->fill($admin);
+
+		if(!$admin_store->save())
+		{
+			return response()->json( JSend::error($admin_store->getError()->toArray())->asArray());
+		}
 		
-		if(is_null($admin['id']))
-		{
-			$is_new                 = true;
-		}
-		else
-		{
-			$is_new                 = false;
-		}
-
-		$admin_rules                =   [
-											'name'                          => 'required|max:255',
-											'email'                         => 'required|max:255|unique:users,email,'.(!is_null($admin['id']) ? $admin['id'] : ''),
-											'role'                          => 'required|in:admin,store_manager,staff',
-											'is_active'                     => 'boolean',
-											'gender'                        => 'in:male,female',
-											'date_of_birth'                 => 'date_format:"Y-m-d H:i:s"',
-										];
-
-		//1a. Get original data
-		$admin_data                 = \App\Entities\Admin::findornew($admin['id']);
-
-		//1b. Validate Basic Admin Parameter
-		$validator                  = Validator::make($admin, $admin_rules);
-
-		if (!$validator->passes())
-		{
-			$errors->add('Admin', $validator->errors());
-		}
-		else
-		{
-			//if validator passed, save admin
-			$admin_data           = $admin_data->fill($admin);
-
-			if(!$admin_data->save())
-			{
-				$errors->add('Admin', $admin_data->getError());
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
-		
-		$final_admin                 = \App\Entities\Admin::id($admin_data['id'])->with(['audits'])->first()->toArray();
-
-		return new JSend('success', (array)$final_admin);
+		return response()->json( JSend::success($admin_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

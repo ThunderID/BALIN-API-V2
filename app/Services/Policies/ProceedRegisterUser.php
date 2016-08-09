@@ -2,6 +2,7 @@
 
 namespace App\Services\Policies;
 
+use App\Entities\Admin;
 use App\Entities\Customer;
 use App\Entities\Referral;
 use App\Entities\QuotaLog;
@@ -27,6 +28,27 @@ class ProceedRegisterUser implements ProceedRegisterUserInterface
 	function __construct()
 	{
 		$this->errors 	= new MessageBag;
+	}
+
+	public function storeadmin(array $admin)
+	{
+		$stored_admin					= Admin::findornew($admin['id']);
+		
+		$stored_admin->fill($admin);
+
+		$stored_admin->date_of_birth 	= \Carbon\Carbon::parse('- 14 years')->format('Y-m-d H:i:s');
+
+		if(Hash::needsRehash($stored_admin->password))
+		{
+			$stored_admin->password 	= Hash::make($stored_admin->password);
+		}
+
+		if(!$stored_admin->save())
+		{
+			$this->errors->add('Admin', $stored_admin->getError());
+		}
+
+		$this->admin					= $stored_admin;
 	}
 
 	public function storecustomer(array $customer)

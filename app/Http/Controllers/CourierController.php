@@ -7,7 +7,10 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
+use App\Services\BalinStoreExpedition;
+use App\Services\BalinDeleteExpedition;
 /**
  * Handle Protected Resource of Courier
  * 
@@ -15,6 +18,13 @@ use Illuminate\Support\Facades\DB;
  */
 class CourierController extends Controller
 {
+	public function __construct(Request $request, BalinStoreExpedition $store_courier, BalinDeleteExpedition $delete_courier)
+	{
+		$this->request 				= $request;
+		$this->store_courier		= $store_courier;
+		$this->delete_courier		= $delete_courier;
+	}
+
 	/**
 	 * Display all couriers
 	 *
@@ -120,277 +130,18 @@ class CourierController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data courier.');
 		}
 
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
-
 		//1. Validate Courier Parameter
-		$courier                    = Input::get('courier');
-		
-		if(is_null($courier['id']))
+		$courier			= Input::get('courier');
+
+		$this->store_courier->fill($courier);
+
+		if(!$this->store_courier->save())
 		{
-			$is_new                 = true;
-		}
-		else
-		{
-			$is_new                 = false;
+			return response()->json( JSend::error($this->store_courier->getError()->toArray())->asArray());
 		}
 
-		$courier_rules             =   [
-											'name'                      => 'required|max:255',
-										];
-
-		//1a. Get original data
-		$courier_data              = \App\Entities\Courier::findornew($courier['id']);
-
-		//1b. Validate Basic Courier Parameter
-		$validator                  = Validator::make($courier, $courier_rules);
-
-		if (!$validator->passes())
-		{
-			$errors->add('Courier', $validator->errors());
-		}
-		else
-		{
-			//if validator passed, save courier
-			$courier_data           = $courier_data->fill($courier);
-
-			if(!$courier_data->save())
-			{
-				$errors->add('Courier', $courier_data->getError());
-			}
-		}
-		//End of validate courier
-
-		//2. Validate Shipping Cost Parameter
-		if(!$errors->count() && isset($courier['shippingcosts']) && is_array($courier['shippingcosts']))
-		{
-			$cost_current_ids         = [];
-			foreach ($courier['shippingcosts'] as $key => $value) 
-			{
-				if(!$errors->count())
-				{
-					$cost_data		= \App\Entities\ShippingCost::findornew($value['id']);
-
-					$cost_rules		=	[
-											'courier_id'			=> 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['courier_id']),
-											'start_postal_code'		=> 'required|max:255|',
-											'end_postal_code'		=> 'required|max:255',
-											'started_at'			=> 'required|date_format:"Y-m-d H:i:s"',
-											'cost'					=> 'required|numeric|',
-										];
-
-					$validator      = Validator::make($value, $cost_rules);
-
-					//if there was cost and validator false
-					if (!$validator->passes())
-					{
-						$errors->add('Cost', $validator->errors());
-					}
-					else
-					{
-						$value['courier_id']        = $courier_data['id'];
-
-						$cost_data                    = $cost_data->fill($value);
-
-						if(!$cost_data->save())
-						{
-							$errors->add('Cost', $cost_data->getError());
-						}
-						else
-						{
-							$cost_current_ids[]       = $cost_data['id'];
-						}
-					}
-				}
-			}
-			//if there was no error, check if there were things need to be delete
-			if(!$errors->count())
-			{
-				$costs                            = \App\Entities\ShippingCost::courierid($courier['id'])->get(['id'])->toArray();
-				
-				$cost_should_be_ids               = [];
-				foreach ($costs as $key => $value) 
-				{
-					$cost_should_be_ids[]         = $value['id'];
-				}
-
-				$difference_cost_ids              = array_diff($cost_should_be_ids, $cost_current_ids);
-
-				if($difference_cost_ids)
-				{
-					foreach ($difference_cost_ids as $key => $value) 
-					{
-						$cost_data                = \App\Entities\ShippingCost::find($value);
-
-						if(!$cost_data->delete())
-						{
-							$errors->add('Cost', $cost_data->getError());
-						}
-					}
-				}
-			}
-		}
-
-		//3. Validate courier address Parameter
-		if(!$errors->count() && isset($courier['addresses']) && is_array($courier['addresses']))
-		{
-			$address_current_ids         = [];
-			foreach ($courier['addresses'] as $key => $value) 
-			{
-				if(!$errors->count())
-				{
-					$address_data		= \App\Entities\Address::findornew($value['id']);
-
-					$address_rules		=   [
-												'owner_id'		=> 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['id']),
-												'owner_type'	=> ($is_new ? '' : 'in:'.get_class($courier_data)),
-												'phone'			=> 'required|max:255',
-												'address'		=> 'required',
-												'zipcode'		=> 'required|max:255',
-											];
-
-					$validator      	= Validator::make($value, $address_rules);
-
-					//if there was address and validator false
-					if (!$validator->passes())
-					{
-						$errors->add('Address', $validator->errors);
-					}
-					else
-					{
-						$value['owner_id']                  = $courier_data['id'];
-						$value['owner_type']                = get_class($courier_data);
-
-						$address_data                       = $address_data->fill($value);
-
-						if(!$address_data->save())
-						{
-							$errors->add('Address', $address_data->getError());
-						}
-						else
-						{
-							$address_current_ids[]          = $address_data['id'];
-						}
-					}
-				}
-			}
-			//if there was no error, check if there were things need to be delete
-			if(!$errors->count())
-			{
-				$addresses                            = \App\Entities\Address::ownerid($courier['id'])->ownertype(get_class($courier_data))->get(['id'])->toArray();
-				
-				$address_should_be_ids               = [];
-				foreach ($addresses as $key => $value) 
-				{
-					$address_should_be_ids[]         = $value['id'];
-				}
-
-				$difference_address_ids              = array_diff($address_should_be_ids, $address_current_ids);
-
-				if($difference_address_ids)
-				{
-					foreach ($difference_address_ids as $key => $value) 
-					{
-						$address_data                = \App\Entities\Address::find($value);
-
-						if(!$address_data->delete())
-						{
-							$errors->add('Address', $address_data->getError());
-						}
-					}
-				}
-			}
-		}
-		//End of validate courier image
-
-		//4. Validate courier Image Parameter
-		if(!$errors->count() && isset($courier['images']) && is_array($courier['images']))
-		{
-			$image_current_ids		= [];
-			foreach ($courier['images'] as $key => $value) 
-			{
-				if(!$errors->count())
-				{
-					$image_data		= \App\Entities\Image::findornew($value['id']);
-
-					$image_rules	=   [
-											'imageable_id'              => 'exists:couriers,id|'.($is_new ? '' : 'in:'.$courier_data['id']),
-											'imageable_type'			=> ($is_new ? '' : 'in:'.get_class($courier_data)),
-											'thumbnail'                 => 'required|max:255',
-											'image_xs'                  => 'required|max:255',
-											'image_sm'                  => 'required|max:255',
-											'image_md'                  => 'required|max:255',
-											'image_lg'                  => 'required|max:255',
-											'is_default'                => 'boolean',
-										];
-
-					$validator      	= Validator::make($value, $image_rules);
-
-					//if there was image and validator false
-					if (!$validator->passes())
-					{
-						$errors->add('Image', $validator->errors());
-					}
-					else
-					{
-						$value['imageable_id']          = $courier_data['id'];
-						$value['imageable_type']        = get_class($courier_data);
-
-						$image_data                     = $image_data->fill($value);
-
-						if(!$image_data->save())
-						{
-							$errors->add('Image', $image_data->getError());
-						}
-						else
-						{
-							$image_current_ids[]       = $image_data['id'];
-						}
-					}
-				}
-			}
-			//if there was no error, check if there were things need to be delete
-			if(!$errors->count())
-			{
-				$images                            = \App\Entities\Image::imageableid($courier['id'])->imageabletype(get_class($courier_data))->get(['id'])->toArray();
-				
-				$image_should_be_ids               = [];
-				foreach ($images as $key => $value) 
-				{
-					$image_should_be_ids[]         = $value['id'];
-				}
-
-				$difference_image_ids              = array_diff($image_should_be_ids, $image_current_ids);
-
-				if($difference_image_ids)
-				{
-					foreach ($difference_image_ids as $key => $value) 
-					{
-						$image_data                = \App\Entities\Image::find($value);
-
-						if(!$image_data->delete())
-						{
-							$errors->add('Image', $image_data->getError());
-						}
-					}
-				}
-			}
-		}
-		//End of validate courier image
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
-		
-		$final_courier                 = \App\Entities\Courier::id($courier_data['id'])->with(['shippingcosts', 'addresses', 'images'])->first()->toArray();
-
-		return new JSend('success', (array)$final_courier);
+		return response()->json( JSend::success($this->store_courier->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -403,18 +154,18 @@ class CourierController extends Controller
 		//
 		$courier                    = \App\Entities\Courier::id($id)->with(['shippingcosts'])->first();
 
+
 		if(!$courier)
 		{
-			return new JSend('error', (array)Input::all(), 'Kurir tidak ditemukan.');
+			return response()->json( JSend::error(['Kurir tidak ditemukan.']));
 		}
 
-		$result                     = $courier->toArray();
-
-		if($courier->delete())
+		if($this->delete_courier->delete($courier))
 		{
-			return new JSend('success', (array)$result);
+			return response()->json( JSend::success(['data' => $this->delete_courier->getData()])->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
-		return new JSend('error', (array)$result, $courier->getError());
+		return response()->json( JSend::error($this->delete_courier->getError())->asArray());
 	}
 }

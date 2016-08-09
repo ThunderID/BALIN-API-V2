@@ -129,7 +129,7 @@ class ProductExtensionController extends Controller
 			return new JSend('error', (array)Input::all(), 'Tidak ada data extension.');
 		}
 
-		$ornament                    = Input::get('extension');
+		$ornament				= Input::get('extension');
 
 		$this->store_ornament->fill($ornament);
 

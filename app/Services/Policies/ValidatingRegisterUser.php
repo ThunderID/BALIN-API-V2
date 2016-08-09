@@ -3,6 +3,7 @@
 namespace App\Services\Policies;
 
 use App\Entities\Customer;
+use App\Entities\Admin;
 
 use App\Contracts\Policies\ValidatingRegisterUserInterface;
 
@@ -21,6 +22,26 @@ class ValidatingRegisterUser implements ValidatingRegisterUserInterface
 	function __construct()
 	{
 		$this->errors 	= new MessageBag;
+	}
+
+	public function validateadmin(array $admin)
+	{
+		if(!isset($admin['email']))
+		{
+			$this->errors->add('Admin', 'Email tidak boleh kosong');
+		}
+
+		$exists_mail 			= Admin::email($admin['email'])->notid($admin['id'])->first();
+
+		if($exists_mail)
+		{
+			$this->errors->add('Admin', 'Email sudah pernah terdaftar');
+		}
+
+		if(!in_array($admin['role'], ['staff', 'store_manager', 'admin']))
+		{
+			$this->errors->add('Admin', 'Role tidak valid');
+		}
 	}
 
 	public function validatecustomer(array $customer)

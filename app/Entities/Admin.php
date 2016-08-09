@@ -52,7 +52,8 @@ class Admin extends User
 	protected $rules				=	[
 											'name'							=> 'required|max:255',
 											'email'							=> 'max:255|email',
-											'date_of_birth'					=> 'date_format:"Y-m-d H:i:s"|before:13 years ago'
+											'date_of_birth'					=> 'date_format:"Y-m-d H:i:s"|before:13 years ago',
+											'role'							=> 'in:staff,store_manager,admin'
 										];
 	
 	/**

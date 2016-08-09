@@ -3,6 +3,7 @@
 namespace App\Services\Policies;
 
 use App\Entities\Courier;
+use App\Entities\Address;
 use App\Entities\ShippingCost;
 use App\Entities\Image;
 
@@ -55,6 +56,8 @@ class ProceedExpedition implements ProceedExpeditionInterface
 			
 			$stored_cost->fill($value);
 
+			$stored_cost->courier_id 	= $courier->id;
+
 			if(!$stored_cost->save())
 			{
 				$this->errors->add('Expedition', $stored_cost->getError());
@@ -72,6 +75,51 @@ class ProceedExpedition implements ProceedExpeditionInterface
 			foreach ($difference_cost_ids as $key => $value) 
 			{
 				$cost_data				= ShippingCost::find($value);
+
+				if(!$cost_data->delete())
+				{
+					$this->errors->add('Expedition', $cost_data->getError());
+				}
+			}
+		}
+	}
+
+	public function storeaddress(Courier $courier, array $addresses)
+	{
+		$ids 							= [];
+		$new_ids 						= [];
+
+		foreach ($courier->addresses as $key => $value) 
+		{
+			$ids[]						= $value['id'];
+		}
+
+		foreach ($addresses as $key => $value) 
+		{
+			$stored_addr				= Address::findornew($value['id']);
+			
+			$stored_addr->fill($value);
+
+			$stored_addr->owner_id 		= $courier->id;
+			$stored_addr->owner_type 	= get_class($courier);
+
+			if(!$stored_addr->save())
+			{
+				$this->errors->add('Expedition', $stored_addr->getError());
+			}
+			else
+			{
+				$new_ids[]				= $stored_addr['id'];
+			}
+		}
+
+		$difference_addr_ids			= array_diff($ids, $new_ids);
+
+		if($difference_addr_ids)
+		{
+			foreach ($difference_addr_ids as $key => $value) 
+			{
+				$cost_data				= Address::find($value);
 
 				if(!$cost_data->delete())
 				{

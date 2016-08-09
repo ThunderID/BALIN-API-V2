@@ -10,6 +10,16 @@ namespace App\Entities\TraitRelations;
 trait HasManyShippingCostsTrait 
 {
 	/**
+	 * boot
+	 *
+	 * @return void
+	 **/
+	function HasManyShippingCostsTraitConstructor()
+	{
+		//
+	}
+	
+	/**
 	 * call has many relationship
 	 *
 	 **/

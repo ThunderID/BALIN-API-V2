@@ -10,6 +10,8 @@ interface ValidatingExpeditionInterface
 
 	public function validateshippingcost(array $shippingcost);
 
+	public function validateaddress(array $address);
+
 	public function validatedeletecourier(Courier $courier);
 	
 	public function validatedeleteshippingcost(Courier $courier);

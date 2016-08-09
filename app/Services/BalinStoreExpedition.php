@@ -80,7 +80,16 @@ class BalinStoreExpedition implements StoreExpeditionInterface
 		$this->pre->validatecourier($this->courier); 
 
 		//2. Validateshippingcost
-		$this->pre->validateshippingcost($this->courier['shippingcosts']); 
+		if(isset($this->courier['shippingcosts']))
+		{
+			$this->pre->validateshippingcost($this->courier['shippingcosts']); 
+		}
+
+		//3. Validate address
+		if(isset($this->courier['addresses']))
+		{
+			$this->pre->validateaddress($this->courier['addresses']); 
+		}
 
 		if($this->pre->errors->count())
 		{
@@ -93,13 +102,22 @@ class BalinStoreExpedition implements StoreExpeditionInterface
 
 		/** PROCESS */
 
-		//3. store Expedition
+		//4. store Expedition
 		$this->pro->storecourier($this->courier); 
 
-		//4. store shipping cost
-		$this->pro->storeshippingcost($this->pro->courier, $this->courier['shippingcosts']); 
+		//5. store shipping cost
+		if(isset($this->courier['shippingcosts']))
+		{
+			$this->pro->storeshippingcost($this->pro->courier, $this->courier['shippingcosts']); 
+		}
 
-		//5. store images
+		//6. store addresses
+		if(isset($this->courier['addresses']))
+		{
+			$this->pro->storeaddress($this->pro->courier, $this->courier['addresses']); 
+		}
+
+		//7. store images
 		$this->pro->storeimage($this->pro->courier, $this->courier['images']); 
 
 		if($this->pro->errors->count())
@@ -113,7 +131,7 @@ class BalinStoreExpedition implements StoreExpeditionInterface
 
 		\DB::commit();
 
-		//6. Return Expedition Model Object
+		//8. Return Expedition Model Object
 		$this->saved_data	= $this->pro->courier;
 
 		return true;

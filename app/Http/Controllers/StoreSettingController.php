@@ -119,6 +119,10 @@ class StoreSettingController extends Controller
 			{
 				$result         = \App\Entities\Slider::id($id)->with(['images'])->first();
 			}
+			elseif(str_is('*_banner', $result['type']))
+			{
+				$result         = \App\Entities\Banner::id($id)->with(['images'])->first();
+			}
 
 			return new JSend('success', (array)$result->toArray());
 		}

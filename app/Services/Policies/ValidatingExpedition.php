@@ -32,6 +32,11 @@ class ValidatingExpedition implements ValidatingExpeditionInterface
 		//
 	}
 
+	public function validateaddress(array $address)
+	{
+		//
+	}
+
 	public function validatedeletecourier(Courier $courier)
 	{
 		$used_courier 		= Shipment::courierid($courier['id'])->count();

@@ -6,6 +6,8 @@ use App\Entities\Customer;
 
 interface ValidatingRegisterUserInterface
 {
+	public function validateadmin(array $admin);
+
 	public function validatecustomer(array $customer);
 
 	public function validateactivationlink(array $customer);

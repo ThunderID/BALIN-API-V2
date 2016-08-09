@@ -15,8 +15,8 @@ use Illuminate\Http\Request;
 use GenTux\Jwt\JwtToken;
 use GenTux\Jwt\GetsJwtToken;
 
-use App\Services\BalinRegisterCustomer;
 use App\Services\BalinRegisterCustomerByInvitation;
+use App\Services\BalinRegisterCustomer;
 use App\Services\BalinAccountActivate;
 use App\Services\BalinResetPassword;
 use App\Services\BalinResettingPassword;

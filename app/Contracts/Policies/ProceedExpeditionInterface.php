@@ -8,6 +8,8 @@ interface ProceedExpeditionInterface
 {
 	public function storecourier(array $courier);
 
+	public function storeaddress(Courier $courier, array $addresses);
+	
 	public function storeshippingcost(Courier $courier, array $shippingcosts);
 
 	public function storeimage(Courier $courier, array $images);

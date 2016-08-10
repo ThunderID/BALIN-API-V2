@@ -25,7 +25,12 @@ class ValidatingVoucher implements ValidatingVoucherInterface
 
 	public function validatevoucher(array $voucher)
 	{
-		//
+		$exists_voucher		= Voucher::notid($voucher['id'])->code($voucher['code'])->first();
+
+		if($exists_voucher)
+		{
+			$this->errors->add('Voucher', 'Kode voucher sudah pernah terdaftar');
+		}
 	}
 
 	public function getquota(array $voucher)
@@ -50,14 +55,14 @@ class ValidatingVoucher implements ValidatingVoucherInterface
 
 		if($used_point)
 		{
-			$this->errors->add('Product', 'Tidak dapat menghapus voucher yang telah digunakan');
+			$this->errors->add('Voucher', 'Tidak dapat menghapus voucher yang telah digunakan');
 		}
 
 		$used_voucher 		= Sale::voucherid($voucher['id'])->count();
 		
 		if($used_voucher)
 		{
-			$this->errors->add('Product', 'Tidak dapat menghapus voucher yang telah digunakan');
+			$this->errors->add('Voucher', 'Tidak dapat menghapus voucher yang telah digunakan');
 		}
 	}
 }

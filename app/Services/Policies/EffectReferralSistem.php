@@ -43,7 +43,7 @@ class EffectReferralSistem implements EffectReferralSistemInterface
 
 	public function sendmailpointreminder(array $point, array $product)
 	{
-		$this->storeinfo['action'] 	= 'https://balin.id/products';
+		$this->storeinfo['action'] 	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/products';
 		$data						= ['point' => $point, 'balin' => $this->storeinfo, 'product' => $product];
 
 		//send mail
@@ -58,7 +58,7 @@ class EffectReferralSistem implements EffectReferralSistemInterface
 	
 	public function sendinvitationmail(Customer $customer, $email)
 	{
-		$this->storeinfo['action'] 	= 'https://balin.id/invite/by/'.$customer['code_referral'];
+		$this->storeinfo['action'] 	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/invite/by/'.$customer['code_referral'];
 		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
 
 		//send mail

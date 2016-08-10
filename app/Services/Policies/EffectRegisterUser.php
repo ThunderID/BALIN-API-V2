@@ -45,7 +45,7 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 	{
 		$template 					= 'balin';
 
-		$this->storeinfo['action']	= 'https://balin.id/activation/link/'.$customer['activation_link'];
+		$this->storeinfo['action']	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/activation/link/'.$customer['activation_link'];
 
 		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
 
@@ -61,7 +61,7 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 	
 	public function sendresetpasswordmail(Customer $customer)
 	{
-		$this->storeinfo['action']	= 'https://balin.id/reset/password/'.$customer['reset_password_link'];
+		$this->storeinfo['action']	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/reset/password/'.$customer['reset_password_link'];
 
 		$data						= ['user' => $customer, 'balin' => $this->storeinfo];
 

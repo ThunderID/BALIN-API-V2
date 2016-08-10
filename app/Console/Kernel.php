@@ -29,15 +29,15 @@ class Kernel extends ConsoleKernel
 	protected function schedule(Schedule $schedule)
 	{
 		//running queue (every five minutes)
-		$schedule->command('run:queue QueueCommand')
+		$schedule->command('run:queue')
 				 ->everyFiveMinutes();
 
 		//running queue (every five minutes)
-		$schedule->command('point:expirequeue PointExpireQueueCommand')
+		$schedule->command('point:expirequeue')
 				 ->dailyAt('06:00');
 
 		//running queue (every five minutes)
-		$schedule->command('veritrans:notification HandlingPaymentVeritransCommand')
+		$schedule->command('veritrans:notification')
 				 ->everyFiveMinutes();
 	}
 }

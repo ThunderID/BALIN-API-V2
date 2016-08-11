@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 use App\Services\BalinCheckout;
 use App\Services\BankTransferHandlingPayment;
@@ -16,7 +17,7 @@ use App\Services\BalinShippingOrder;
 use App\Services\BalinDeliveredOrder;
 use App\Services\BalinCancelOrder;
 use App\Services\BalinAddToCart;
-use Request, Carbon\Carbon;
+use Carbon\Carbon;
 
 class MyOrderController extends Controller
 {
@@ -112,7 +113,7 @@ class MyOrderController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 		
-		return response()->json( JSend::error(['Tidak ada cart.']));
+		return response()->json( JSend::error(['Tidak ada cart.'])->asArray());
 	}
 
 

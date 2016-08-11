@@ -285,7 +285,7 @@ class MyController extends Controller
 			return response()->json( JSend::error($this->invitation->getError()->toArray())->asArray());
 		}
 
-		return response()->json( JSend::success(['Undangan terkirim']))
+		return response()->json( JSend::success(['Undangan terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 }

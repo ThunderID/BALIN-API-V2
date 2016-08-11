@@ -13,4 +13,6 @@ interface EffectTransactionInterface
 	public function sendmailcancelorder(Sale $sale);
 
 	public function sendmaildeliveredorder(Sale $sale);
+
+	public function sendmailabandonedcart(Sale $sale);
 }

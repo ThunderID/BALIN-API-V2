@@ -151,7 +151,7 @@ class WarehouseController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{

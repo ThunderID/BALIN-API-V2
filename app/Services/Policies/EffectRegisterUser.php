@@ -74,4 +74,18 @@ class EffectRegisterUser implements EffectRegisterUserInterface
 			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
 		});
 	}
+
+	public function contactusmail(array $customer)
+	{
+		$data						= ['customer' => $customer, 'balin' => $this->storeinfo];
+
+		//send mail
+		Mail::send('mail.balin.crm.contact', ['data' => $data], function (Message $message) use ($customer, $data) 
+		{
+			$message->to($this->storeinfo['email'], 'BALIN - CS')
+			->subject(strtoupper('BALIN').' - RESET PASSWORD')
+			->from('cs@balin.id', 'CUSTOMER FEEDBACK')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
+	}
 }

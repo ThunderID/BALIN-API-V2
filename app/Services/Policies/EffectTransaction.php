@@ -96,4 +96,18 @@ class EffectTransaction implements EffectTransactionInterface
 			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
 		});
 	}
+
+	public function sendmailabandonedcart(Sale $sale)
+	{
+		$data				= ['cart' => $sale, 'balin' => $this->storeinfo];
+		
+		//send mail
+		Mail::send('mail.balin.crm.abandoned', ['data' => $data], function (Message $message) use ($sale, $data) 
+		{
+			$message->to($sale['user']['email'], $sale['user']['name'])
+			->subject(strtoupper('BALIN').' - FRIENDLY REMINDER')
+			->from('cs@balin.id', 'BALIN INDONESIA')
+			->embedData(['data' => $data], 'sendgrid/x-smtpapi');
+		});
+	}
 }

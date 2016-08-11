@@ -46,7 +46,7 @@ class OrderController extends Controller
 
 		$this->post->sendmailinvoice(Sale::id($invoice['id'])->status(['wait', 'veritrans_processing_payment'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -62,7 +62,7 @@ class OrderController extends Controller
 
 		$this->post->sendmailpaymentacceptance(Sale::id($paid['id'])->status(['paid'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -78,7 +78,7 @@ class OrderController extends Controller
 
 		$this->post_ship->sendmailshippingpackage(Sale::id($shipped['id'])->status(['shipping'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -94,7 +94,7 @@ class OrderController extends Controller
 		
 		$this->post->sendmaildeliveredorder(Sale::id($delivered['id'])->status(['delivered'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -110,7 +110,7 @@ class OrderController extends Controller
 		
 		$this->post->sendmailcancelorder(Sale::id($canceled['id'])->status(['canceled'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 }

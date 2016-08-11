@@ -84,12 +84,15 @@ class BalinChangePassword implements ForgotPasswordInterface
 			return false;
 		}
 
+		$customer 				= $this->pre->customer->toArray();
+		$customer['password']	= $this->customer['password'];
+		
 		\DB::BeginTransaction();
 
 		/** PROCESS */
 
 		//2. Store customer customer
-		$this->pro->storecustomer($this->pre->customer->toArray()); 
+		$this->pro->storecustomer($customer); 
 		
 		if($this->pro->errors->count())
 		{

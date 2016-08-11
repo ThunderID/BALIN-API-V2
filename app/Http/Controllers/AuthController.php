@@ -213,15 +213,16 @@ class AuthController extends Controller
 	 */
 	public function change()
 	{
-		if(!Input::has('email'))
+		if(!Input::has('email') || !Input::has('password'))
 		{
-			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
+			return response()->json( JSend::error(['Tidak ada data email dan password.'])->asArray());
 		}
 
 		$email					= Input::get('email');
+		$password				= Input::get('password');
 
 		//1. Check Link
-		$customer				= ['email' => $email];
+		$customer				= ['email' => $email, 'password' => $password];
 
 		$customer_store 		= $this->changepwd;
 		
@@ -269,7 +270,7 @@ class AuthController extends Controller
     }
 
 
-	public function getme()
+	public function getMe()
     {
         $payload                    = $this->jwtPayload();
 		

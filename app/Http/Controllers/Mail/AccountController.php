@@ -46,7 +46,7 @@ class AccountController extends Controller
 		
 		$this->post->sendresetpasswordmail(Customer::id($user['id'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -62,7 +62,7 @@ class AccountController extends Controller
 		
 		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 }

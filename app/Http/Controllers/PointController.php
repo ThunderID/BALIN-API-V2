@@ -111,7 +111,7 @@ class PointController extends Controller
 	{
 		if(!Input::has('point'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data point.');
+			return response()->json( JSend::error(['Tidak ada data point.'])->asArray());
 		}
 
 		$errors                     = new MessageBag();

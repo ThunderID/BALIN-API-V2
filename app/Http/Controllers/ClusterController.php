@@ -220,6 +220,6 @@ class ClusterController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::error($cluster->getError()));
+		return response()->json( JSend::error($cluster->getError())->asArray());
 	}
 }

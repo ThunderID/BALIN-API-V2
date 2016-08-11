@@ -10,8 +10,10 @@ use Illuminate\Http\Request;
 
 use App\Libraries\JSend;
 
+use App\Entities\Sale;
 use App\Entities\Customer;
 use App\Contracts\Policies\EffectRegisterUserInterface;
+use App\Contracts\Policies\EffectTransactionInterface;
 
 use \Exception;
 
@@ -29,10 +31,11 @@ class CRMController extends Controller
 	 * construct function, iniate error
 	 *
 	 */
-	function __construct(Request $request, EffectRegisterUserInterface $post)
+	function __construct(Request $request, EffectRegisterUserInterface $post, EffectTransactionInterface $post_sale)
 	{
-		$this->request 	= $request;
-		$this->post 	= $post;
+		$this->request 		= $request;
+		$this->post 		= $post;
+		$this->post_sale 	= $post_sale;
 	}
 
 	/**
@@ -47,7 +50,7 @@ class CRMController extends Controller
 
 		$this->post->sendactivationmail(Customer::id($user['id'])->first());
 
-		return response()->json( JSend::success(['Email terkirim']))
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 
@@ -60,29 +63,11 @@ class CRMController extends Controller
 	public function abandoned()
 	{
 		$cart 					= Input::get('cart');
-		$store 					= Input::get('store');
 
-		// checking cart data
-		if(empty($cart))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post_sale->sendmailabandonedcart(Sale::id($cart['id'])->status(['cart'])->first());
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['cart' => $cart, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.crm.abandoned', ['data' => $data], function($message) use($cart)
-		{
-			$message->to($cart['user']['email'], $cart['user']['name'])->subject(strtoupper($this->template).' - FRIENDLY REMINDER');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 
@@ -95,28 +80,10 @@ class CRMController extends Controller
 	public function contact()
 	{
 		$customer 				= Input::get('customer');
-		$store 					= Input::get('store');
 
-		// checking customer data
-		if(empty($customer))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
+		$this->post->contactusmail($customer);
 
-		// checking store data
-		if(empty($store))
-		{
-			throw new Exception('Sent variable must be array of a record.');
-		}
-
-		$data						= ['customer' => $customer, 'balin' => $store];
-
-		//send mail
-		Mail::send('mail.'.$this->template.'.crm.contact', ['data' => $data], function($message) use($customer)
-		{
-			$message->to($store['email'], strtoupper($this->template).' CS ')->subject(strtoupper($this->template).' - CUSTOMER FEEDBACK');
-		}); 
-		
-		return new JSend('success', (array)Input::all());
+		return response()->json( JSend::success(['Email terkirim'])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

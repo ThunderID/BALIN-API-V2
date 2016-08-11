@@ -33,7 +33,7 @@ class PaymentController extends Controller
 	{
 		if(!Input::has('order_id'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data order id.');
+			return response()->json( JSend::error(['Tidak ada data order id.'])->asArray());
 		}
 
 		$errors                     = new MessageBag();

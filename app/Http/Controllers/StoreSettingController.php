@@ -141,7 +141,7 @@ class StoreSettingController extends Controller
 	{
 		if(!Input::has('setting'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data setting.');
+			return response()->json( JSend::error(['Tidak ada data setting.'])->asArray());
 		}
 
 		$errors                     = new MessageBag();

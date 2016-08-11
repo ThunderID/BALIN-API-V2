@@ -195,5 +195,20 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 			$this->errors->add('Redeem', $invitationlog->getError());
 		}
 	}
+
+	public function storepoint(array $point)
+	{
+		$stored_point					= PointLog::findornew($point['id']);
+		
+		$stored_point->fill($point);
+
+		if(!$stored_point->save())
+		{
+			$this->errors->add('Redeem', $stored_point->getError());
+		}
+
+		$this->point					= $stored_point;
+	}
+
 }
 

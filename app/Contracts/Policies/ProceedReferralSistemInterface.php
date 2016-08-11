@@ -20,4 +20,6 @@ interface ProceedReferralSistemInterface
 	public function storequotavoucher(Voucher $voucher, Customer $customer);
 
 	public function storeinvitationlog(UserInvitationLog $invitationlog);
+
+	public function storepoint(array $point);
 }

@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
+use App\Services\BalinManualStorePoint;
+
 /**
  * Handle Protected display and store of point
  * 
@@ -16,9 +18,10 @@ use Illuminate\Http\Request;
  */
 class PointController extends Controller
 {
-	public function __construct(Request $request)
+	public function __construct(Request $request, BalinManualStorePoint $point)
 	{
 		$this->request 				= $request;
+		$this->point 				= $point;
 	}
 	
 	/**
@@ -114,66 +117,19 @@ class PointController extends Controller
 			return response()->json( JSend::error(['Tidak ada data point.'])->asArray());
 		}
 
-		$errors                     = new MessageBag();
-
-		DB::beginTransaction();
-
 		//1. Validate Point Parameter
-		$point                       = Input::get('point');
+		$point				= Input::get('point');
 
-		if(is_null($point['id']))
+		$point_store		= $this->point;
+			
+		$point_store->fill($point);
+
+		if(!$point_store->save())
 		{
-			$is_new                 = true;
+			return response()->json( JSend::error($point_store->getError()->toArray())->asArray());
 		}
-		else
-		{
-			$is_new                 = false;
-		}
-
-
-		//1. Get original data
-		$point_data                 = \App\Entities\PointLog::findornew($point['id']);
-
-		if(!$errors->count())
-		{
-			$point_rules   =   [
-												'user_id'                   => 'required|exists:users,id',
-												'amount'                    => 'required|numeric',
-												'expired_at'                => 'required|date_format:"Y-m-d H:i:s"',
-												'notes'                     => 'required',
-											];
-
-			$validator      = Validator::make($point, $point_rules);
-
-			if (!$validator->passes())
-			{
-				$errors->add('Point', $validator->errors());
-			}
-			else
-			{
-				$point_data                    = new \App\Entities\PointLog;
-
-				$point_data                    = $point_data->fill($point);
-
-				if(!$point_data->save())
-				{
-					$errors->add('Point', $point_data->getError());
-				}
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return response()->json( JSend::error($errors)->asArray());
-		}
-
-		DB::commit();
 		
-		$final_point                 = \App\Entities\PointLog::id($point_data['id'])->with(['user'])->first();
-		
-		return response()->json( JSend::success($final_point->toArray())->asArray())
+		return response()->json( JSend::success($point_store->getData()->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 }

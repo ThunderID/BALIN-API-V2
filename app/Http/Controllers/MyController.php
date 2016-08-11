@@ -19,16 +19,17 @@ use App\Entities\Customer;
 use App\Services\BalinEntryReferral;
 use App\Services\BalinEntryPromoReferral;
 use App\Services\BalinInviteFriend;
-
+use App\Services\BalinStoreCustomer;
 
 class MyController extends Controller
 {
-	public function __construct(Request $request, BalinEntryReferral $referral, BalinEntryPromoReferral $promo_referral, BalinInviteFriend $invitation)
+	public function __construct(Request $request, BalinEntryReferral $referral, BalinEntryPromoReferral $promo_referral, BalinInviteFriend $invitation, BalinStoreCustomer $customer)
 	{
 		$this->request 					= $request;
 		$this->referral 				= $referral;
 		$this->promo_referral 			= $promo_referral;
 		$this->invitation 				= $invitation;
+		$this->customer 				= $customer;
 	}
 
 	/**
@@ -149,66 +150,19 @@ class MyController extends Controller
 			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
 		}
 
-		$customer                   = Input::get('customer');
+		//1. Validate Admin Parameter
+		$customer			= Input::get('customer');
 
-		$errors                     = new MessageBag();
+		$customer_store		= $this->customer;
+			
+		$customer_store->fill($customer);
 
-		DB::beginTransaction();
-
-		//1. Validate User Parameter
-		if(is_null($customer['id']))
+		if(!$customer_store->save())
 		{
-			$is_new                 = true;
+			return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
 		}
-		else
-		{
-			$is_new                 = false;
-		}
-
-		$customer_rules             =   [
-											'name'                          => 'required|max:255',
-											'email'                         => 'max:255|unique:users,email,'.(!is_null($customer['id']) ? $customer['id'] : ''),
-											'password'                      => 'max:255',
-											'sso_id'                        => '',
-											'sso_media'                     => 'in:facebook',
-											'sso_data'                      => '',
-											'gender'                        => 'in:male,female',
-											'date_of_birth'                 => 'date_format:"Y-m-d H:i:s"',
-										];
-
-		//1a. Get original data
-		$customer_data              = Customer::findornew($customer['id']);
-
-		//1b. Validate Basic Customer Parameter
-		$validator                  = Validator::make($customer, $customer_rules);
-
-		if (!$validator->passes())
-		{
-			$errors->add('Customer', $validator->errors());
-		}
-		else
-		{
-			//if validator passed, save customer
-			$customer_data           = $customer_data->fill($customer);
-
-			if(!$customer_data->save())
-			{
-				$errors->add('Customer', $customer_data->getError());
-			}
-		}
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return response()->json( JSend::error($errors)->asArray());
-		}
-
-		DB::commit();
 		
-		$final_customer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
-
-		return response()->json( JSend::success($final_customer->toArray())->asArray())
+		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 

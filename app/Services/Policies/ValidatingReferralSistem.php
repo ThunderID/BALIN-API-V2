@@ -104,5 +104,9 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 
 		$this->invitationlog 	= $invitation;
 	}
+
+	public function validatepoint(array $point)
+	{
+	}
 }
 

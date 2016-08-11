@@ -14,4 +14,6 @@ interface ValidatingReferralSistemInterface
 	public function validatepromoreferral(array $customer);
 
 	public function validateinvitation(Referral $referral, array $customer);
+
+	public function validatepoint(array $point);
 }

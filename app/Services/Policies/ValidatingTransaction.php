@@ -92,7 +92,6 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		}
 	}
 
-
 	public function validatesaleitem(array $transaction_details)
 	{
 		foreach ($transaction_details as $key => $value) 
@@ -107,6 +106,19 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		if(empty($transaction_details))
 		{
 			$this->errors->add('Sale', 'Tidak ada item di keranjang belanja');
+		}
+	}
+
+	public function validaterollbackitem(array $transaction_details)
+	{
+		foreach ($transaction_details as $key => $value) 
+		{
+			$varian 				= Varian::find($value['varian_id']);
+
+			if($value['quantity'] > $varian->current_stock)
+			{
+				$this->errors->add('Purchase', 'Stok digudang Produk '.$varian->product->name.' ukuran '.$varian->size.' tidak sesuai dengan pembatalan transaksi');
+			}
 		}
 	}
 	

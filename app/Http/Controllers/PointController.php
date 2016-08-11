@@ -96,7 +96,7 @@ class PointController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['user'])->get()->toArray();
+		$result                     = $result->with(['user'])->get();
 
 		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
 					->setCallback($this->request->input('callback'));

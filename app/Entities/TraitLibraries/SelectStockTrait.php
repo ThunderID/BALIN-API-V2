@@ -40,7 +40,7 @@ trait SelectStockTrait
 	public function scopeSelectCurrentStock($query, $variable)
 	{
 		return $query->selectraw('IFNULL(SUM(
-									if(transactions.type ="sell", if(transaction_logs.status ="wait" OR transaction_logs.status ="veritrans_processing_payment" OR transaction_logs.status ="paid" OR transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), quantity)
+									if(transactions.type ="sell", if(transaction_logs.status ="wait" OR transaction_logs.status ="veritrans_processing_payment" OR transaction_logs.status ="paid" OR transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), if(transaction_logs.status ="delivered", quantity, 0))
 									),0) as current_stock')
 		;
 	}
@@ -79,7 +79,7 @@ trait SelectStockTrait
 	public function scopeSelectInventoryStock($query, $variable)
 	{
 		return $query->selectraw('IFNULL(SUM(
-									if(transactions.type ="sell", if(transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), quantity)
+									if(transactions.type ="sell", if(transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), if(transaction_logs.status ="delivered", quantity, 0))
 									),0) as inventory_stock')
 		;
 	}
@@ -140,7 +140,7 @@ trait SelectStockTrait
 		}
 
 		return $query->havingraw('IFNULL(SUM(
-									if(transactions.type ="sell", if(transaction_logs.status ="wait" OR transaction_logs.status ="veritrans_processing_payment" OR transaction_logs.status ="paid" OR transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), quantity)
+									if(transactions.type ="sell", if(transaction_logs.status ="wait" OR transaction_logs.status ="veritrans_processing_payment" OR transaction_logs.status ="paid" OR transaction_logs.status ="shipping" OR transaction_logs.status="packed" OR transaction_logs.status ="delivered", 0-quantity, 0), if(transaction_logs.status ="delivered", quantity, 0))
 									),0) '.$param.' '.$variable)
 		;
 	}

@@ -141,14 +141,24 @@ class PurchaseController extends Controller
 
 		$purchase                    = Input::get('purchase');
 
-		$this->restock_product->fill($purchase);
-
-		if(!$this->restock_product->save())
+		switch ($purchase['status']) 
 		{
-			return response()->json( JSend::error($this->restock_product->getError()->toArray())->asArray());
+			case 'canceled':
+				$purchase_store		= $this->rollback_product;
+				break;
+			default:
+				$purchase_store		= $this->restock_product;
+				break;
 		}
 
-		return response()->json( JSend::success($this->restock_product->getData()->toArray())->asArray())
+		$purchase_store->fill($purchase);
+
+		if(!$purchase_store->save())
+		{
+			return response()->json( JSend::error($purchase_store->getError()->toArray())->asArray());
+		}
+
+		return response()->json( JSend::success($purchase_store->getData()->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
 	}
 

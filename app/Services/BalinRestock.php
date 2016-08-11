@@ -84,10 +84,13 @@ class BalinRestock implements RestockInterface
 		$this->purchase['type']			= 'buy'; 
 		$this->purchase['ref_number']	= $this->pre->getpurchasenumber($purchase); 
 
-		//2. Validate Buyer
+		//2. Validate quantity
+		$this->pre->validaterollbackitem($purchase['transactiondetails']->toArray()); 
+
+		//3. Validate Buyer
 		$this->pre->validatesupplier($supplier); 
 
-		//3. Validate Stock, Price, Calculate Price main product
+		//4. Validate Stock, Price, Calculate Price main product
 		$this->pre->validatepurchaseitem($this->purchase['transactiondetails']); 
 
 		if($this->pre->errors->count())
@@ -97,7 +100,7 @@ class BalinRestock implements RestockInterface
 			return false;
 		}
 
-		//4. set transact_at
+		//5. set transact_at
 		if(!isset($this->purchase['transact_at']))
 		{
 			$this->purchase['transact_at']	= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
@@ -107,13 +110,13 @@ class BalinRestock implements RestockInterface
 
 		/** PROCESS */
 
-		//5. Store Data Transaksi
+		//6. Store Data Transaksi
 		$this->pro->storepurchase($this->purchase); 
 		
-		//6. Store purchase item
+		//7. Store purchase item
 		$this->pro->storepurchaseitem($this->pro->sale, $this->purchase['transactiondetails']); 
 
-		//7. Store Log Transaksi
+		//8. Store Log Transaksi
 		$this->pro->updatestatus($this->pro->sale, 'delivered');
 
 		if($this->pro->errors->count())
@@ -127,7 +130,7 @@ class BalinRestock implements RestockInterface
 
 		\DB::Commit();
 
-		//8. Return purchase Model Object
+		//9. Return purchase Model Object
 		$this->saved_data	= $this->pro->sale;
 
 		return true;

@@ -240,7 +240,7 @@ class ProceedTransaction implements ProceedTransactionInterface
 					$this->errors->add('Sale', $point->getError());
 				}
 
-				$paidamount					= $paidamount - $camount;
+				$paidamount					= $paidamount - abs($camount);
 			}
 
 			$idx++;

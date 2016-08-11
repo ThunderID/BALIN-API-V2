@@ -77,12 +77,24 @@ class BalinRollbackStock implements RollbackStockInterface
 	public function save()
 	{
 		$purchase 						= Purchase::findornew($this->purchase['id']);
+		
+		/** PREPROCESS */
+
+		//1. Validate rollback
+		$this->pre->validaterollbackitem($purchase['transactiondetails']->toArray()); 
+
+		if($this->pre->errors->count())
+		{
+			$this->errors 					= $this->pre->errors;
+
+			return false;
+		}
 
 		\DB::BeginTransaction();
 
 		/** PROCESS */
 
-		//1. Store Log Transaksi
+		//2. Store Log Transaksi
 		$this->pro->updatestatus($purchase, 'canceled');
 
 		if($this->pro->errors->count())
@@ -96,7 +108,7 @@ class BalinRollbackStock implements RollbackStockInterface
 
 		\DB::Commit();
 
-		//2. Return purchase Model Object
+		//3. Return purchase Model Object
 		$this->saved_data	= $this->pro->sale;
 
 		return true;

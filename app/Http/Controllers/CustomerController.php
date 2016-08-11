@@ -93,7 +93,7 @@ class CustomerController extends Controller
 			$result					= $result->take($take);
 		}
 
-		$result						= $result->with(['myreferrals', 'myreferrals.user'])->get()->toArray();
+		$result						= $result->with(['myreferrals', 'myreferrals.user'])->get();
 
 		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
 					->setCallback($this->request->input('callback'));

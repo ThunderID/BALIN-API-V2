@@ -25,6 +25,7 @@ interface ValidatingTransactionInterface
 	public function validatestock(Varian $varian, $quantity);
 	public function validateprice(Varian $varian, $price, $discount);
 	public function calculatesubtotal($price, $discount, $quantity);
+	public function validaterollbackitem(array $transaction_details);
 
 	public function validatepackingornament(array $transaction_extensions);
 	public function validatestockornament(ProductExtension $ornament);

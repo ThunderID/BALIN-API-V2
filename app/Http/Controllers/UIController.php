@@ -3,12 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+
 use App\Events\ProductSearched;
 
 use \GenTux\Jwt\GetsJwtToken;
@@ -21,6 +24,11 @@ use \GenTux\Jwt\GetsJwtToken;
 class UIController extends Controller
 {
 	use GetsJwtToken;
+	
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
 	
 	/**
 	 * Display all sellable products
@@ -102,7 +110,7 @@ class UIController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -233,7 +241,7 @@ class UIController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -336,7 +344,7 @@ class UIController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{

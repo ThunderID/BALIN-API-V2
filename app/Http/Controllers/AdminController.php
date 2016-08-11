@@ -64,7 +64,7 @@ class AdminController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -114,7 +114,7 @@ class AdminController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -126,7 +126,7 @@ class AdminController extends Controller
 	{
 		if(!Input::has('admin'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data admin.');
+			return response()->json( JSend::error(['Tidak ada data admin.'])->asArray());
 		}
 
 		//1. Validate Admin Parameter

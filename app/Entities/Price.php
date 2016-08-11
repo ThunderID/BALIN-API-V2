@@ -2,10 +2,18 @@
 
 namespace App\Entities;
 
-use App\CrossServices\ClosedDoorModelObserver;
+// use App\CrossServices\ClosedDoorModelObserver;
+
+use App\Entities\TraitRelations\BelongsToProductTrait;
 
 class Price extends BaseModel
 {
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use BelongsToProductTrait;
+
 	/**
 	 * The database table used by the model.
 	 *
@@ -92,8 +100,26 @@ class Price extends BaseModel
 	{
         parent::boot();
  
-        Price::observe(new ClosedDoorModelObserver());
+        // Price::observe(new ClosedDoorModelObserver());
     }
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	public function scopeOnDate($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			$started_at 	= date('Y-m-d H:i:s', strtotime($variable[0]));
+			$ended_at 		= date('Y-m-d H:i:s', strtotime($variable[1]));
+
+			return $query->where('started_at', '>=', $started_at)
+						->where('started_at', '<=', $ended_at);
+		}
+		else
+		{
+			$ondate 	= date('Y-m-d H:i:s', strtotime($variable));
+
+			return $query->where('started_at', '<=', $ondate);
+		}
+	}
 }

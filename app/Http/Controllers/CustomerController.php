@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 /**
  * Handle Protected Resource of customer
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\DB;
  */
 class CustomerController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+
 	/**
 	 * Display all customers
 	 *
@@ -50,7 +56,7 @@ class CustomerController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -73,23 +79,24 @@ class CustomerController extends Controller
 			}
 		}
 
-		$count                      = count($result->get(['id']));
+		$count						= count($result->get(['id']));
 
 		if(Input::has('skip'))
 		{
-			$skip                   = Input::get('skip');
-			$result                 = $result->skip($skip);
+			$skip					= Input::get('skip');
+			$result					= $result->skip($skip);
 		}
 
 		if(Input::has('take'))
 		{
-			$take                   = Input::get('take');
-			$result                 = $result->take($take);
+			$take					= Input::get('take');
+			$result					= $result->take($take);
 		}
 
-		$result                     = $result->with(['myreferrals', 'myreferrals.user'])->get()->toArray();
+		$result						= $result->with(['myreferrals', 'myreferrals.user'])->get()->toArray();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -103,9 +110,10 @@ class CustomerController extends Controller
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 		
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 }

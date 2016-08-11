@@ -84,7 +84,8 @@ class AuthController extends Controller
 		$issue['token']['token']	= $token;
 		$issue['me']				= $user->toArray();
 		
-		return new \App\Libraries\JSend('success', (array)$issue);
+		return response()->json( JSend::success($issue)->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -96,7 +97,7 @@ class AuthController extends Controller
 	{
 		if(!Input::has('customer'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
+			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
 		}
 
 		$customer                   = Input::get('customer');
@@ -120,7 +121,6 @@ class AuthController extends Controller
 
 		return response()->json( JSend::success($customer_store->getData()->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
-	
 	}
 
 	/**
@@ -132,7 +132,7 @@ class AuthController extends Controller
 	{
 		if(!Input::has('link'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
+			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
 		}
 
 		$link					= Input::get('link');
@@ -162,7 +162,7 @@ class AuthController extends Controller
 	{
 		if(!Input::has('email'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
+			return response()->json( JSend::error(['Tidak ada data email.'])->asArray());
 		}
 
 		$email					= Input::get('email');
@@ -215,7 +215,7 @@ class AuthController extends Controller
 	{
 		if(!Input::has('email'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
+			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
 		}
 
 		$email					= Input::get('email');
@@ -251,7 +251,7 @@ class AuthController extends Controller
 				}
 				else
 				{
-					return new JSend('error', (array)Input::all(), ['User tidak ada']);
+					return response()->json( JSend::error(['User tidak ada'])->asArray());
 				}
 			}
 		}
@@ -264,7 +264,8 @@ class AuthController extends Controller
 		$issue['token']['token']		= $token;
 		$issue['me']					= $user->toArray();
 		
-		return new \App\Libraries\JSend('success', (array)$issue);
+		return response()->json( JSend::success($issue)->asArray())
+					->setCallback($this->request->input('callback'));
     }
 
 
@@ -281,6 +282,7 @@ class AuthController extends Controller
 			$user						= \App\Entities\Admin::id($payload['context']['id'])->first()->toArray();
 		}
 
-		return new \App\Libraries\JSend('success', (array)$user);
+		return response()->json( JSend::success($user)->asArray())
+					->setCallback($this->request->input('callback'));
     }
 }

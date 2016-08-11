@@ -3,11 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
+
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Request;
+
+use \GenTux\Jwt\GetsJwtToken;
+
+use App\Entities\Admin;
 
 /**
  * Tool to help broadcasting process
@@ -16,6 +22,13 @@ use Illuminate\Support\Facades\Log;
  */
 class BroadcastController extends Controller
 {
+	use GetsJwtToken;
+	
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+
 	/**
 	 * Display all queues
 	 *
@@ -24,8 +37,9 @@ class BroadcastController extends Controller
 	 */
 	public function queue()
 	{
-		$user						= \LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
-		$user						= json_decode($user, true)['data'];
+        $payload                    = $this->jwtPayload();
+
+		$user						= Admin::find($payload['context']['id']);
 
 		if($user)
 		{
@@ -69,7 +83,7 @@ class BroadcastController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -83,23 +97,24 @@ class BroadcastController extends Controller
 			}
 		}
 
-		$count                      = count($result->get());
+		$count						= count($result->get());
 
 		if(Input::has('skip'))
 		{
-			$skip                   = Input::get('skip');
-			$result                 = $result->skip($skip);
+			$skip					= Input::get('skip');
+			$result					= $result->skip($skip);
 		}
 
 		if(Input::has('take'))
 		{
-			$take                   = Input::get('take');
-			$result                 = $result->take($take);
+			$take					= Input::get('take');
+			$result					= $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result						= $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -113,15 +128,16 @@ class BroadcastController extends Controller
 	{
 		if(!Input::has('price'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data price.');
+			return response()->json( JSend::error(['Tidak ada data price.'])->asArray());
 		}
 		
-		$user                       = \LucaDegasperi\OAuth2Server\Facades\Authorizer::getResourceOwnerId();
-		$user                       = json_decode($user, true)['data'];
+		$payload				= $this->jwtPayload();
+
+		$user					= Admin::find($payload['context']['id']);
 
 		if($user)
 		{
-			$userid             = $user['id'];
+			$userid				= $user['id'];
 		}
 		else
 		{
@@ -193,13 +209,14 @@ class BroadcastController extends Controller
 		{
 			DB::rollback();
 
-			return new JSend('error', (array)Input::all(), $errors);
+			return response()->json( JSend::error($errors->toArray())->asArray());
 		}
 
 		DB::commit();
 		
-		$final_queue				= \App\Entities\Queue::id($queue['id'])->first()->toArray();
+		$final_queue				= \App\Entities\Queue::id($queue['id'])->first();
 
-		return new JSend('success', (array)$final_queue);
+		return response()->json( JSend::success($final_queue->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

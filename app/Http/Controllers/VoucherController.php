@@ -18,7 +18,6 @@ use App\Services\BalinDeleteVoucher;
  */
 class VoucherController extends Controller
 {
-
 	public function __construct(Request $request, BalinStoreVoucher $store_voucher, BalinDeleteVoucher $delete_voucher)
 	{
 		$this->request 				= $request;
@@ -65,7 +64,7 @@ class VoucherController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.']));
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -123,7 +122,8 @@ class VoucherController extends Controller
 			return response()->json( JSend::success($result->toArray())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -138,7 +138,7 @@ class VoucherController extends Controller
 	{
 		if(!Input::has('voucher'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data voucher.');
+			return response()->json( JSend::error(['Tidak ada data voucher.'])->asArray());
 		}
 
 		//1. Validate Voucher Parameter
@@ -168,12 +168,12 @@ class VoucherController extends Controller
 
 		if(!$voucher)
 		{
-			return response()->json( JSend::error(['Voucher tidak ditemukan.']));
+			return response()->json( JSend::error(['Voucher tidak ditemukan.'])->asArray());
 		}
 
 		if($this->delete_voucher->delete($voucher))
 		{
-			return response()->json( JSend::success(['data' => $this->delete_voucher->getData()])->asArray())
+			return response()->json( JSend::success($this->delete_voucher->getData())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 

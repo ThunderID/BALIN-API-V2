@@ -62,7 +62,7 @@ class CourierController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -90,9 +90,10 @@ class CourierController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['shippingcosts', 'addresses'])->get()->toArray();
+		$result                     = $result->with(['shippingcosts', 'addresses'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -106,10 +107,11 @@ class CourierController extends Controller
 	   
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
-
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 
 	}
 
@@ -127,7 +129,7 @@ class CourierController extends Controller
 	{
 		if(!Input::has('courier'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data courier.');
+			return response()->json( JSend::error(['Tidak ada data courier.'])->asArray());
 		}
 
 		//1. Validate Courier Parameter
@@ -152,17 +154,16 @@ class CourierController extends Controller
 	public function delete($id = null)
 	{
 		//
-		$courier                    = \App\Entities\Courier::id($id)->with(['shippingcosts'])->first();
-
+		$courier					= \App\Entities\Courier::id($id)->with(['shippingcosts'])->first();
 
 		if(!$courier)
 		{
-			return response()->json( JSend::error(['Kurir tidak ditemukan.']));
+			return response()->json( JSend::error(['Kurir tidak ditemukan.'])->asArray());
 		}
 
 		if($this->delete_courier->delete($courier))
 		{
-			return response()->json( JSend::success(['data' => $this->delete_courier->getData()])->asArray())
+			return response()->json( JSend::success($this->delete_courier->getData())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 

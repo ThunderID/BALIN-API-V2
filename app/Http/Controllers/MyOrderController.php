@@ -56,9 +56,10 @@ class MyOrderController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -75,7 +76,7 @@ class MyOrderController extends Controller
 			return response()->json( JSend::success($result->toArray())->asArray());
 		}
 
-		return response()->json( JSend::error(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -89,10 +90,11 @@ class MyOrderController extends Controller
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -106,10 +108,11 @@ class MyOrderController extends Controller
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 		
-		return new JSend('error', (array)Input::all(), 'Tidak ada cart.');
+		return response()->json( JSend::error(['Tidak ada cart.']));
 	}
 
 
@@ -122,7 +125,7 @@ class MyOrderController extends Controller
 	{
 		if(!Input::has('order'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data order.');
+			return response()->json( JSend::error(['Tidak ada data order.'])->asArray());
 		}
 
 		$errors                     = new MessageBag();

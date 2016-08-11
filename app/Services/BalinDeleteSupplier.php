@@ -83,6 +83,9 @@ class BalinDeleteSupplier implements DeleteSupplierInterface
 		//2. Delete Suppliers
 		$this->pro->deletesupplier($supplier); 
 
+		//3. Delete Image
+		$this->pro->deleteimage($supplier); 
+
 		if($this->pro->errors->count())
 		{
 			\DB::rollback();
@@ -94,7 +97,7 @@ class BalinDeleteSupplier implements DeleteSupplierInterface
 
 		\DB::commit();
 
-		//3. Return Supplier Model Object
+		//4. Return Supplier Model Object
 		$this->saved_data	= $this->supplier;
 
 		return true;

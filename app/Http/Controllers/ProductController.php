@@ -20,7 +20,6 @@ use App\Services\BalinDeleteProduct;
  */
 class ProductController extends Controller
 {
-	
 	public function __construct(Request $request, BalinStoreProduct $store_product, BalinDeleteProduct $delete_product)
 	{
 		$this->request 				= $request;
@@ -79,7 +78,7 @@ class ProductController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.']));
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -145,7 +144,7 @@ class ProductController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 		
-		return response()->json( JSend::error(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -157,7 +156,7 @@ class ProductController extends Controller
 	{
 		if(!Input::has('product'))
 		{
-			return response()->json( JSend::error(['Tidak ada data produk.']));
+			return response()->json( JSend::error(['Tidak ada data produk.'])->asArray());
 		}
 
 		$product                    = Input::get('product');
@@ -186,12 +185,12 @@ class ProductController extends Controller
 
 		if(!$product)
 		{
-			return response()->json( JSend::error(['Produk tidak ditemukan.']));
+			return response()->json( JSend::error(['Produk tidak ditemukan.'])->asArray());
 		}
 
 		if($this->delete_product->delete($product))
 		{
-			return response()->json( JSend::success(['data' => $this->delete_product->getData()])->asArray())
+			return response()->json( JSend::success($this->delete_product->getData())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 

@@ -93,6 +93,9 @@ class BalinStoreSupplier implements StoreSupplierInterface
 		//2. store Supplier
 		$this->pro->storesupplier($this->supplier); 
 
+		//3. store images
+		$this->pro->storeimage($this->pro->supplier, $this->supplier['images']); 
+
 		if($this->pro->errors->count())
 		{
 			\DB::rollback();
@@ -104,7 +107,7 @@ class BalinStoreSupplier implements StoreSupplierInterface
 
 		\DB::commit();
 
-		//3. Return Supplier Model Object
+		//4. Return Supplier Model Object
 		$this->saved_data	= $this->pro->supplier;
 
 		return true;

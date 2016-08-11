@@ -7,6 +7,10 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+
+use App\Services\BalinStoreSupplier;
+use App\Services\BalinDeleteSupplier;
 
 /**
  * Handle Protected Resource of Supplier
@@ -15,6 +19,13 @@ use Illuminate\Support\Facades\DB;
  */
 class SupplierController extends Controller
 {
+	public function __construct(Request $request, BalinStoreSupplier $store_supplier, BalinDeleteSupplier $delete_supplier)
+	{
+		$this->request 				= $request;
+		$this->store_supplier		= $store_supplier;
+		$this->delete_supplier		= $delete_supplier;
+	}
+	
 	/**
 	 * Display all suppliers
 	 *
@@ -58,9 +69,10 @@ class SupplierController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result						= $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -71,14 +83,14 @@ class SupplierController extends Controller
 	public function detail($id = null)
 	{
 		$result                 = \App\Entities\Supplier::id($id)->first();
-	   
+	
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
-
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
 
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -90,62 +102,21 @@ class SupplierController extends Controller
 	{
 		if(!Input::has('supplier'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data supplier.');
+			return response()->json( JSend::error(['Tidak ada data supplier.'])->asArray());
 		}
 
-		$errors                     = new MessageBag();
+		//1. Validate supplier Parameter
+		$supplier			= Input::get('supplier');
 
-		DB::beginTransaction();
+		$this->store_supplier->fill($supplier);
 
-		//1. Validate Supplier Parameter
-		$supplier                    = Input::get('supplier');
-		if(is_null($supplier['id']))
+		if(!$this->store_supplier->save())
 		{
-			$is_new                 = true;
-		}
-		else
-		{
-			$is_new                 = false;
+			return response()->json( JSend::error($this->store_supplier->getError()->toArray())->asArray());
 		}
 
-		$supplier_rules             =   [
-											'name'                      => 'required|max:255',
-										];
-
-		//1a. Get original data
-		$supplier_data              = \App\Entities\Supplier::findornew($supplier['id']);
-
-		//1b. Validate Basic Supplier Parameter
-		$validator                  = Validator::make($supplier, $supplier_rules);
-
-		if (!$validator->passes())
-		{
-			$errors->add('Supplier', $validator->errors());
-		}
-		else
-		{
-			//if validator passed, save supplier
-			$supplier_data           = $supplier_data->fill($supplier);
-
-			if(!$supplier_data->save())
-			{
-				$errors->add('Supplier', $supplier_data->getError());
-			}
-		}
-		//End of validate supplier
-
-		if($errors->count())
-		{
-			DB::rollback();
-
-			return new JSend('error', (array)Input::all(), $errors);
-		}
-
-		DB::commit();
-		
-		$final_supplier              = \App\Entities\Supplier::id($supplier_data['id'])->first()->toArray();
-
-		return new JSend('success', (array)$final_supplier);
+		return response()->json( JSend::success($this->store_supplier->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -156,20 +127,19 @@ class SupplierController extends Controller
 	public function delete($id = null)
 	{
 		//
-		$supplier                   = \App\Entities\Supplier::id($id)->first();
+		$supplier					= \App\Entities\Supplier::id($id)->first();
 
 		if(!$supplier)
 		{
-			return new JSend('error', (array)Input::all(), 'Supplier tidak ditemukan.');
+			return response()->json( JSend::error(['Supplier tidak ditemukan.'])->asArray());
 		}
 
-		$result                     = $supplier->toArray();
-
-		if($supplier->delete())
+		if($this->delete_supplier->delete($supplier))
 		{
-			return new JSend('success', (array)$result);
+			return response()->json( JSend::success($this->delete_supplier->getData())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
-		return new JSend('error', (array)$result, $supplier->getError());
+		return response()->json( JSend::error($this->delete_supplier->getError())->asArray());
 	}
 }

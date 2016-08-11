@@ -5,7 +5,7 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-use App\Models\Queue;
+use App\Entities\Queue;
 
 use DB, Carbon\Carbon;
 
@@ -94,7 +94,7 @@ class BroadcastDiscountCommand extends Command {
 		$messages 				= json_decode($pending->message, true);
 
 		//1. Check product
-		$products 				= new \App\Models\Product;
+		$products 				= new \App\Entities\Product;
 		$products 				= $products->sellable(true);
 
 		//1a. Only for certain category
@@ -119,7 +119,7 @@ class BroadcastDiscountCommand extends Command {
 			//if there were setup price right after end date, do nothing
 			//if there were setup price after end date, but not precisely duplicated latest and expand right after
 			//if there were no setup price right after end date, duplicate latest price with right after end date
-			$price				= \App\Models\Price::productid($product['id'])->where('started_at', '>', date('Y-m-d H:i:s', strtotime($parameters['ended_at'])))->orderby('started_at', 'desc')->first();
+			$price				= \App\Entities\Price::productid($product['id'])->where('started_at', '>', date('Y-m-d H:i:s', strtotime($parameters['ended_at'])))->orderby('started_at', 'desc')->first();
 			
 			$promo 				= 0;
 
@@ -128,7 +128,7 @@ class BroadcastDiscountCommand extends Command {
 			 	if(date('Y-m-d H:i:s', strtotime($parameters['ended_at'].' + 1 second')) != $price['started_at']->format('Y-m-d H:i:s'))
 			 	{
 			 		$prev 		= $price->toArray();
-			 		$price 		= new \App\Models\Price;
+			 		$price 		= new \App\Entities\Price;
 
 			 		$price->fill($prev);
 
@@ -142,12 +142,12 @@ class BroadcastDiscountCommand extends Command {
 			}
 			else
 			{
-				$price			= \App\Models\Price::productid($product['id'])->ondate($parameters['ended_at'])->orderby('started_at', 'desc')->first();
+				$price			= \App\Entities\Price::productid($product['id'])->ondate($parameters['ended_at'])->orderby('started_at', 'desc')->first();
 
 				if($price)
 				{
 			 		$prev 		= $price->toArray();
-			 		$price 		= new \App\Models\Price;
+			 		$price 		= new \App\Entities\Price;
 
 			 		$price->fill($prev);
 
@@ -163,7 +163,7 @@ class BroadcastDiscountCommand extends Command {
 			//2b. Check price on that start day
 			//if there were setup price right after start date, create new one
 			//if there were setup price exactly in time, update promo price
-			$price				= \App\Models\Price::productid($product['id'])->ondate($parameters['started_at'])->orderby('started_at', 'desc')->first();
+			$price				= \App\Entities\Price::productid($product['id'])->ondate($parameters['started_at'])->orderby('started_at', 'desc')->first();
 			
 			$promo 				= 0;
 
@@ -190,7 +190,7 @@ class BroadcastDiscountCommand extends Command {
 			 	{
 			 		$prev 		= $price->toArray();
 
-			 		$price 		= new \App\Models\Price;
+			 		$price 		= new \App\Entities\Price;
 
 			 		$price->fill($prev);
 
@@ -206,11 +206,11 @@ class BroadcastDiscountCommand extends Command {
 
 			//2c. Check price on that period
 			//if there were setup price during period, update promo price
-			$prices				= \App\Models\Price::productid($product['id'])->ondate([date('Y-m-d H:i:s', strtotime($parameters['started_at'].' + 1 second')), $parameters['ended_at']])->orderby('started_at', 'desc')->get();
+			$prices				= \App\Entities\Price::productid($product['id'])->ondate([date('Y-m-d H:i:s', strtotime($parameters['started_at'].' + 1 second')), $parameters['ended_at']])->orderby('started_at', 'desc')->get();
 
 			foreach ($prices as $key => $value) 
 			{
-				$price			= \App\Models\Price::id($value['id'])->first();
+				$price			= \App\Entities\Price::id($value['id'])->first();
 				
 				if($price)
 				{

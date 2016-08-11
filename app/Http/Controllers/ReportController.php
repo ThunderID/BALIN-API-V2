@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
+
 use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
 
 /**
  * Handle Protected reports
@@ -12,6 +14,11 @@ use Illuminate\Support\Facades\Input;
  */
 class ReportController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+
 	/**
 	 * Display usage of voucher in transaction
 	 *
@@ -30,7 +37,7 @@ class ReportController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -86,9 +93,10 @@ class ReportController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'payment', 'paidpointlogs', 'paidpointlogs.referencepointvoucher', 'paidpointlogs.referencepointvoucher.referencevoucher', 'paidpointlogs.referencepointreferral', 'paidpointlogs.referencepointreferral.referencereferral', 'paidpointlogs.pointlog'])->get()->toArray();
+		$result                     = $result->with(['user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'payment', 'paidpointlogs', 'paidpointlogs.referencepointvoucher', 'paidpointlogs.referencepointvoucher.referencevoucher', 'paidpointlogs.referencepointreferral', 'paidpointlogs.referencepointreferral.referencereferral', 'paidpointlogs.pointlog'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 	
 	/**
@@ -133,8 +141,9 @@ class ReportController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->havingsolditem(0)->with(['product'])->get()->toArray();
+		$result                     = $result->havingsolditem(0)->with(['product'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Libraries\JSend;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Http\Request;
+
 use Carbon\Carbon;
 
 /**
@@ -13,6 +15,11 @@ use Carbon\Carbon;
  */
 class WarehouseController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+	
 	/**
 	 * Display product stock's movement
 	 *
@@ -56,7 +63,7 @@ class WarehouseController extends Controller
    
    		if(!$varian->first())
    		{
-        	return response()->json( JSend::fail(['ID Tidak Valid.']));
+        	return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
    		}
 
 		$varian                     = $varian->with(['product'])->first()->toArray();
@@ -81,7 +88,8 @@ class WarehouseController extends Controller
 			$varian['details']		= $detail->get()->toArray();
 		}
 
-		return new JSend('success', (array)$varian);
+		return response()->json( JSend::success($varian)->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -119,9 +127,10 @@ class WarehouseController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['product'])->get()->toArray();
+		$result                     = $result->with(['product'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -199,8 +208,9 @@ class WarehouseController extends Controller
 
 		$count                      = count($result->get(['id']));
 
-		$result                     = $result->with(['product'])->get()->toArray();
+		$result                     = $result->with(['product'])->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

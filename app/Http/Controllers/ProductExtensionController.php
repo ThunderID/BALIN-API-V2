@@ -63,7 +63,7 @@ class ProductExtensionController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -91,9 +91,10 @@ class ProductExtensionController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -107,11 +108,12 @@ class ProductExtensionController extends Controller
 	   
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 
 		}
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
 
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -126,7 +128,7 @@ class ProductExtensionController extends Controller
 	{
 		if(!Input::has('extension'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data extension.');
+			return response()->json( JSend::error(['Tidak ada data extension.'])->asArray());
 		}
 
 		$ornament				= Input::get('extension');
@@ -154,12 +156,12 @@ class ProductExtensionController extends Controller
 
 		if(!$ornament)
 		{
-			return response()->json( JSend::error(['Extension tidak ditemukan.']));
+			return response()->json( JSend::error(['Extension tidak ditemukan.'])->asArray());
 		}
 
 		if($this->delete_ornament->delete($ornament))
 		{
-			return response()->json( JSend::success(['data' => $this->delete_ornament->getData()])->asArray())
+			return response()->json( JSend::success($this->delete_ornament->getData())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 

@@ -65,7 +65,7 @@ class PurchaseController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.']));
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -120,7 +120,7 @@ class PurchaseController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::error(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -136,7 +136,7 @@ class PurchaseController extends Controller
 	{
 		if(!Input::has('purchase'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data purchase.');
+			return response()->json( JSend::error(['Tidak ada data purchase.'])->asArray());
 		}
 
 		$purchase                    = Input::get('purchase');
@@ -164,12 +164,12 @@ class PurchaseController extends Controller
 
 		if(!$purchase)
 		{
-			return response()->json( JSend::error(['Pembelian tidak ditemukan.']));
+			return response()->json( JSend::error(['Pembelian tidak ditemukan.'])->asArray());
 		}
 
 		if($this->rollback_product->delete($purchase))
 		{
-			return response()->json( JSend::success(['data' => $this->rollback_product->getData()])->asArray())
+			return response()->json( JSend::success($this->rollback_product->getData())->asArray())
 					->setCallback($this->request->input('callback'));
 		}
 

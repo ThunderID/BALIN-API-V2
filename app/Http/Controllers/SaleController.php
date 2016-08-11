@@ -118,7 +118,7 @@ class SaleController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.']));
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -173,7 +173,7 @@ class SaleController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -189,7 +189,7 @@ class SaleController extends Controller
 	{
 		if(!Input::has('sale'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data sale.');
+			return response()->json( JSend::error(['Tidak ada data sale.'])->asArray());
 		}
 
 		//1. Validate Sale Parameter
@@ -197,7 +197,7 @@ class SaleController extends Controller
 
 		if(is_null($sale['id']))
 		{
-			return response()->json( JSend::fail(['Tidak ada data sale.']));
+			return response()->json( JSend::error(['Tidak ada data sale.'])->asArray());
 		}
 
 		switch ($sale['status']) 

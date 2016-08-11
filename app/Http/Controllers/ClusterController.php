@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 /**
  * Handle Protected Resource of cluster
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\DB;
  */
 class ClusterController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+	
 	/**
 	 * Display all clusters
 	 *
@@ -94,7 +100,7 @@ class ClusterController extends Controller
 					->setCallback($this->request->input('callback'));
 		}
 
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -107,7 +113,7 @@ class ClusterController extends Controller
 	{
 		if(!Input::has('category') && !Input::has('tag'))
 		{
-			return response()->json( JSend::error(['Tidak ada data cluster.']));
+			return response()->json( JSend::error(['Tidak ada data cluster.'])->asArray());
 		}
 
 		$errors 						= new MessageBag;
@@ -203,7 +209,7 @@ class ClusterController extends Controller
 
 		if(!$cluster)
 		{
-			return response()->json( JSend::error(['Category/Tag tidak ditemukan.']));
+			return response()->json( JSend::error(['Category/Tag tidak ditemukan.'])->asArray());
 		}
 
 		$result                     = $cluster->toArray();

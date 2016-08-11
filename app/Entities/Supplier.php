@@ -4,16 +4,37 @@ namespace App\Entities;
 
 use App\CrossServices\ClosedDoorModelObserver;
 
+use App\Entities\Traits\HasImageTrait;
+use App\Entities\Traits\GetAllTrait;
+
 use App\Entities\TraitLibraries\FieldNameTrait;
+
+use App\Entities\TraitRelations\MorphManyImagesTrait;
 
 class Supplier extends BaseModel
 {
+	/**
+	 * Traits To Calculated Relations
+	 */
+	use HasImageTrait;
+
+	/**
+	 * Traits To Condition within itself
+	 */
+	use GetAllTrait;
+	
 	/**
 	 * Libraries Traits for scopes
 	 *
 	 */
 	use FieldNameTrait;
 
+	/**
+	 * Relationship Traits
+	 *
+	 */
+	use MorphManyImagesTrait;
+	
 	/**
 	 * The database table used by the model.
 	 *

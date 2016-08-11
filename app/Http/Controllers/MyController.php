@@ -42,10 +42,11 @@ class MyController extends Controller
 
 		if($result)
 		{
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 		
-		return response()->json( JSend::fail(['ID Tidak Valid.']));
+		return response()->json( JSend::error(['ID Tidak Valid.'])->asArray());
 	}
 
 	/**
@@ -71,9 +72,10 @@ class MyController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 
@@ -100,9 +102,10 @@ class MyController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -128,9 +131,10 @@ class MyController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -142,7 +146,7 @@ class MyController extends Controller
 	{
 		if(!Input::has('customer'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data customer.');
+			return response()->json( JSend::error(['Tidak ada data customer.'])->asArray());
 		}
 
 		$customer                   = Input::get('customer');
@@ -197,14 +201,15 @@ class MyController extends Controller
 		{
 			DB::rollback();
 
-			return new JSend('error', (array)Input::all(), $errors);
+			return response()->json( JSend::error($errors)->asArray());
 		}
 
 		DB::commit();
 		
-		$final_customer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first()->toArray();
+		$final_customer                 = Customer::id($user_id)->with(['myreferrals', 'myreferrals.user'])->first();
 
-		return new JSend('success', (array)$final_customer);
+		return response()->json( JSend::success($final_customer->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -216,7 +221,7 @@ class MyController extends Controller
 	{
 		if(!Input::has('code'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data code.');
+			return response()->json( JSend::error(['Tidak ada data code.'])->asArray());
 		}
 
 		$code                       = Input::only('code');
@@ -229,7 +234,7 @@ class MyController extends Controller
 			
 			if(!$promo_ref)
 			{
-				return new JSend('error', (array)Input::all(), 'Code tidak valid.');
+				return response()->json( JSend::error(['Code tidak valid.'])->asArray());
 			}
 			else
 			{
@@ -267,7 +272,7 @@ class MyController extends Controller
 	{
 		if(!Input::has('invitations'))
 		{
-			return new JSend('error', (array)Input::all(), 'Tidak ada data invitations.');
+			return response()->json( JSend::error(['Tidak ada data invitations.'])->asArray());
 		}
 
 		$user['id'] 			= $user_id;

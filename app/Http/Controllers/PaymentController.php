@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 /**
  * Handle Protected Resource of Sale
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\DB;
  */
 class PaymentController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+	
 	/**
 	 * Veritrans Credit Card
 	 *
@@ -62,13 +68,14 @@ class PaymentController extends Controller
 		{
 			DB::rollback();
 
-			return response()->json(new JSend('error', (array)Input::all(), $errors), 404);
+			return response()->json( JSend::error($errors)->asArray());
 		}
 
 		DB::commit();
 		
-		$final_sale					= \App\Entities\Sale::id($sale_data['id'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first()->toArray();
+		$final_sale					= \App\Entities\Sale::id($sale_data['id'])->with(['voucher', 'transactionlogs', 'user', 'transactiondetails', 'transactiondetails.varian', 'transactiondetails.varian.product', 'paidpointlogs', 'payment', 'shipment', 'shipment.address', 'shipment.courier', 'transactionextensions', 'transactionextensions.productextension'])->first();
 
-		return response()->json(new JSend('success', (array)$final_sale), 200);
+		return response()->json( JSend::success($final_sale->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

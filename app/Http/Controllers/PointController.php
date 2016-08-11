@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 /**
  * Handle Protected display and store of point
@@ -15,6 +16,11 @@ use Illuminate\Support\Facades\DB;
  */
 class PointController extends Controller
 {
+	public function __construct(Request $request)
+	{
+		$this->request 				= $request;
+	}
+	
 	/**
 	 * Display all points
 	 *
@@ -59,7 +65,7 @@ class PointController extends Controller
 			{
 				if(!in_array($value, ['asc', 'desc']))
 				{
-					return new JSend('error', (array)Input::all(), $key.' harus bernilai asc atau desc.');
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
 				}
 				switch (strtolower($key)) 
 				{
@@ -92,7 +98,8 @@ class PointController extends Controller
 
 		$result                     = $result->with(['user'])->get()->toArray();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -159,13 +166,14 @@ class PointController extends Controller
 		{
 			DB::rollback();
 
-			return new JSend('error', (array)Input::all(), $errors);
+			return response()->json( JSend::error($errors)->asArray());
 		}
 
 		DB::commit();
 		
-		$final_point                 = \App\Entities\PointLog::id($point_data['id'])->with(['user'])->first()->toArray();
-
-		return new JSend('success', (array)$final_point);
+		$final_point                 = \App\Entities\PointLog::id($point_data['id'])->with(['user'])->first();
+		
+		return response()->json( JSend::success($final_point->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 }

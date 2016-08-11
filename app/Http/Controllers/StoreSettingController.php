@@ -99,9 +99,10 @@ class StoreSettingController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->get()->toArray();
+		$result                     = $result->get();
 
-		return new JSend('success', (array)['count' => $count, 'data' => $result]);
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
 	}
 
 	/**
@@ -124,7 +125,8 @@ class StoreSettingController extends Controller
 				$result         = \App\Entities\Banner::id($id)->with(['images'])->first();
 			}
 
-			return new JSend('success', (array)$result->toArray());
+			return response()->json( JSend::success($result->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
 		}
 
 		return response()->json( JSend::fail(['ID Tidak Valid.']));

@@ -14,19 +14,19 @@
 			<td width="80%">
 				<p>Dear Bpk/Ibu <strong>{{$data['user']['name']}},</strong></p>
 
-				<p>Selamat datang, Anda telah terdaftar di <a href="{{$data['balin']['url']}}">Balin.id</a></p>
+				<p>Selamat, Anda telah terdaftar di <a href="{{$data['balin']['url']}}">Balin.id</a></p>
 
-				<p>Dengan menjadi bagian dari Balin.id, anda juga dapat menikmati fasilitas yang kami berikan berupa Kode Referal dan Balin Point. Dengan kode Referal, 
-				anda dapat mengajak teman atau kerabat anda untuk mendaftar ke situs Balin.id dan berikan kode referal anda. Dengan menggunakan kode referal anda, 
-				teman anda akan mendapatkan Balin Point sebesar IDR. 50.000 dan anda akan mendapatkan Balin Point sebesar IDR. 10.000. Kode referal anda, pada mulanya 
-				hanya dapat anda berikan kepada 10 orang teman anda. Apabila teman yang menggunakan kode referal anda melakukan pembelian, anda akan mendapatkan 
-				tambahan kuota tersebut menjadi 11 dan anda akan mendapatkan Balin Point sebesar IDR. 10.000, dan demikian seterusnya tanpa ada batasnya. Balin Point
-				tersebut dapat anda gunakan untuk berbelanja di Balin.id, namun tidak dapat diuangkan.
-				</p>
-
-				<p>Semakin banyak teman yang menggunakan referal anda dan semakin sering teman yang anda referensikan melakukan pembelian, semakin besar voucher yang anda dapatkan.</p>
-
-				<p>Untuk memulai, Balin telah menyediakan Balin Point untuk anda. Klaim Balin Point tersebut dengan klik tombol di bawah ini.</p>
+				<br>
+				<p>Kode Referral Anda: {{$data['user']['referral_code']}}</p>
+				<p>Balin point Anda: IDR {{$data['user']['total_point']}}</p>
+				<br>
+				<p>Ajaklah teman untuk mendaftar di Balin.id dengan memasukkan kode referral Anda. Teman anda akan mendapatkan Balin Point sebesar IDR. 50.000 dan anda akan mendapatkan Balin Point sebesar IDR. 10.000.</p>
+				<br>
+				<p>Kode referal pada mulanya hanya dapat Anda berikan kepada 10 orang teman anda. Namun, apabila teman yang menggunakan kode referal anda melakukan pembelian, anda akan mendapatkan tambahan kuota tersebut menjadi 11 dan anda akan mendapatkan Balin Point sebesar IDR. 10.000, dan demikian seterusnya tanpa ada batasnya.</p>
+				<br>
+				<p>Balin Point dapat Anda gunakan untuk berbelanja di balin.id. Namun tidak dapat diuangkan. Semakin banyak teman yang menggunakan referal anda dan semakin sering teman yang anda referensikan melakukan pembelian, semakin besar poin yang anda dapatkan.</p>
+				<br>
+				<p>Klaim balin point Anda dengan klik tombol di bawah ini.</p>
 			</td>
 			<td width="10%"></td>
 		</tr>

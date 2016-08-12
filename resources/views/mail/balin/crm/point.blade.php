@@ -5,7 +5,7 @@
 		<tr>
 			<td width="10%"></td>
 			<td width="80%">
-				<img src="{{ $message->embed($data['balin']['logo']) }}" style="max-width:200px; text-align:left;">
+				<img src="{{ $data['balin']['logo'] }}" style="max-width:200px; text-align:left;">
 			</td>
 			<td width="10%"></td>
 		</tr>
@@ -18,26 +18,23 @@
 					Anda Memiliki BALIN Point sebesar @thunder_mail_money_indo($data['point']['amount']) dari total point Anda yang akan expire tanggal {{date('d-m-Y H:i', strtotime($data['point']['expired_at']))}}.
 					Ayo, gunakan point Anda sebelum expire!
 				</p>
-
+				@if(count($data['product']))
 				<h4>Anda Mungkin Suka</h4>
 				<p>
 					<table>
 						<tr>
 							@foreach($data['product'] as $key => $value)
-								@if($key%2==0 && $key!=0)
-									</tr>
-									<tr>
-								@endif
-									<td>
-										<a href="{{$data['balin']['action'].'/'.$value['slug']}}">
-											<img src="{{ $message->embed($value['thumbnail']) }}" style="max-width:150px; text-align:left;">
-										</a>
-									</td>
+								<td>
+									<a href="{{$data['balin']['action'].'/'.$value['slug']}}">
+										<img src="{{ $value['thumbnail'] }}" style="max-width:150px; text-align:left;">
+									</a>
+								</td>
 							@endforeach
 						</tr>
 					</table>
 				</p>
 				<h4>ATAU</h4>
+				@endif
 			</td>
 			<td width="10%"></td>
 		</tr>

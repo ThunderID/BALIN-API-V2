@@ -5,7 +5,7 @@
 		<tr>
 			<td width="10%"></td>
 			<td width="80%">
-				<img src="{{ $message->embed($data['balin']['logo']) }}" style="max-width:200px; text-align:left;">
+				<img src="{{ $data['balin']['logo'] }}" style="max-width:200px; text-align:left;">
 			</td>
 			<td width="10%"></td>
 		</tr>

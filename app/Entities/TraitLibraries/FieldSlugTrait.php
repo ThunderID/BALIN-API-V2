@@ -26,6 +26,11 @@ trait FieldSlugTrait
 	 **/
 	public function scopeSlug($query, $variable)
 	{
+		if(is_array($variable))
+		{
+			return 	$query->whereIn('slug', $variable);
+		}
+
 		return 	$query->where('slug', $variable);
 	}
 }

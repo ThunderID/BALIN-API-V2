@@ -150,7 +150,7 @@ class PointExpireCommand extends Command {
 			}
 
 			$product                     = $result->orderby('price', 'desc')->take(4)->get()->toArray();
-	
+
 			$this->mail_point->sendmailpointreminder($point, $product);
 
 			$pnumber 						= $pending->process_number + 1;

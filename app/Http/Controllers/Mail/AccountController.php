@@ -27,7 +27,7 @@ class AccountController extends Controller
 	protected $post;
 	protected $post_ref;
 
-	function __construct(Request $request, EffectRegisterUserInterface $post, EffectReferralSistemInterface $post)
+	function __construct(Request $request, EffectRegisterUserInterface $post, EffectReferralSistemInterface $post_ref)
 	{
 		$this->request 		= $request;
 		$this->post 		= $post;
@@ -59,8 +59,9 @@ class AccountController extends Controller
 	public function invitation()
 	{
 		$user 				= Input::get('user');
+		$email 				= Input::get('email');
 		
-		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first());
+		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first(), $email);
 
 		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));

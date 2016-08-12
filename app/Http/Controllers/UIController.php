@@ -310,6 +310,72 @@ class UIController extends Controller
 	}
 
 	/**
+	 * Display all couriers
+	 *
+	 * @return Response
+	 */
+	public function couriers($type = null)
+	{
+		$result                 = new \App\Entities\Courier;
+
+		if(Input::has('search'))
+		{
+			$search                 = Input::get('search');
+
+			foreach ($search as $key => $value) 
+			{
+				switch (strtolower($key)) 
+				{
+					case 'name' :
+						$result     = $result->name($value);
+					break;
+					default:
+						# code...
+						break;
+				}
+			}
+		}
+
+		if(Input::has('sort'))
+		{
+			$sort                 = Input::get('sort');
+
+			foreach ($sort as $key => $value) 
+			{
+				if(!in_array($value, ['asc', 'desc']))
+				{
+					return response()->json( JSend::error([$key.' harus bernilai asc atau desc.'])->asArray());
+				}
+				switch (strtolower($key)) 
+				{
+					case 'name':
+						$result     = $result->orderby($key, $value);
+						break;
+				}
+			}
+		}
+
+		$count                      = count($result->get());
+
+		if(Input::has('skip'))
+		{
+			$skip                   = Input::get('skip');
+			$result                 = $result->skip($skip);
+		}
+
+		if(Input::has('take'))
+		{
+			$take                   = Input::get('take');
+			$result                 = $result->take($take);
+		}
+
+		$result                     = $result->with(['shippingcosts'])->get();
+
+		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
+					->setCallback($this->request->input('callback'));
+	}
+
+	/**
 	 * Display all extensions
 	 *
 	 * @return Response

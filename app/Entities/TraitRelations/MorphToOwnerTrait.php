@@ -35,7 +35,7 @@ trait MorphToOwnerTrait
 	 **/
     public function scopeOwnerID($query, $variable)
     {
-		return $query->where('Owner_id', $variable);
+		return $query->where('owner_id', $variable);
     }
 	
 	/**
@@ -44,7 +44,12 @@ trait MorphToOwnerTrait
 	 **/
     public function scopeOwnerType($query, $variable)
     {
-		return $query->where('Owner_type', $variable);
+    	if(is_array($variable))
+    	{
+			return $query->whereIn('owner_type', $variable);
+    	}
+
+		return $query->where('owner_type', $variable);
     }
 
 	/**
@@ -53,7 +58,7 @@ trait MorphToOwnerTrait
 	 **/
     public function OwnerVoucher()
     {
-		return $this->belongsTo('\App\Entities\VoucherCampaign', 'Owner_id');
+		return $this->belongsTo('\App\Entities\VoucherCampaign', 'owner_id');
     }
 
 	/**
@@ -62,7 +67,7 @@ trait MorphToOwnerTrait
 	 **/
     public function OwnerReferral()
     {
-		return $this->belongsTo('\App\Entities\User', 'Owner_id');
+		return $this->belongsTo('\App\Entities\User', 'owner_id');
     }
 
 	/**
@@ -71,7 +76,7 @@ trait MorphToOwnerTrait
 	 **/
     public function OwnerPointVoucher()
     {
-		return $this->belongsTo('\App\Entities\PointLog', 'point_log_id')->where('Owner_type', ['App\Models\Voucher', 'App\Entities\Voucher']);
+		return $this->belongsTo('\App\Entities\PointLog', 'point_log_id')->where('owner_type', ['App\Models\Voucher', 'App\Entities\Voucher']);
     }
 
 	/**
@@ -80,6 +85,6 @@ trait MorphToOwnerTrait
 	 **/
     public function OwnerPointReferral()
     {
-		return $this->belongsTo('\App\Entities\PointLog', 'point_log_id')->where('Owner_type', ['App\Models\User', 'App\Entities\User']);
+		return $this->belongsTo('\App\Entities\PointLog', 'point_log_id')->where('owner_type', ['App\Models\User', 'App\Entities\User']);
     }
 }

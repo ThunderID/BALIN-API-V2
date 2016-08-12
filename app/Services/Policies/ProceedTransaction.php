@@ -138,13 +138,15 @@ class ProceedTransaction implements ProceedTransactionInterface
 
 	public function shippingaddress(Sale $sale, array $shipment)
 	{
-		$address 						= Address::phone($shipment['address']['phone'])->address($shipment['address']['address'])->zipcode($shipment['address']['zipcode'])->first();
+		$address 						= Address::phone($shipment['address']['phone'])->address($shipment['address']['address'])->zipcode($shipment['address']['zipcode'])->ownerid($sale['user_id'])->ownertype(get_class($sale->customer))->first();
 
 		if(!$address)
 		{
 			$address 					= new Address;
 			
 			$address->fill($shipment['address']);
+			$address->owner_id 			= $sale->customer->id;
+			$address->owner_type 		= get_class($sale->customer);
 
 			if(!$address->save())
 			{

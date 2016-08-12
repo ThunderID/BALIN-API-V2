@@ -61,7 +61,7 @@ class UserInvitationLog extends BaseModel
 	 */
 	protected $rules				=	[
 											'user_id'						=> 'exists:users,id',
-											'email'							=> 'max:255',
+											'email'							=> 'required|max:255|email',
 											'is_used'						=> 'boolean',
 										];
 

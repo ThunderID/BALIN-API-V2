@@ -51,6 +51,7 @@ class UserInvitationLog extends BaseModel
 	protected $fillable				=	[
 											'user_id'						,
 											'email'							,
+											'invitation_link'				.
 											'is_used'						,
 										];
 										
@@ -62,6 +63,7 @@ class UserInvitationLog extends BaseModel
 	protected $rules				=	[
 											'user_id'						=> 'exists:users,id',
 											'email'							=> 'required|max:255|email',
+											'invitation_link'				=> 'max:255',
 											'is_used'						=> 'boolean',
 										];
 
@@ -92,5 +94,16 @@ class UserInvitationLog extends BaseModel
 	public function scopeEmail($query, $variable)
 	{
 		return $query->where('email', $variable);
+	}
+
+
+	/**
+	 * find invitation link
+	 * 
+	 * @param invitation link
+	 */	
+	public function scopeInvitationLink($query, $variable)
+	{
+		return $query->where('invitation_link', $variable);
 	}
 }

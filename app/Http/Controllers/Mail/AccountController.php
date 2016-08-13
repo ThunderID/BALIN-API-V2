@@ -60,8 +60,10 @@ class AccountController extends Controller
 	{
 		$user 				= Input::get('user');
 		$email 				= Input::get('email');
+
+		$friend 			= UserInvitationLog::userid($user['id'])->email($email)->first();
 		
-		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first(), $email);
+		$this->post_ref->sendinvitationmail(Customer::id($user['id'])->first(), $email, $friend->invitation_link);
 
 		return response()->json( JSend::success(['Email terkirim'])->asArray())
 					->setCallback($this->request->input('callback'));

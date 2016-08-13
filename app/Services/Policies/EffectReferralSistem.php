@@ -56,9 +56,9 @@ class EffectReferralSistem implements EffectReferralSistemInterface
 		});
 	}
 	
-	public function sendinvitationmail(Customer $customer, $email)
+	public function sendinvitationmail(Customer $customer, $email, $link)
 	{
-		$this->storeinfo['action'] 	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/invite/by/'.$customer['code_referral'];
+		$this->storeinfo['action'] 	= env('BALIN_ACTION_BASEURL', 'https://balin.id').'/invite/by/'.$customer['code_referral'].'/at/'.$link;
 		
 		$product                     = \App\Entities\Product::sellable(true)->stats(0)->take(4)->get()->toArray();
 

@@ -16,6 +16,7 @@ class CreateUserInvitationLogTable extends Migration
             $table->increments('id');
             $table->integer('user_id')->unsigned()->index();
             $table->string('email', 255);
+            $table->string('invitation_link', 255);
             $table->boolean('is_used');
             $table->timestamps();
             $table->softDeletes();

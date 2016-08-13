@@ -95,7 +95,7 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 
 	public function validateinvitation(Referral $referral, array $customer)
 	{
-		$invitation				= UserInvitationLog::userid($referral['user_id'])->email($customer['email'])->first();
+		$invitation				= UserInvitationLog::userid($referral['user_id'])->email($customer['email'])->invitationlink($customer['invitation_link'])->first();
 
 		if(!$invitation)
 		{

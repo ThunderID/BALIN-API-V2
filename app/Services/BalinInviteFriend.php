@@ -86,7 +86,7 @@ class BalinInviteFriend implements InviteFriendInterface
 				$invite 	= new UserInvitationLog;
 			}
 
-			$invite->fill(['user_id' => $customer['id'], 'email' => $value, 'is_used' => false]);
+			$invite->fill(['user_id' => $customer['id'], 'email' => $value, 'is_used' => false, 'invitation_link' => $customer->code_referral.md5(uniqid(rand(), TRUE))]);
 
 			if(!$invite->save())
 			{
@@ -95,7 +95,7 @@ class BalinInviteFriend implements InviteFriendInterface
 				return false;
 			}
 
-			$this->post->sendinvitationmail($customer, $value);
+			$this->post->sendinvitationmail($customer, $value, $invite->invitation_link);
 		}
 
 		//8. Return customer Model Object

@@ -8,5 +8,5 @@ interface EffectReferralSistemInterface
 {
 	public function sendmailpointreminder(array $point, array $product);
 
-	public function sendinvitationmail(Customer $customer, $email);
+	public function sendinvitationmail(Customer $customer, $email, $link);
 }

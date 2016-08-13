@@ -51,7 +51,7 @@ class UserInvitationLog extends BaseModel
 	protected $fillable				=	[
 											'user_id'						,
 											'email'							,
-											'invitation_link'				.
+											'invitation_link'				,
 											'is_used'						,
 										];
 										

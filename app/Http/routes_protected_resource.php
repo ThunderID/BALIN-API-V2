@@ -392,3 +392,10 @@ $app->group(['middleware' => 'jwt|staff', 'namespace' => 'App\Http\Controllers']
 		]
 	);
 });
+
+
+$app->post('/payment/notification/veritrans',
+	[
+		'uses'				=> 'PaymentController@veritranscc'
+	]
+);

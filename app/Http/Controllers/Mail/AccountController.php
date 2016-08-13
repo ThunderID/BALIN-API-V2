@@ -15,6 +15,7 @@ use App\Contracts\Policies\EffectReferralSistemInterface;
 
 use \Exception;
 use App\Entities\Customer;
+use App\Entities\UserInvitationLog;
 
 /**
  * Handle order mail sender

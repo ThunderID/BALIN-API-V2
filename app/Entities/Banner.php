@@ -55,7 +55,7 @@ class Banner extends StoreSetting
 	 * @var array
 	 */
 	protected $rules				=	[
-											'type'								=> 'in:left_banner,right_banner,full_banner',
+											'type'								=> 'in:banner,banner_instagram',
 											'started_at'						=> 'date_format:"Y-m-d H:i:s"'/*|after: - 1 second'*/,
 										];
 

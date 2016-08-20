@@ -24,7 +24,7 @@ class BannerScope implements ScopeInterface
 	public function apply(Builder $builder, Model $model)
 	{
 		$builder
-				->whereIn($model->getTable().'.type', ['left_banner', 'right_banner', 'full_banner']);
+				->whereIn($model->getTable().'.type', ['banner', 'banner_instagram']);
 	}
 
 	/**

@@ -167,9 +167,18 @@ class ClusterObserver
 		}
 
 		//2. Delete Child
-		$childs                         = Cluster::orderBy('path','desc')
-											->where('path','like',$model->path . ',%')
-											->get();
+		if(str_is('*Category', get_class($model)))
+		{
+			$childs				= Category::orderBy('path','desc')
+									->where('path','like',$model->path . ',%')
+									->get();
+		}
+		else
+		{
+			$childs				= Tag::orderBy('path','desc')
+									->where('path','like',$model->path . ',%')
+									->get();
+		}
 
 		foreach ($childs as $child) 
 		{

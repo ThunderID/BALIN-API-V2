@@ -145,7 +145,7 @@ class UIController extends Controller
 			$result                 = $result->take($take);
 		}
 
-		$result                     = $result->with(['varians', 'images', 'labels'])->get();
+		$result                     = $result->with(['varians', 'images', 'labels', 'categories'])->get();
 
 		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
 					->setCallback($this->request->input('callback'));

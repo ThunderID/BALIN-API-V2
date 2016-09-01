@@ -47,6 +47,7 @@ class Banner extends StoreSetting
 											'type'								,
 											'value'								,
 											'started_at'						,
+											'ended_at'							,
 										];
 
 	/**
@@ -57,6 +58,7 @@ class Banner extends StoreSetting
 	protected $rules				=	[
 											'type'								=> 'in:banner,banner_instagram',
 											'started_at'						=> 'date_format:"Y-m-d H:i:s"'/*|after: - 1 second'*/,
+											'ended_at'							=> 'date_format:"Y-m-d H:i:s"'/*|after: - 1 second'*/,
 										];
 
 	/**

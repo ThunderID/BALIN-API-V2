@@ -95,7 +95,13 @@ class StoreSetting extends BaseModel
 			;
 		}
 
-		return $query->where('started_at', '<=', date('Y-m-d H:i:s', strtotime($variable[0])))->where('ended_at', '>=', date('Y-m-d H:i:s', strtotime($variable[1])))->orderBy('started_at', 'asc');
+		return $query->where('started_at', '<=', date('Y-m-d H:i:s', strtotime($variable[0])))
+					 ->where(function ($query) use($variable)
+					    	{
+							    $query->wherenull('ended_at')
+							    ->orwhere('ended_at', '>=',date('Y-m-d H:i:s', strtotime($variable[1])));
+							})
+			;
 	}
 }
 

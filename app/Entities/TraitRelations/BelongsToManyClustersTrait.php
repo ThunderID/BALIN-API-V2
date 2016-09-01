@@ -71,13 +71,13 @@ trait BelongsToManyClustersTrait
 		{
 			foreach ($variable as $key => $value) 
 			{
-				$query = $query->whereHas('categories', function($q)use($value){$q->slug($value);});
+				$query = $query->whereHas('categories', function($q)use($value){$q->where('slug', 'like', $value.'%');});
 			}
 
 			return $query;
 		}
 
-		return $query->whereHas('categories', function($q)use($variable){$q->slug($variable);});
+		return $query->whereHas('categories', function($q)use($variable){$q->where('slug', 'like', $variable.'%');});
 	}
 
 	/**

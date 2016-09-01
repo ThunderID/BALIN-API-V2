@@ -41,8 +41,8 @@ class PriceScope implements ScopeInterface
 		->leftjoin(DB::raw('prices as prices2'), function ($join)
 		 {
             $join->on ( 'prices2.product_id', '=', 'products.id' )
-			->on(DB::raw('(prices2.id = (select id from prices as tl3 where tl3.product_id = prices2.product_id and tl3.deleted_at is null and tl3.started_at <= "'.date('Y-m-d H:i:s').'" order by tl3.started_at desc limit 1 offset 2))'), DB::raw(''), DB::raw(''))
-            ->where('prices2.started_at', '<=', date('Y-m-d H:i:s'))
+			->on(DB::raw('(prices2.id = (select id from prices as tl3 where tl3.product_id = prices2.product_id and tl3.deleted_at is null and tl3.started_at > "'.date('Y-m-d H:i:s').'" order by tl3.started_at asc limit 1))'), DB::raw(''), DB::raw(''))
+            ->where('prices2.started_at', '>', date('Y-m-d H:i:s'))
             ->wherenull('prices2.deleted_at')
             ;
 		})

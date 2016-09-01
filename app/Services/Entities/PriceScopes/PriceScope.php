@@ -29,7 +29,7 @@ class PriceScope implements ScopeInterface
 		->selectraw('IFNULL(prices.price, 0) as price')
 		->selectraw('IFNULL(prices.promo_price, 0) as promo_price')
 		->selectraw('IFNULL(prices.started_at, NOW()) as price_start')
-		->selectraw('IFNULL(prices2.started_at, NOW()) as price_end')
+		->selectraw('IFNULL(prices2.started_at, NULL) as price_end')
 		->leftjoin('prices', function ($join)
 		 {
             $join->on ( 'prices.product_id', '=', 'products.id' )

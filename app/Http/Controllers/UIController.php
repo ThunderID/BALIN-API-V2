@@ -282,7 +282,7 @@ class UIController extends Controller
 		$sliders						= new \App\Entities\Slider;
 		$sliders 						= $sliders->ondate(['now', 'now'])->with(['image'])->get()->toArray();
 		$banners						= new \App\Entities\Banner;
-		$banners 						= $banners->default(true)->with(['image'])->get()->toArray();
+		$banners 						= $banners->ondate(['now', 'now'])->with(['image'])->get()->toArray();
 		$storeinfo						= new \App\Entities\Store;
 		$storepage						= new \App\Entities\StorePage;
 		$storepolicy					= new \App\Entities\Policy;
@@ -290,17 +290,13 @@ class UIController extends Controller
 		$storepage 						= $storepage->default(true)->get()->toArray();
 		$storepolicy 					= $storepolicy->default(true)->type('expired_paid')->first()->toArray();
 
+		$store['banners']				= $banners;
 		$store['sliders']				= $sliders;
 		$store['info']					= $storeinfo;
 
 		foreach ($storepage as $key => $value) 
 		{
 			$store[$value['type']]		= $value;
-		}
-
-		foreach ($banners as $key => $value) 
-		{
-			$store['banners'][$value['type']]	= $value;
 		}
 
 		$store['info']['expired_paid']	= $storepolicy;

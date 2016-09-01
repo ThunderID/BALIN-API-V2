@@ -280,7 +280,7 @@ class UIController extends Controller
 	public function config($type = null)
 	{
 		$sliders						= new \App\Entities\Slider;
-		$sliders 						= $sliders->ondate('now')->with(['image'])->get()->toArray();
+		$sliders 						= $sliders->ondate(['now', 'now'])->with(['image'])->get()->toArray();
 		$banners						= new \App\Entities\Banner;
 		$banners 						= $banners->default(true)->with(['image'])->get()->toArray();
 		$storeinfo						= new \App\Entities\Store;

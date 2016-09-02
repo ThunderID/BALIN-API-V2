@@ -16,6 +16,7 @@ use App\Services\BalinShippingOrder;
 use App\Services\BalinDeliveredOrder;
 use App\Services\BalinCancelOrder;
 use App\Services\BalinAddToCart;
+use App\Services\ThirdPartyCheckout;
 /**
  * Handle Protected Resource of Sale
  * 
@@ -23,7 +24,7 @@ use App\Services\BalinAddToCart;
  */
 class SaleController extends Controller
 {
-	public function __construct(Request $request, BalinCheckout $balincheckout, BankTransferHandlingPayment $balinpaid, BalinPackingOrder $balinpack, BalinShippingOrder $balinship, BalinDeliveredOrder $balindeliver, BalinCancelOrder $balincancel, BalinAddToCart $balincart)
+	public function __construct(Request $request, BalinCheckout $balincheckout, BankTransferHandlingPayment $balinpaid, BalinPackingOrder $balinpack, BalinShippingOrder $balinship, BalinDeliveredOrder $balindeliver, BalinCancelOrder $balincancel, BalinAddToCart $balincart, ThirdPartyCheckout $thirdparty)
 	{
 		$this->request 				= $request;
 		$this->balincheckout		= $balincheckout;
@@ -33,6 +34,7 @@ class SaleController extends Controller
 		$this->balindeliver			= $balindeliver;
 		$this->balincancel			= $balincancel;
 		$this->balincart			= $balincart;
+		$this->thirdparty			= $thirdparty;
 	}
 
 	/**
@@ -193,7 +195,7 @@ class SaleController extends Controller
 		}
 
 		//1. Validate Sale Parameter
-		$sale                       = Input::get('sale');
+		$sale						= Input::get('sale');
 
 		if(is_null($sale['id']))
 		{
@@ -224,6 +226,34 @@ class SaleController extends Controller
 				$sale_store			= $this->balincart;
 				break;
 		}
+
+		$sale_store->fill($sale);
+
+		if(!$sale_store->save())
+		{
+			return response()->json( JSend::error($sale_store->getError()->toArray())->asArray());
+		}
+
+		return response()->json( JSend::success($sale_store->getData()->toArray())->asArray())
+					->setCallback($this->request->input('callback'));
+	}
+
+	/**
+	 * Store a third party
+	 *
+	 * @return Response
+	 */
+	public function thirdparty()
+	{
+		if(!Input::has('sale'))
+		{
+			return response()->json( JSend::error(['Tidak ada data sale.'])->asArray());
+		}
+
+		//1. Validate Sale Parameter
+		$sale				= Input::get('sale');
+
+		$sale_store			= $this->thirdparty;
 
 		$sale_store->fill($sale);
 

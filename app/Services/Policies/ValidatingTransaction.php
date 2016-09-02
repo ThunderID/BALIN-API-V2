@@ -232,9 +232,12 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'promo_referral'])->ondate('now')->first();
 			// $voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'debit_point'])->ondate('now')->first();
 
-			$this->validatevoucher($voucher);
+			if(!is_null($voucher))
+			{
+				$this->validatevoucher($voucher);
 
-			$this->calculatevoucherdiscount($voucher);
+				$this->calculatevoucherdiscount($voucher);
+			}
 		}
 	}
 

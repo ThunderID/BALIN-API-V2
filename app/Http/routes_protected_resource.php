@@ -220,6 +220,12 @@ $app->group(['middleware' => 'jwt|staff', 'namespace' => 'App\Http\Controllers']
 		]
 	);
 
+	$app->post('/sale/third/party',
+		[
+			'uses'				=> 'SaleController@thirdparty'
+		]
+	);
+
 	// ------------------------------------------------------------------------------------
 	// COURIERS
 	// ------------------------------------------------------------------------------------

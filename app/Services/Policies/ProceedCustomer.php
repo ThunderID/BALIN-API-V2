@@ -29,7 +29,7 @@ class ProceedCustomer implements ProceedCustomerInterface
 
 		$stored_customer->fill($customer);
 
-		if(Hash::needsRehash($stored_customer->password)))
+		if(Hash::needsRehash($stored_customer->password))
 		{
 			$stored_customer->password 	= Hash::make($stored_customer->password);
 		}

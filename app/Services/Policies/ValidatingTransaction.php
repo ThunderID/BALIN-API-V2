@@ -30,7 +30,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	protected $pointdiscount = 0;
 	protected $paymentamount = 0;
 	protected $uniquenumber = 0;
-	protected $voucher = null;
+	public $voucher = null;
 
 	/**
 	 * construct function, iniate error

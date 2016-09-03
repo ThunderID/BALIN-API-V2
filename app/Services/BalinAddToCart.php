@@ -182,7 +182,7 @@ class BalinAddToCart implements AddToCartInterface
 		//------- Area of store entry promo referral -------//
 		
 		//15. reduce and add point if voucher -eq promo referral
-		if(!$this->pro->sale->voucher()->count() && isset($this->sale['voucher']['code']))
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher == 'promo_referral')
 		{
 			$promo_referral 		= Voucher::code($this->sale['voucher']['code'])->type('promo_referral')->first();
 			

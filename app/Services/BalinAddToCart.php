@@ -133,7 +133,7 @@ class BalinAddToCart implements AddToCartInterface
 		//------- Area of validating entry promo referral -------//
 
 		//7. Get referral code
-		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']))
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher == 'promo_referral')
 		{
 			$this->pre_voucher->validatedownline($customer); 
 

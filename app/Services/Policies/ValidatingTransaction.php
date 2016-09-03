@@ -30,6 +30,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	protected $pointdiscount = 0;
 	protected $paymentamount = 0;
 	protected $uniquenumber = 0;
+	protected $voucher = null;
 
 	/**
 	 * construct function, iniate error
@@ -229,7 +230,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 	{
 		if(isset($voucher['code']))
 		{
-			$voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'promo_referral'])->ondate('now')->first();
+			$voucher 			= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'promo_referral'])->ondate('now')->first();
 			// $voucher 		= Voucher::code($voucher['code'])->type(['free_shipping_cost', 'debit_point'])->ondate('now')->first();
 
 			if(!is_null($voucher))
@@ -237,6 +238,8 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 				$this->validatevoucher($voucher);
 
 				$this->calculatevoucherdiscount($voucher);
+
+				$this->voucher = $voucher;
 			}
 		}
 	}

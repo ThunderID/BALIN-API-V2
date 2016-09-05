@@ -241,6 +241,8 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 				$this->voucher = $voucher;
 			}
+		
+			$this->errors->add('Voucher', 'Voucher tidak valid');
 		}
 	}
 

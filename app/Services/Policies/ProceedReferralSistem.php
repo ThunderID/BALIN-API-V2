@@ -149,8 +149,8 @@ class ProceedReferralSistem implements ProceedReferralSistemInterface
 
 		$point					=   [
 										'user_id'			=> $customer['id'],
-										'reference_id'		=> 1,
-										'reference_type'	=> 'App\Entities\Admin',
+										'reference_id'		=> $voucher['id'],
+										'reference_type'	=> get_class($voucher),
 										'expired_at'		=> $expired_at->format('Y-m-d H:i:s'),
 										'amount'			=> $voucher->value,
 										'notes'				=> 'Direferensikan '.$voucher['user']['name'],

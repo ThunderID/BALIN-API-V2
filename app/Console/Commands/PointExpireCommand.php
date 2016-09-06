@@ -107,6 +107,15 @@ class PointExpireCommand extends Command {
 
 			//1b. Get slugs
 			$slugs                      = [];
+			if($point['user']['gender'] == 'male')
+			{
+				$slugs[]				= 'pria';
+			}
+			else
+			{
+				$slugs[]				= 'wanita';
+			}
+			
 			$purchased_prods            = [];
 			$purchased_varians          = [];
 			foreach ($stat as $key => $value) 

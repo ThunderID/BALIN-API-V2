@@ -143,6 +143,11 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 
 	public function validatestock(Varian $varian, $quantity)
 	{
+		if($quantity < 1)
+		{
+			$this->errors->add('Stock', 'Minimal jumlah item adalah 1');
+		}
+
 		if($varian->current_stock < $quantity)
 		{
 			$this->errors->add('Stock', 'Stok '.$varian->product->name.' Ukuran '.$varian['size'].' tinggal '.$varian->current_stock);

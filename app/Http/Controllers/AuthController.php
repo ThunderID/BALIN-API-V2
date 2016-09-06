@@ -64,14 +64,26 @@ class AuthController extends Controller
 											'role'			=> 'customer',
 										];
 
-			$customer_store 		= $this->register;
-			
+			if(isset($sso_data['reference_code']))
+			{
+				$customer['reference_code']		= $sso_data['reference_code'];
+				$customer['invitation_link']	= $sso_data['invitation_link'];
+
+				$customer_store 				= $this->regist_by_invite;
+			}
+			else
+			{
+				$customer_store 				= $this->register;
+			}
+
 			$customer_store->fill($customer);
 
 			if(!$customer_store->save())
 			{
 				return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
 			}
+
+			if(isset($sso_data['']))
 
 			$user					= $customer_store->getData();
 		}

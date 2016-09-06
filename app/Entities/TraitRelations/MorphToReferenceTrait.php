@@ -44,6 +44,11 @@ trait MorphToReferenceTrait
 	 **/
     public function scopeReferenceType($query, $variable)
     {
+    	if(is_array($variable))
+    	{
+			return $query->whereIn('reference_type', $variable);
+    	}
+
 		return $query->where('reference_type', $variable);
     }
 

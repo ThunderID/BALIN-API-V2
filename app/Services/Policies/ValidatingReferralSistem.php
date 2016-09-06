@@ -53,7 +53,7 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 			$this->errors->add('Referral', 'Tidak dapat menggunakan referral Anda');
 		}
 
-		$downline 			 	= PointLog::userid($exists_ref['user_id'])->referenceid($customer['id'])->first();
+		$downline 			 	= PointLog::userid($exists_ref['user_id'])->referencetype(['App\Models\User', 'App\Entities\User', 'App\Entities\Customer', 'App\Entities\Admin'])->referenceid($customer['id'])->first();
 
 		if(!is_null($downline['id']))
 		{

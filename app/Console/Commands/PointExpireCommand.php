@@ -111,7 +111,7 @@ class PointExpireCommand extends Command {
 			$purchased_varians          = [];
 			foreach ($stat as $key => $value) 
 			{
-				$slugs[]                = \App\Entities\Cluster::find($value['statable_id'])['slug'];
+				$slugs[]                = \App\Entities\CategoryCluster::find($value['statable_id'])['slug'];
 			}
 
 			$purchased                  = \App\Entities\TransactionDetail::TransactionSellOn(['paid', 'packed', 'shipping', 'delivered'])->where('transactions.user_id', $point['user_id'])->groupby('varian_id')->with(['varian', 'varian.product', 'varian.product.clusters'])->get()->toArray();

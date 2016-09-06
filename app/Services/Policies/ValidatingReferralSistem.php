@@ -55,7 +55,7 @@ class ValidatingReferralSistem implements ValidatingReferralSistemInterface
 
 		$downline 			 	= PointLog::userid($exists_ref['user_id'])->referenceid($customer['id'])->first();
 
-		if($downline)
+		if(!is_null($downline['id']))
 		{
 			$this->errors->add('Customer', 'Tidak dapat menggunakan referral code downline Anda');
 		}

@@ -7,7 +7,7 @@
 			<img src="{{ $data['balin']['logo'] }}" style="max-width:200px; text-align:left;">
 		</td>
 		<td class="col-sm-10" valign="top" style="text-align:right;width:40%">
-			<h3>Keranjang Belanja Anda</h3>
+			<h3>Tas Belanja Anda</h3>
 		</td>
 	</tr>
 </table>
@@ -17,9 +17,9 @@
 <table style="width:100%;">
 	<tr>
 		<td class="col-sm-12" style="width:100%; height:50px;text-align:left">
-			<p>Dear Bpk/Ibu <strong>{{$data['cart']['user']['name']}},</strong> </p>
+			<p>Dear @if($data['cart']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['cart']['user']['name']}},</strong> </p>
 			
-			<p>Terima kasih telah mengunjungi toko kami. Keranjang Belanja Anda tanggal <span style="font-weight:bold">@thunder_mail_date_indo($data['cart']['transact_at'])</span> menunggu untuk checkout. Silakan login ke laman <a href="{{$data['balin']['url']}}"> <strong>BALIN.ID</strong></a> untuk checkout keranjang belanja Anda.</p>
+			<p>Terima kasih telah mengunjungi toko kami. Tas Belanja Anda tanggal <span style="font-weight:bold">@thunder_mail_date_indo($data['cart']['transact_at'])</span> menunggu untuk checkout. Silakan login ke laman <a href="{{$data['balin']['url']}}"> <strong>BALIN.ID</strong></a> untuk checkout keranjang belanja Anda.</p>
 		</td>
 	</tr>
 </table>

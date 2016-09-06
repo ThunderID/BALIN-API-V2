@@ -64,7 +64,7 @@
 									}
 								}
 							?>
-							<p>Dear Bpk/Ibu <strong>{{$data['paid']['user']['name']}}, </strong></p>
+							<p>Dear @if($data['paid']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['paid']['user']['name']}}, </strong></p>
 							<p> 
 								Pembayaran untuk pesanan <strong>#{{$data['paid']['ref_number']}}</strong> telah kami terima pada tanggal 
 								@if(count($data['paid']['payment'])) 

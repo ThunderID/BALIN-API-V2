@@ -4,27 +4,27 @@ use Illuminate\Console\Command;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-use App\Entities\PointLog;
+use App\Entities\Sale;
 use App\Entities\Queue;
-use App\Entities\Store;
+use App\Entities\Policy;
 
 use Log, DB, Carbon\Carbon;
 
-class PointExpireQueueCommand extends Command 
+class AbandonedCartQueueCommand extends Command 
 {
 	/**
 	 * The console command name.
 	 *
 	 * @var string
 	 */
-	protected $name = 'point:expirequeue';
+	protected $name = 'cart:abandonedqueue';
 
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Generate queue for point expire.';
+	protected $description = 'Generate queue for abandoned cart.';
 
 	/**
 	 * Create a new command instance.
@@ -57,37 +57,36 @@ class PointExpireQueueCommand extends Command
 	 **/
 	public function generate()
 	{
-		Log::info('Running PointExpireQueue Generator command @'.date('Y-m-d H:i:s'));
+		Log::info('Running AbandonedCartQueue Generator command @'.date('Y-m-d H:i:s'));
 
-		$points 							= PointLog::debit(true)->onactive([Carbon::parse(' + 1 month ')->startOfDay()->format('Y-m-d H:i:s'), Carbon::parse(' + 1 month ')->endOfDay()->format('Y-m-d H:i:s')])->haventgetcut(true)->get();
+		$policies 						= new Policy;
+		$policies 						= $policies->default(true)->get()->toArray();
 
-		if(count($points) > 0)
+		$store 							= [];
+		foreach ($policies as $key => $value2) 
 		{
-			$policies 						= new Store;
-			$policies 						= $policies->default(true)->get()->toArray();
+			$store[$value2['type']]		= $value2['value'];
+		}
 
-			$store 							= [];
-			foreach ($policies as $key => $value2) 
-			{
-				$store[$value2['type']]		= $value2['value'];
-			}
+		$expired_today 					= Sale::TransactionLogChangedAt([Carbon::parse($store['expired_paid'])->startOfDay()->format('Y-m-d H:i:s'), Carbon::parse($store['expired_paid'])->endOfDay()->format('Y-m-d H:i:s')])->status(['cart'])->count();
 
-			$store['action'] 				= $store['url'];
-
+		if($expired_today > 0)
+		{
 			DB::beginTransaction();
 
 			$parameter['store']				= $store;
 			$parameter['template']			= 'balin';
-			$parameter['on']				= Carbon::parse(' + 1 month ')->format('Y-m-d H:i:s');
+			$parameter['start']				= Carbon::parse($store['expired_paid'])->startOfDay()->format('Y-m-d H:i:s');
+			$parameter['end']				= Carbon::parse($store['expired_paid'])->endOfDay()->format('Y-m-d H:i:s');
 
 			$queue 							= new Queue;
 			$queue->fill([
-					'process_name' 			=> 'point:expire',
+					'process_name' 			=> 'cart:abandoned',
 					'parameter' 			=> json_encode($parameter),
-					'total_process' 		=> count($points),
+					'total_process' 		=> $expired_today,
 					'task_per_process' 		=> 1,
 					'process_number' 		=> 0,
-					'total_task' 			=> count($points),
+					'total_task' 			=> $expired_today,
 					'message' 				=> 'Initial Commit',
 			]);
 
@@ -102,8 +101,5 @@ class PointExpireQueueCommand extends Command
 				DB::Commit();
 			}
 		}
-
-		return true;
 	}
-
 }

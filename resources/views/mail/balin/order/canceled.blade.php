@@ -17,7 +17,7 @@
 				<table class="twelve columns">
 					<tr>
 						<td>
-							<p>Dear	Bpk/Ibu <strong>{{$data['canceled']['user']['name']}}, </strong></p>
+							<p>Dear	@if($data['canceled']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['canceled']['user']['name']}}, </strong></p>
 							<p> 
 								Pesanan <strong>#{{$data['canceled']['ref_number']}}</strong> sudah dibatalkan karena belum diterima pembayaran dalam waktu 1x24 jam, atau karena permintaan customer.
 							</p>

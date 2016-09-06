@@ -99,7 +99,7 @@
 <table style="width:100%;">
 	<tr>
 		<td class="col-sm-12" style="width:100%; height:50px;text-align:left">
-			<p>Dear Bpk/Ibu <strong>{{$data['invoice']['user']['name']}},</strong> </p>
+			<p>Dear @if($data['invoice']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['invoice']['user']['name']}},</strong> </p>
 			<p>Terima kasih telah memesan. Pesanan Anda <span style="font-weight:bold">#{!!$data['invoice']['ref_number']!!}</span> menunggu pembayaran. Silakan melakukan pembayaran ke rekening bank yang berada dibawah sebelum <span style="font-weight:bold">@thunder_mail_date_indo($data['invoice']['transact_at'].' '.str_replace('-', '+' , $data['balin']['expired_paid']))</span> atau pesanan Anda akan dibatalkan. Berikut rincian tagihan pesanan Anda.</p>
 		</td>
 	</tr>

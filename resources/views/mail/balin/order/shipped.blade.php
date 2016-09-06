@@ -53,7 +53,7 @@
 				<table class="twelve columns">
 					<tr>
 						<td>
-							<p>Dear	Bpk/Ibu <strong>{{$data['shipped']['user']['name']}}, </strong></p>
+							<p>Dear	@if($data['shipped']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['shipped']['user']['name']}}, </strong></p>
 							<p> 
 								Pesanan <strong>#{{$data['shipped']['ref_number']}}</strong> sedang dalam proses pengiriman dengan nomor resi pengiriman
 								<strong>{{$data['shipped']['shipment']['receipt_number']}}</strong>, menggunakan jasa kurir {{$data['shipped']['shipment']['courier']['name']}}

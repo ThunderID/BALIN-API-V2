@@ -17,7 +17,7 @@
 		<tr>
 			<td width="10%"></td>
 			<td width="80%">
-				<p>Dear Bpk/Ibu <strong>{{$data['user']['name']}},</strong></p>
+				<p>Dear @if($data['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['user']['name']}},</strong></p>
 
 				<p>
 					Klik link <a href="{{$data['balin']['action']}}"> <strong>berikut</strong></a> untuk reset password anda.

@@ -12,7 +12,7 @@
 		<tr>
 			<td width="10%"></td>
 			<td width="80%">
-				<p>Dear Bpk/Ibu <strong>{{$data['point']['user']['name']}},</strong></p>
+				<p>Dear @if($data['point']['user']['gender']=='male') Mr. @else Mrs. @endif <strong>{{$data['point']['user']['name']}},</strong></p>
 
 				<p>
 					Anda Memiliki BALIN Point sebesar @thunder_mail_money_indo($data['point']['amount']) dari total point Anda yang akan expire tanggal {{date('d-m-Y H:i', strtotime($data['point']['expired_at']))}}.

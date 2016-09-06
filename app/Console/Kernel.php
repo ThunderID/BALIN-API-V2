@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
 	 */
 	protected $commands = [
 		'App\Console\Commands\QueueCommand',
+		'App\Console\Commands\AbandonedCartQueueCommand',
+		'App\Console\Commands\AbandonedCartCommand',
 		'App\Console\Commands\PointExpireQueueCommand',
 		'App\Console\Commands\PointExpireCommand',
 		'App\Console\Commands\BroadcastDiscountCommand',
@@ -32,9 +34,13 @@ class Kernel extends ConsoleKernel
 		$schedule->command('run:queue')
 				 ->everyFiveMinutes();
 
-		//running queue (every five minutes)
+		//running queue (every day)
 		$schedule->command('point:expirequeue')
 				 ->dailyAt('06:00');
+
+		//running queue (every day)
+		$schedule->command('cart:abandonedqueue')
+				 ->dailyAt('07:00');
 
 		//running queue (every five minutes)
 		$schedule->command('veritrans:notification')

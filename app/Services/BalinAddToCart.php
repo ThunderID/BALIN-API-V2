@@ -133,7 +133,7 @@ class BalinAddToCart implements AddToCartInterface
 		//------- Area of validating entry promo referral -------//
 
 		//7. Get referral code
-		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher == 'promo_referral')
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher->type == 'promo_referral')
 		{
 			$this->pre_voucher->validatedownline($customer); 
 
@@ -182,7 +182,7 @@ class BalinAddToCart implements AddToCartInterface
 		//------- Area of store entry promo referral -------//
 		
 		//15. reduce and add point if voucher -eq promo referral
-		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher == 'promo_referral')
+		if(!isset($this->sale['voucher']['id']) && isset($this->sale['voucher']['code']) && !is_null($this->pre->voucher) && $this->pre->voucher->type == 'promo_referral')
 		{
 			$promo_referral 		= Voucher::code($this->sale['voucher']['code'])->type('promo_referral')->first();
 			

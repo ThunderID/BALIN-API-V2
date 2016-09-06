@@ -83,8 +83,6 @@ class AuthController extends Controller
 				return response()->json( JSend::error($customer_store->getError()->toArray())->asArray());
 			}
 
-			if(isset($sso_data['']))
-
 			$user					= $customer_store->getData();
 		}
 		else

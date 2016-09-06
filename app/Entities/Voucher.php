@@ -59,7 +59,7 @@ class Voucher extends VoucherCampaign
 	protected $rules				=	[
 											'type'							=> 'in:free_shipping_cost,debit_point,promo_referral',
 											'code'							=> 'max:255|min:8',
-											'value'							=> 'numeric',
+											'value'							=> 'required|numeric',
 											'started_at'					=> 'date_format:"Y-m-d H:i:s"'/*|after:now'*/,
 											'expired_at'					=> 'date_format:"Y-m-d H:i:s"|after:now',
 										];

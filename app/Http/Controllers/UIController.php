@@ -288,7 +288,7 @@ class UIController extends Controller
 		$storepolicy					= new \App\Entities\Policy;
 		$storeinfo 						= $storeinfo->default(true)->get()->toArray();
 		$storepage 						= $storepage->default(true)->get()->toArray();
-		$storepolicy 					= $storepolicy->default(true)->type('expired_paid')->first()->toArray();
+		$storepolicy 					= $storepolicy->default(true)->type('expired_cart')->first()->toArray();
 
 		$store['banners']				= $banners;
 		$store['sliders']				= $sliders;
@@ -299,7 +299,7 @@ class UIController extends Controller
 			$store[$value['type']]		= $value;
 		}
 
-		$store['info']['expired_paid']	= $storepolicy;
+		$store['info']['expired_cart']	= $storepolicy;
 
 		return response()->json( JSend::success($store)->asArray())
 					->setCallback($this->request->input('callback'));

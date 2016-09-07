@@ -17,7 +17,7 @@
 				<p>Selamat, Anda telah terdaftar di <a href="{{$data['balin']['url']}}">Balin.id</a></p>
 
 				<br>
-				<p>Kode Referral Anda: {{$data['user']['referral_code']}}</p>
+				<p>Kode Referral Anda: {{$data['user']['code_referral']}}</p>
 				<p>Balin point Anda: IDR {{$data['user']['total_point']}}</p>
 				<br>
 				<p>Ajaklah teman untuk mendaftar di Balin.id dengan memasukkan kode referral Anda. Teman anda akan mendapatkan Balin Point sebesar IDR. 50.000 dan anda akan mendapatkan Balin Point sebesar IDR. 10.000.</p>

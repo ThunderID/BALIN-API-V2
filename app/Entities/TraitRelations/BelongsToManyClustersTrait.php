@@ -131,4 +131,17 @@ trait BelongsToManyClustersTrait
 
 		return $query->whereHas('tags', function($q)use($variable){$q->slug($variable);});
 	}
+
+
+	/**
+	 * check if model has tag in certain slug
+	 *
+	 * @var array or singular slug
+	 **/
+	public function scopeTagsSlugOrVersion($query, $variable)
+	{
+		$query = $query->whereHas('tags', function($q)use($variable){$q->slug($variable);});
+
+		return $query;
+	}
 }

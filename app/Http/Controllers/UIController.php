@@ -75,7 +75,7 @@ class UIController extends Controller
 						$data['type']           = 'category';
 						break;
 					case 'tags':
-						$result     = $result->tagsslug($value);
+						$result     = $result->tagsslugorversion($value);
 
 						if(!is_null($payload['context']['id']))
 						{

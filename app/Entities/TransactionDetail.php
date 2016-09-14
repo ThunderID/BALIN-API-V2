@@ -9,6 +9,8 @@ use App\Entities\TraitLibraries\JoinTransactionTrait;
 use App\Entities\TraitRelations\BelongsToVarianTrait;
 use App\Entities\TraitRelations\BelongsToTransactionTrait;
 
+use DB;
+
 class TransactionDetail extends BaseModel
 {
 	/**
@@ -100,6 +102,26 @@ class TransactionDetail extends BaseModel
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
 
 	/**
+	 * scope to check stock movement of varian on certain time
+	 *
+	 * @return stock in, stock out, varian_id, transact_at
+	 */	
+	public function scopeStockMovement($query, $variable)
+	{
+		return 	$query
+					->selectraw('transaction_details.varian_id')
+					->selectraw('transactions.ref_number as ref')
+					->selectraw('transactions.transact_at')
+					->selectraw('sum(if(transactions.type = "buy", quantity, 0)) as stock_in')
+					->selectraw('sum(if(transactions.type = "sell", quantity, 0)) as stock_out')
+					->JoinTransactionFromTransactionDetail(true)->JoinTransactionLogFromTransactionOnStatus(['paid', 'packed', 'shipping', 'delivered'])->transactiontype(['sell', 'buy'])
+					->groupby('transactions.id')
+					->orderByRaw(DB::raw('varian_id asc, transactions.transact_at asc'))
+					;
+		;
+	}
+
+	/**
 	 * scope to check critical stock that below margin (current_stock)
 	 *
 	 * @param treshold
@@ -109,7 +131,7 @@ class TransactionDetail extends BaseModel
 		return 	$query
 				->selectraw('transaction_details.*')
 				// ->selectcurrentstock(true)
-				->TransactionStockOn(['wait', 'veritrans_processing_payment', 'paid', 'packed', 'shipping', 'delivered'])
+				->JoinTransactionFromTransactionDetail(true)->JoinTransactionLogFromTransactionOnStatus(['wait', 'veritrans_processing_payment', 'paid', 'packed', 'shipping', 'delivered'])->transactiontype(['sell', 'buy'])
 				->HavingCurrentStock($variable)
 				// ->orderby('current_stock', 'asc')
 				->groupBy('varian_id')

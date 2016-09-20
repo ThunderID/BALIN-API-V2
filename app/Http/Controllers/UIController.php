@@ -37,7 +37,11 @@ class UIController extends Controller
 	 */
 	public function products()
 	{
-        $payload                    = $this->jwtPayload();
+       	\Log::info('Require Catalog Start');
+
+    	$time_start = microtime(true); 
+
+		$payload                    = $this->jwtPayload();
 
 		$result                     = new \App\Entities\Product;
 
@@ -146,7 +150,12 @@ class UIController extends Controller
 		}
 
 		$result                     = $result->with(['varians', 'images', 'labels', 'categories'])->get();
+	
+		$time_end 					= microtime(true); 
+		$execution_time 			= ($time_end - $time_start)/60;
 
+		\Log::info('Require Catalog End '.$execution_time);
+    
 		return response()->json( JSend::success(['count' => $count, 'data' => $result->toArray()])->asArray())
 					->setCallback($this->request->input('callback'));
 	}

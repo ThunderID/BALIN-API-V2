@@ -95,7 +95,7 @@ class BalinAddToCart implements AddToCartInterface
 		$this->pre->validatebuyer($customer); 
 
 		//3. Validate Stock, Price, Calculate Price main product
-		$this->pre->validatesaleitem($this->sale['transactiondetails']); 
+		$this->pre->validatesaleitem(isset($this->sale['transactiondetails']) ? $this->sale['transactiondetails'] : null); 
 
 		//4. Generate unique number
 		if($pre_sale)
@@ -165,7 +165,7 @@ class BalinAddToCart implements AddToCartInterface
 		$this->pro->store($this->sale); 
 		
 		//12. Store sale item
-		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
+		$this->pro->storesaleitem($this->pro->sale, isset($this->sale['transactiondetails']) ? $this->sale['transactiondetails'] : null); 
 
 		//13. Store packing ornament
 		if(isset($this->sale['transactionextensions']))

@@ -89,7 +89,7 @@ class BalinCheckout implements CheckoutInterface
 		$this->pre->validatebuyer($customer); 
 
 		//3. Validate Stock, Price, Calculate Price main product
-		$this->pre->validatesaleitem($this->sale['transactiondetails']); 
+		$this->pre->validatesaleitem(isset($this->sale['transactiondetails']) ? $this->sale['transactiondetails'] : null); 
 
 		//4. Validate Stock, Calculate Price of packing ornament
 		if(isset($this->sale['transactionextensions']))
@@ -154,7 +154,7 @@ class BalinCheckout implements CheckoutInterface
 		$this->pro->store($this->sale); 
 		
 		//15. Store sale item
-		$this->pro->storesaleitem($this->pro->sale, $this->sale['transactiondetails']); 
+		$this->pro->storesaleitem($this->pro->sale, isset($this->sale['transactiondetails']) ? $this->sale['transactiondetails'] : null); 
 
 		//16. Store packing ornament
 		if(isset($this->sale['transactionextensions']))

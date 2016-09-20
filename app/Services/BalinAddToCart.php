@@ -95,7 +95,10 @@ class BalinAddToCart implements AddToCartInterface
 		$this->pre->validatebuyer($customer); 
 
 		//3. Validate Stock, Price, Calculate Price main product
-		$this->pre->validatesaleitem(isset($this->sale['transactiondetails']) ? $this->sale['transactiondetails'] : []); 
+		if(isset($this->sale['transactiondetails']))
+		{
+			$this->pre->validatesaleitem($this->sale['transactiondetails']); 
+		}
 
 		//4. Generate unique number
 		if($pre_sale)

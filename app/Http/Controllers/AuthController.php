@@ -249,6 +249,10 @@ class AuthController extends Controller
 
 	public function createToken(JwtToken $jwt)
     {
+    	\Log::info('Require Access Token Start');
+
+    	$time_start = microtime(true); 
+
 		if(Input::has('email'))
 		{
 			$check						= Auth::attempt(['email' => Input::get('email'), 'password' => Input::get('password')]);
@@ -275,7 +279,12 @@ class AuthController extends Controller
 		$issue['token']['token']		= $token;
 		$issue['me']					= $user->toArray();
 		
-		return response()->json( JSend::success($issue)->asArray())
+    	$time_end = microtime(true); 
+		$execution_time = ($time_end - $time_start)/60;
+
+		\Log::info('Require Access Token End '.$execution_time);
+    	
+    	return response()->json( JSend::success($issue)->asArray())
 					->setCallback($this->request->input('callback'));
     }
 

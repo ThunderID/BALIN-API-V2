@@ -63,6 +63,8 @@ class ProceedTransaction implements ProceedTransactionInterface
 
 	public function storesaleitem(Sale $sale, array $transaction_details)
 	{
+		$ids 				= [];
+
 		foreach ($transaction_details as $key => $value) 
 		{
 			$tdetail 	= TransactionDetail::transactionid($sale->id)->varianid($value['varian_id'])->first();
@@ -83,11 +85,27 @@ class ProceedTransaction implements ProceedTransactionInterface
 			{
 				$this->errors->add('Sale', $tdetail->getError());
 			}
+			else
+			{
+				$ids[]	= $tdetail['id'];
+			}
+		}
+
+		$deletes 		= TransactionDetail::transactionid($sale->id)->notid($ids)->get();
+
+		foreach ($deletes as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Sale', $value->getError());
+			}
 		}
 	}
 
 	public function storepurchaseitem(Purchase $purchase, array $transaction_details)
 	{
+		$ids 				= [];
+
 		foreach ($transaction_details as $key => $value) 
 		{
 			$tdetail 	= TransactionDetail::transactionid($purchase->id)->varianid($value['varian_id'])->first();
@@ -107,6 +125,20 @@ class ProceedTransaction implements ProceedTransactionInterface
 			if(!$tdetail->save())
 			{
 				$this->errors->add('Purchase', $tdetail->getError());
+			}
+			else
+			{
+				$ids[]	= $tdetail['id'];
+			}
+		}
+
+		$deletes 		= TransactionDetail::transactionid($purchase->id)->notid($ids)->get();
+
+		foreach ($deletes as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Sale', $value->getError());
 			}
 		}
 	}

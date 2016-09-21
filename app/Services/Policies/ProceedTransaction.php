@@ -145,6 +145,8 @@ class ProceedTransaction implements ProceedTransactionInterface
 
 	public function storepackingornament(Sale $sale, array $transaction_extensions)
 	{
+		$ids 				= [];
+
 		foreach ($transaction_extensions as $key => $value) 
 		{
 			$textension 	= TransactionExtension::transactionid($sale->id)->productextensionid($value['product_extension_id'])->first();
@@ -164,6 +166,20 @@ class ProceedTransaction implements ProceedTransactionInterface
 			if(!$textension->save())
 			{
 				$this->errors->add('Sale', $textension->getError());
+			}
+			else
+			{
+				$ids[]		= $textension['id'];
+			}
+		}
+
+		$deletes 			= TransactionExtension::transactionid($sale->id)->notid($ids)->get();
+
+		foreach ($deletes as $key => $value) 
+		{
+			if(!$value->delete())
+			{
+				$this->errors->add('Sale', $value->getError());
 			}
 		}
 	}

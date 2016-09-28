@@ -10,6 +10,8 @@ use App\Entities\Image;
 
 use App\Contracts\Policies\ProceedProductInterface;
 
+use Carbon\Carbon;
+
 use Illuminate\Support\MessageBag;
 
 class ProceedProduct implements ProceedProductInterface
@@ -140,10 +142,14 @@ class ProceedProduct implements ProceedProductInterface
 
 		foreach ($label as $key => $value) 
 		{
-
 			$stored_label				= ProductLabel::findornew($value['id']);
 			$stored_label->product_id 	= $product->id;
 			
+			if($value['ended_at']=='-0001-11-30 00:00:00')
+			{
+				unset($value['ended_at']);
+			}
+
 			$stored_label->fill($value);
 
 			if(!$stored_label->save())

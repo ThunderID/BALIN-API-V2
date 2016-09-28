@@ -266,7 +266,7 @@ class AuthController extends Controller
 				}
 				else
 				{
-					return response()->json( JSend::error(['User tidak ada'])->asArray());
+					return response()->json( JSend::error(['Email / Password Tidak Valid'])->asArray());
 				}
 			}
 		}

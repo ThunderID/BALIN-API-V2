@@ -55,6 +55,6 @@ trait HasManyPricesTrait
 	 **/
 	public function scopeDiscount($query, $variable)
 	{
-		return $query->where('promo_price', '>', '0');
+		return $query->where('prices.promo_price', '>', '0');
 	}
 }

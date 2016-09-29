@@ -48,7 +48,14 @@ class Veritrans_Config {
    */
   public static function getBaseUrl()
   {
-    return Veritrans_Config::$isProduction ?
-        Veritrans_Config::PRODUCTION_BASE_URL : Veritrans_Config::SANDBOX_BASE_URL;
+    if(str_is(env('APP_ENV','prod'),'prod'))
+    {
+      return Veritrans_Config::PRODUCTION_BASE_URL;
+    }
+
+    return Veritrans_Config::SANDBOX_BASE_URL;
+    
+    // return Veritrans_Config::$isProduction ?
+    //     Veritrans_Config::PRODUCTION_BASE_URL : Veritrans_Config::SANDBOX_BASE_URL;
   }
 }

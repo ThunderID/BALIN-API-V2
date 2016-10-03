@@ -201,7 +201,7 @@ trait JoinTransactionTrait
 	{
 		if(!is_array($variable))
 		{
-			return $query->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable)))->orderBy('changed_at', 'desc');
+			return $query->where('changed_at', '<=', date('Y-m-d H:i:s', strtotime($variable)));
 		}
 		else
 		{

@@ -15,6 +15,8 @@ use App\Entities\Supplier;
 use App\Entities\Voucher;
 use App\Entities\StoreSetting;
 
+use Carbon\Carbon;
+
 use App\Contracts\Policies\ValidatingTransactionInterface;
 
 use Illuminate\Support\MessageBag;
@@ -51,7 +53,7 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 			{
 				//do cancel
 				$transaction_log 	= new TransactionLog;
-				$transaction_log	= $transaction_log->fill(['status' => 'abandoned', 'transaction_id' => $value['id']]);
+				$transaction_log	= $transaction_log->fill(['status' => 'abandoned', 'transaction_id' => $value['id'], 'changed_at' => Carbon::now()->format('Y-m-d H:i:s')]);
 
 				if(!$transaction_log->save())
 				{

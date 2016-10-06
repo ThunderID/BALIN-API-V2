@@ -86,10 +86,19 @@ class BalinAddToCart implements AddToCartInterface
 		$customer 						= Customer::findorfail($this->sale['user_id']);
 		$pre_sale 						= Sale::id($this->sale['id'])->first();
 	
+		if($pre_sale)
+		{
+			$sale_id 					= $pre_sale->id;
+		}
+		else
+		{
+			$sale_id 					= 0;
+		}
+
 		/** PREPROCESS */
 
 		//1. Validate Previous Transaction
-		$this->pre->validateprevioustransaction($pre_sale, $customer); 
+		$this->pre->validateprevioustransaction($sale_id, $customer); 
 
 		//2. Validate Buyer
 		$this->pre->validatebuyer($customer); 

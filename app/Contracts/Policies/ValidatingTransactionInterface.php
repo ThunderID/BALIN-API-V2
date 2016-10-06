@@ -15,7 +15,7 @@ use App\Entities\Supplier;
 
 interface ValidatingTransactionInterface
 {
-	public function validateprevioustransaction(Sale $sale, User $user);
+	public function validateprevioustransaction($sale_id, User $user);
 	public function validatebuyer(User $user);
 	public function validatesupplier(Supplier $supplier);
 	public function validatecheckoutstatus(Sale $sale);

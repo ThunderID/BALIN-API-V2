@@ -187,7 +187,9 @@ class UIController extends Controller
 					case 'name':
 						$result     = $result->name($value);
 						break;
-					
+					case 'categories':
+						$result     = $result->ProductCategoriesSlug($value);
+						break;
 					default:
 						# code...
 						break;

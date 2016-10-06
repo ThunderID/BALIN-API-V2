@@ -19,6 +19,7 @@ trait BelongsToManyProductsTrait
 	{
 		//
 	}
+
 	/**
 	 * call belongsto many relationship products
 	 *
@@ -27,4 +28,15 @@ trait BelongsToManyProductsTrait
 	{
 		return $this->belongsToMany('App\Entities\Product', 'categories_products', 'category_id');
 	}
+
+	/**
+	 * check if model has category in certain slug
+	 *
+	 * @var array or singular slug
+	 **/
+	public function scopeProductCategoriesSlug($query, $variable)
+	{
+		return $query->whereHas('products', function($q)use($variable){$q;});
+	}
+
 }

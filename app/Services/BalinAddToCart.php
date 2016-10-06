@@ -89,7 +89,7 @@ class BalinAddToCart implements AddToCartInterface
 		/** PREPROCESS */
 
 		//1. Validate Previous Transaction
-		$this->pre->validateprevioustransaction($customer); 
+		$this->pre->validateprevioustransaction($pre_sale, $customer); 
 
 		//2. Validate Buyer
 		$this->pre->validatebuyer($customer); 

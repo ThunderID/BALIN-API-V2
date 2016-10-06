@@ -43,9 +43,18 @@ class ValidatingTransaction implements ValidatingTransactionInterface
 		$this->errors 	= new MessageBag;
 	}
 
-	public function validateprevioustransaction(User $user)
+	public function validateprevioustransaction(Sale $sale, User $user)
 	{
-		$prev_sale 					= Sale::status(['cart', 'na'])->userid($user->id)->get();
+		if($sale)
+		{
+			$sale_id 				= $sale->id;
+		}
+		else
+		{
+			$sale_id 				= 0;
+		}
+
+		$prev_sale 					= Sale::status(['cart', 'na'])->userid($user->id)->notid($sale_id)->get();
 
 		if($prev_sale->count())
 		{

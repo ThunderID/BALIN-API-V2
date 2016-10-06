@@ -7,6 +7,7 @@ use App\Entities\Varian;
 use App\Entities\Price;
 use App\Entities\ProductLabel;
 use App\Entities\Image;
+use App\Entities\CategoryCluster;
 
 use App\Contracts\Policies\ProceedProductInterface;
 
@@ -183,12 +184,29 @@ class ProceedProduct implements ProceedProductInterface
 		foreach ($cluster as $key => $value) 
 		{
 			$cluster_current_ids[]		= $value['id'];
+
+			$replay						= $this->checkparent(CategoryCluster::find($value['id']));
+
+			$cluster_current_ids 		= array_merge($replay, $cluster_current_ids);
 		}
 
 		if(!$product->clusters()->sync($cluster_current_ids))
 		{
 			$this->errors->add('Product', 'Tag/Kategori produk tidak tersimpan.');
 		}
+	}
+
+	public function checkparent($cluster)
+	{
+		$ids 		= [];
+
+		if($cluster->category_id > 0)
+		{
+			$ids 	= $this->checkparent(CategoryCluster::find($cluster->category_id));
+		}
+
+		return array_merge($ids, [$cluster->id]);
+
 	}
 
 	public function storeimage(Product $product, array $image)

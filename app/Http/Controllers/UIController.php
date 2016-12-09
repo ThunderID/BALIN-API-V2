@@ -37,7 +37,7 @@ class UIController extends Controller
 	 */
 	public function products()
 	{
-       	\Log::info('Require Catalog Start');
+       	\Log::info('Require Catalog Start, require : '.json_encode(Input::get('search')));
 
     	$time_start = microtime(true); 
 

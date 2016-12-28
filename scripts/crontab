@@ -1,3 +1,5 @@
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/5 * * * * root /usr/bin/php -q -f /var/www/html/artisan schedule:run 1>> /var/log/cron.log 2>&1
+*/5 * * * * /usr/bin/php -q -f /var/www/html/artisan schedule:run 1>> /var/log/cron.log 2>&1
+
+#* * * * * echo "Hello world" >> /var/log/cron.log 2>&1

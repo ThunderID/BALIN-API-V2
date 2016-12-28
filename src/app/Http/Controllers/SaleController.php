@@ -105,6 +105,9 @@ class SaleController extends Controller
 					case 'refnumber':
 						$result 	= $result->refnumber($value);
 						break;
+					case 'notissuer':
+						$result 	= $result->NotIssuer($value);
+						break;
 					default:
 						# code...
 						break;

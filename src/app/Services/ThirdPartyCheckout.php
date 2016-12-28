@@ -101,10 +101,10 @@ class ThirdPartyCheckout implements CheckoutInterface
 		$this->sale['unique_number']	= 0; 
 
 		//7. set transact_at
-		$this->sale['transact_at'] 		= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
+		// $this->sale['transact_at'] 		= \Carbon\Carbon::now()->format('Y-m-d H:i:s');
 
 		//8. set total payment
-		$this->sale['payment']['amount']= $this->pre->getsubtotal();
+		// $this->sale['payment']['amount']= $this->pre->getsubtotal();
 
 		\DB::BeginTransaction();
 

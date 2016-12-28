@@ -95,6 +95,7 @@ class Sale extends Transaction
 											'unique_number'					,
 											'shipping_cost'					,
 											'voucher_discount'				,
+											'issuer'						,
 										];
 	/**
 	 * Basic rule of database

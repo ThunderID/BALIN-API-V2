@@ -11,6 +11,11 @@
 |
 */
 
+$app->get('/', function () use ($app) 
+{
+    return $app->version();
+});
+
 /**
 * Routes Authorized used only for authorized
 */

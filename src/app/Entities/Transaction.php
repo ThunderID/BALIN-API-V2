@@ -49,4 +49,24 @@ class Transaction extends BaseModel
 	}
 
 	/* ---------------------------------------------------------------------------- SCOPES ----------------------------------------------------------------------------*/
+
+	/**
+	 * scope search based on not issuer (pk)
+	 *
+	 * @param string or array of issuer
+	 */	
+	public function scopeNotIssuer($query, $variable)
+	{
+		if(is_array($variable))
+		{
+			return 	$query->whereNotIn($query->getModel()->table.'.issuer', $variable);
+		}
+
+		if(is_null($variable))
+		{
+			return $query;
+		}
+
+		return 	$query->where($query->getModel()->table.'.issuer', '<>', $variable);
+	}
 }

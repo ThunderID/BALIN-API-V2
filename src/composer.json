@@ -11,7 +11,8 @@
         "vlucas/phpdotenv": "~1.0",
         "guzzlehttp/guzzle": "~5.3|~6.0",
         "generationtux/jwt-artisan": "^0.1.8",
-        "s-ichikawa/laravel-sendgrid-driver": "dev-master"
+        "s-ichikawa/laravel-sendgrid-driver": "dev-master",
+        "doctrine/dbal": "^2.5"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",

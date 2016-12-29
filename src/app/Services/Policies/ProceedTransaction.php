@@ -37,7 +37,13 @@ class ProceedTransaction implements ProceedTransactionInterface
 	public function store(array $sale)
 	{
 		$stored_sale	= Sale::findornew($sale['id']);
+
 		$stored_sale->fill($sale);
+
+		if(is_null($stored_sale->issuer))
+		{
+			$stored_sale->issuer 	= 'balin.web';
+		}
 
 		if(!$stored_sale->save())
 		{

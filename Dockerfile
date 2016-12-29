@@ -57,8 +57,9 @@ RUN echo @testing http://nl.alpinelinux.org/alpine/edge/testing >> /etc/apk/repo
     mkdir -p /var/www/app && \
     mkdir -p /run/nginx && \
     mkdir -p /var/log/supervisor &&\
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    pip install --upgrade pip && \
+    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer && \
+    pip install -U pip && \
+    pip install -U setuptools && \
     pip install -U certbot && \
     mkdir -p /etc/letsencrypt/webrootauth && \
     apk del gcc musl-dev linux-headers libffi-dev augeas-dev python-dev

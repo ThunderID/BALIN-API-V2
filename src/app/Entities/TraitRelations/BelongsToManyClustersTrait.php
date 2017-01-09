@@ -140,6 +140,31 @@ trait BelongsToManyClustersTrait
 	 **/
 	public function scopeTagsSlugOrVersion($query, $variable)
 	{
+		if(is_array($variable))
+		{
+			$new_var 			= [];
+			foreach ($variable as $key => $value) 
+			{
+				$explodes 		= explode('-', $value);
+
+				if(isset($new_var[$explodes[0]]))
+				{
+					$new_var[$explodes[0]]	= array_merge($new_var[$explodes[0]], [$value]);
+				}
+				else
+				{
+					$new_var[$explodes[0]]	= [$value];
+				}
+			}
+
+			foreach ($new_var as $key => $value) 
+			{
+				$query 			= $query->whereHas('tags', function($q)use($value){$q->slug($value);});
+			}
+			
+			return $query;
+		}
+		
 		$query = $query->whereHas('tags', function($q)use($variable){$q->slug($variable);});
 
 		return $query;
